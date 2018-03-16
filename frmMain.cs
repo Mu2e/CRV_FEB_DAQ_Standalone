@@ -2959,6 +2959,7 @@ namespace TB_mu2e
                 Mu2e_Register.WriteReg(0x0, ref trigControlReg, ref PP.FEB1.client); //Disable the on-board test pulser
                 Mu2e_Register.WriteReg(0x0, ref testPulseFreqReg, ref PP.FEB1.client); //Set the on-board test pulser's frequency to 0
 
+
                 //Turn off bias for SiPMs
                 for (uint fpga = 0; fpga < 4; fpga++)
                     PP.FEB1.SetV(0.0, (int)fpga);
