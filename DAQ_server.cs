@@ -91,8 +91,10 @@ namespace TB_mu2e
                     delimeter[9] = " ";
                     Stream s = new NetworkStream(soc);
                     StreamReader sr = new StreamReader(s);
-                    StreamWriter sw = new StreamWriter(s);
-                    sw.AutoFlush = true; // enable automatic flushing
+                    StreamWriter sw = new StreamWriter(s)
+                    {
+                        AutoFlush = true // enable automatic flushing
+                    };
                     string RCcmd = "";
                     sw.WriteLine("Hello NIU!");
                     while (RCcmd != "quit")

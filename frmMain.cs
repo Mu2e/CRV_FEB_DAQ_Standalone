@@ -44,8 +44,6 @@ namespace TB_mu2e
         private const int num_chans = 16;
         private System.Windows.Forms.Label[] BDVoltLabels = new System.Windows.Forms.Label[num_chans];
 
-        private SerialPort comPort;
-
         public void AddConsoleMessage(string mess)
         {
             console_label.add_messg(mess);
@@ -343,7 +341,7 @@ namespace TB_mu2e
                 }
                 catch
                 {
-                    string m = "Exception caught. Do yu have a module selected?";
+                    string m = "Exception caught. Do you have a module selected?";
                     lblConsole_disp.Text = m;
                     Application.DoEvents();
                 }
@@ -363,13 +361,13 @@ namespace TB_mu2e
                 else
                 { MessageBox.Show("No FEB active"); return; }
 
-                myFEB.checkFEB_connection();
+                myFEB.CheckFEB_connection();
 
                 ushort fpga_num = Convert.ToUInt16(udFPGA.Value);
                 for (int j = 0; j < num_reg; j++)
                 {
-                    Mu2e_Register.FindName(rnames[j], ref myFEB.arrReg, out Mu2e_Register r1);
-                    r1.fpga_index = fpga_num;
+                    Mu2e_Register.FindName(rnames[j], fpga_num, ref myFEB.arrReg, out Mu2e_Register r1);
+                    //r1.fpga_index = fpga_num;
                     Mu2e_Register.ReadReg(ref r1, ref myFEB.client);
                     if (!r1.pref_hex)
                     { txtREGISTERS[j].Text = r1.val.ToString(); }
@@ -398,8 +396,8 @@ namespace TB_mu2e
                 ushort fpga_num = Convert.ToUInt16(udFPGA.Value);
                 for (int j = 0; j < num_reg; j++)
                 {
-                    Mu2e_Register.FindName(rnames[j], ref myFEB.arrReg, out Mu2e_Register r1);
-                    r1.fpga_index = fpga_num;
+                    Mu2e_Register.FindName(rnames[j], fpga_num, ref myFEB.arrReg, out Mu2e_Register r1);
+                    //r1.fpga_index = fpga_num;
                     if (txtREGISTERS[j].Text.Contains("x"))
                     {
                         try
@@ -461,8 +459,8 @@ namespace TB_mu2e
                 ushort fpga_num = Convert.ToUInt16(udFPGA.Value);
                 for (int j = 0; j < num_spill_reg; j++)
                 {
-                    Mu2e_Register.FindName(rnames[j], ref myFEB.arrReg, out Mu2e_Register r1);
-                    r1.fpga_index = fpga_num;
+                    Mu2e_Register.FindName(rnames[j], fpga_num, ref myFEB.arrReg, out Mu2e_Register r1);
+                    //r1.fpga_index = fpga_num;
                     Mu2e_Register.ReadReg(ref r1, ref myFEB.client);
                     if (!r1.pref_hex)
                     { txtSPILL[j].Text = r1.val.ToString(); }
@@ -487,8 +485,8 @@ namespace TB_mu2e
                 ushort fpga_num = Convert.ToUInt16(udFPGA.Value);
                 for (int j = 0; j < num_spill_reg; j++)
                 {
-                    Mu2e_Register.FindName(rnames[j], ref myFEB.arrReg, out Mu2e_Register r1);
-                    r1.fpga_index = fpga_num;
+                    Mu2e_Register.FindName(rnames[j], fpga_num, ref myFEB.arrReg, out Mu2e_Register r1);
+                    //r1.fpga_index = fpga_num;
                     if (txtSPILL[j].Text.Contains("x"))
                     {
                         try
@@ -1047,7 +1045,7 @@ namespace TB_mu2e
             s[5, 2] = "ONE_WIRE_CONTROL";
             s[5, 3] = "ONE_WIRE_READ0";
             s[5, 4] = "ONE_WIRE_READ1";
-            s[5, 5] = "ONE_WIRE_REA2";
+            s[5, 5] = "ONE_WIRE_READ2";
             s[5, 6] = "ONE_WIRE_READ3";
             s[5, 7] = "ONE_WIRE_READ4";
             s[5, 8] = "BIAS_DAC_CH8";
@@ -1063,7 +1061,7 @@ namespace TB_mu2e
                 rnames[i] = s[index, i];
                 txtREGISTERS[i].Tag = i;
 
-                Mu2e_Register.FindName(rnames[i], ref PP.FEB1.arrReg, out Mu2e_Register r1);
+                Mu2e_Register.FindName(rnames[i], Convert.ToUInt16(udFPGA.Value), ref PP.FEB1.arrReg, out Mu2e_Register r1);
                 lblREG[i].Text = rnames[i] + "(x" + Convert.ToString(r1.addr, 16) + ")";
             }
 
@@ -1097,9 +1095,9 @@ namespace TB_mu2e
             catch { num_trig = 0; }
 
 
-            Mu2e_Register.FindName("TRIG_CONTROL", ref PP.FEB1.arrReg, out Mu2e_Register r2);
+            Mu2e_Register.FindName("TRIG_CONTROL", Convert.ToUInt16(udFPGA.Value), ref PP.FEB1.arrReg, out Mu2e_Register r2);
             // Mu2e_Register.WriteReg(0x0350, ref r2, ref PP.FEB1.client);
-            Mu2e_Register.FindName("SPILL_STATE", ref PP.FEB1.arrReg, out Mu2e_Register r3);
+            Mu2e_Register.FindName("SPILL_STATE", Convert.ToUInt16(udFPGA.Value), ref PP.FEB1.arrReg, out Mu2e_Register r3);
             System.Threading.Thread.Sleep(250);
             Mu2e_Register.ReadReg(ref r3, ref PP.FEB1.client);
 
@@ -1284,24 +1282,24 @@ namespace TB_mu2e
 
         private void UdChan_ValueChanged(object sender, EventArgs e)
         {
-            int FPGA_index = (int)udFPGA.Value;
+            uint FPGA_index = (uint)udFPGA.Value;
             uint chan = 0;
             Mu2e_Register mux_reg = new Mu2e_Register();
             Mu2e_FEB_client myFEB = new Mu2e_FEB_client();
             if (_ActiveFEB == 1) { myFEB = PP.FEB1; }
             if (_ActiveFEB == 2) { myFEB = PP.FEB2; }
             chan = (uint)udChan.Value;
-            mux_reg.fpga_index = (ushort)FPGA_index;
+            //mux_reg.fpga_index = (ushort)FPGA_index;
             if (myFEB != null)
             {
-                Mu2e_Register.FindAddr(0x020, ref myFEB.arrReg, out mux_reg);
+                Mu2e_Register.FindAddrFPGA(0x020, FPGA_index, ref myFEB.arrReg, out mux_reg);
                 if (chan < 16)
                 {
                     uint v = (uint)(0x10 + chan);
                     Mu2e_Register.WriteReg(v, ref mux_reg, ref myFEB.client);
                 }
             }
-
+            BtnCHANGE_Click(null, null);
         }
 
         private void Timer1_Tick(object sender, EventArgs e)
@@ -1317,7 +1315,7 @@ namespace TB_mu2e
                     lblSpillTime.Text = since_last_spill.TotalSeconds.ToString("0.0");
                     if ((since_last_spill.TotalSeconds > 2) && (PP.myRun.spill_complete))
                     {
-                        Mu2e_Register.FindName("TRIG_CONTROL", ref PP.FEB1.arrReg, out Mu2e_Register r_spill);
+                        Mu2e_Register.FindName("TRIG_CONTROL", Convert.ToUInt16(udFPGA.Value), ref PP.FEB1.arrReg, out Mu2e_Register r_spill);
                         if (!PP.myRun.OneSpill)
                         { }// Mu2e_Register.WriteReg(0x02, ref r_spill, ref PP.FEB1.client); }
                     }
@@ -1559,7 +1557,7 @@ namespace TB_mu2e
 
         private void BtnOneSpill_Click(object sender, EventArgs e)
         {
-            Mu2e_Register.FindName("TRIG_CONTROL", ref PP.FEB1.arrReg, out Mu2e_Register r_spill);
+            Mu2e_Register.FindName("TRIG_CONTROL", Convert.ToUInt16(udFPGA.Value), ref PP.FEB1.arrReg, out Mu2e_Register r_spill);
             Mu2e_Register.WriteReg(0x300, ref r_spill, ref PP.FEB1.client);
             if (PP.myRun != null)
             {
@@ -1754,7 +1752,7 @@ namespace TB_mu2e
             //PP.FEB1.Open();
             //Application.DoEvents();
             Mu2e_Register csr = new Mu2e_Register();
-            Mu2e_Register.FindName("CONTROL_STATUS", ref PP.FEB1.arrReg, out csr);
+            Mu2e_Register.FindName("CONTROL_STATUS", Convert.ToUInt16(udFPGA.Value), ref PP.FEB1.arrReg, out csr);
             for (int i = 0; i < 4; i++)
             {
                 csr.fpga_index = (UInt16)(i);
@@ -2747,7 +2745,24 @@ namespace TB_mu2e
             //Check that an FEB client exists, otherwise, don't bother setting up the pulser or trying to get data
             if (PP.FEB1.client != null)
             {
-                //byte[] incomingData = new byte[5]; //Declare new array of bytes for incoming data
+
+                //These registers are required for setting up the FEB to record triggered events and the flashing of the LED.
+                //The FEB is responsible for controlling the pulser via the FEB's GPO port into the pulser's external clock port
+                Mu2e_Register.FindAddr(0x300, ref PP.FEB1.arrReg, out Mu2e_Register flashGateControlReg); //Flash gate control register
+                Mu2e_Register.FindAddr(0x303, ref PP.FEB1.arrReg, out Mu2e_Register trigControlReg); //Trigger control register
+                Mu2e_Register.FindAddr(0x304, ref PP.FEB1.arrReg, out Mu2e_Register hitPipelineDelayReg); //Hit Pipeline Delay register
+                Mu2e_Register.FindAddr(0x305, ref PP.FEB1.arrReg, out Mu2e_Register sampleLengthReg); //Sample length for each event/trigger
+                Mu2e_Register.FindAddr(0x307, ref PP.FEB1.arrReg, out Mu2e_Register testPulseFreqReg); //Onboard test pulser frequency
+                Mu2e_Register.FindAddr(0x308, ref PP.FEB1.arrReg, out Mu2e_Register spillDurReg); //Spill duration register
+                Mu2e_Register.FindAddr(0x309, ref PP.FEB1.arrReg, out Mu2e_Register interSpillDurReg); //Interspill duration register
+                Mu2e_Register.WriteReg(0x0, ref testPulseFreqReg, ref PP.FEB1.client); //Set test pulser frequency to zero, this allows external triggering from LEMO
+                Mu2e_Register.WriteReg(0xA, ref interSpillDurReg, ref PP.FEB1.client); //Set the interspill duration for 10 seconds
+
+                Mu2e_Register[] controlStatusReg = Mu2e_Register.FindAllAddr(0x00, ref PP.FEB1.arrReg);
+                Mu2e_Register.WriteAllReg(0x20, ref controlStatusReg, ref PP.FEB1.client); //issue a general reset for each FPGA
+                Mu2e_Register[][] gainControlReg = Mu2e_Register.FindAllAddrRange(0x46, 0x47, ref PP.FEB1.arrReg);
+                Mu2e_Register.WriteAllRegRange(0x250, ref gainControlReg, ref PP.FEB1.client); //Set the gain for all AFE chips on all FPGAs to the same value
+
                 System.Net.Sockets.Socket febSocket = PP.FEB1.TNETSocket_prop; //Declare and define FEB socket variable
                 febSocket.ReceiveTimeout = 500; //Set timeout on FEB socket to 500
                 byte[] sendRDB = Encoding.ASCII.GetBytes("rdb\r\n"); //PP.GetBytes("rdb\r\n"); //Lazy way for converting RDB command into packet to send to FEB
@@ -2760,85 +2775,197 @@ namespace TB_mu2e
                 //Open up the file used to store/read channel responses
                 //Stores in single line per channel format, channel# AverageADCresponse
                 #region ReadFileAvgs
-                String cmbAvgFileName = "C:\\data\\cmb_tester_data\\cmb_channel_averages.dat";
-                String[] channelAvgString = new String[64];
-                double[] channelAvgVal = new double[64];
-                if (File.Exists(cmbAvgFileName))
+                if (updateFilesChkBox.Checked)
                 {
-                    channelAvgString = File.ReadAllLines(cmbAvgFileName); //read all the lines from the file and store each line as a different entry in the channelAvgString array
-                    for (int channel = 0; channel < 64; channel++)
+                    String cmbAvgFileName = "C:\\data\\cmb_tester_data\\cmb_channel_averages.dat";
+                    String[] channelAvgString = new String[64];
+                    double[] channelAvgVal = new double[64];
+                    if (File.Exists(cmbAvgFileName))
                     {
-                        channelAvgVal[channel] = Convert.ToDouble(channelAvgString[channel].Substring(2)); //convert the average recorded value for each channel into a usable number
+                        channelAvgString = File.ReadAllLines(cmbAvgFileName); //read all the lines from the file and store each line as a different entry in the channelAvgString array
+                        for (int channel = 0; channel < 64; channel++)
+                        {
+                            channelAvgVal[channel] = Convert.ToDouble(channelAvgString[channel].Substring(2)); //convert the average recorded value for each channel into a usable number
+                        }
+                    }
+                    else //If the channel averages file does not exist, then print out an error
+                    {
+                        System.Console.WriteLine("ERR: Could not find " + cmbAvgFileName + "!");
+                        System.Console.WriteLine("Does the file exist and is it accessible?");
                     }
                 }
-                else //If the channel averages file does not exist, then print out an error
-                {
-                    System.Console.WriteLine("ERR: Could not find " + cmbAvgFileName + "!");
-                    System.Console.WriteLine("Does the file exist and is it accessible?");
-                }
                 #endregion ReadFileAvgs
-
-                //These registers are required for setting up the onboard histogrammers and acquiring the data sent by them
-                Mu2e_Register.FindAddr(0x10, ref PP.FEB1.arrReg, out Mu2e_Register histo_control); //Histogram control register
-                Mu2e_Register.FindAddr(0x11, ref PP.FEB1.arrReg, out Mu2e_Register histo_accum_inter); //Histogram accumulation interval
-                Mu2e_Register.FindAddr(0x14, ref PP.FEB1.arrReg, out Mu2e_Register afe0_memRdPtr0); //AFE 0 histogram memory read pointer
-                Mu2e_Register.FindAddr(0x15, ref PP.FEB1.arrReg, out Mu2e_Register afe1_memRdPtr1); //AFE 1 histogram memory read pointer
-                Mu2e_Register.FindAddr(0x16, ref PP.FEB1.arrReg, out Mu2e_Register afe0_dataPort); //AFE 0 data port
-                Mu2e_Register.FindAddr(0x17, ref PP.FEB1.arrReg, out Mu2e_Register afe1_dataPort); //AFE 1 data port
-                var histCntrl_Dark_Base = 0x60; //this leaves the bin size at 1 ADC/bin and starts the histogrammer - the base is necessary since the channel numbers will be added before it starts histogramming
-
-                //In this loop we will go over each channel and histogram it
-                for (uint channel = 0; channel < 8; channel++)
-                {
-                    Mu2e_Register.WriteReg((uint) histCntrl_Dark_Base + channel, ref histo_control, ref PP.FEB1.client);
-                }
-
-                //These registers are required for setting up the FEB to record triggered events and the flashing of the LED.
-                //The FEB is responsible for controlling the pulser via the FEB's GPO port into the pulser's external clock port
-                Mu2e_Register.FindAddr(0x00, ref PP.FEB1.arrReg, out Mu2e_Register controlStatusReg); //Control status register
-                Mu2e_Register.FindAddr(0x303, ref PP.FEB1.arrReg, out Mu2e_Register trigControlReg); //Trigger control register
-                Mu2e_Register.FindAddr(0x308, ref PP.FEB1.arrReg, out Mu2e_Register spillDurReg); //Spill duration register
-                Mu2e_Register.FindAddr(0x309, ref PP.FEB1.arrReg, out Mu2e_Register interSpillDurReg); //Interspill duration register
-                Mu2e_Register.FindAddr(0x305, ref PP.FEB1.arrReg, out Mu2e_Register sampleLengthReg); //Sample length for each event/trigger
-                Mu2e_Register.FindAddr(0x307, ref PP.FEB1.arrReg, out Mu2e_Register testPulseFreqReg); //Onboard test pulser frequency
-                Mu2e_Register.WriteReg(0x0, ref testPulseFreqReg, ref PP.FEB1.client); //Set test pulser frequency to zero, this allows external triggering from LEMO
-                Mu2e_Register.WriteReg(0x20, ref controlStatusReg, ref PP.FEB1.client); //Issue a reset of the trigger/spill counters on the board
-                Mu2e_Register.WriteReg(0xA, ref interSpillDurReg, ref PP.FEB1.client); //Set the interspill duration for 10 seconds
-
-                
 
                 #region Pedestal/Calibration
                 for (uint fpga = 0; fpga < 4; fpga++) //Turn on bias for SiPMs
                     PP.FEB1.SetV(Convert.ToDouble(cmbBias.Text), (int)fpga);
                 #region BiasWait
-                cmbBiasTicker.Text= "Waiting for bias";
-                for (int tick = 0; tick < 5; tick++){ cmbBiasTicker.Text += "."; cmbBiasTicker.Update(); System.Threading.Thread.Sleep(1000);}
-                cmbBiasTicker.Text += "done"; cmbBiasTicker.Update(); System.Threading.Thread.Sleep(250);
-                cmbBiasTicker.Text = "                               "; cmbBiasTicker.Update();
+                cmbInfoBox.Text = "Waiting for bias";
+                for (int tick = 0; tick < 7; tick++) { cmbInfoBox.Text += "."; cmbInfoBox.Update(); System.Threading.Thread.Sleep(1000); }
                 #endregion BiasWait
-                
-
 
                 //Code that was here can be found in the following file: C:\FLASH\..\Redacted.txt
                 bool passed_calibration = false;
                 double[] pedestals = new double[64]; //pedestal for each channel
-                double[] gains = new double[64]; //gain for each channel (adc/pe)                
-                ROOTNET.NTH1F[] peHistos = new ROOTNET.NTH1F[64]; //Histograms used to determine gains
+                double[] gains = new double[64]; //gain for each channel (adc/pe)      
+
+                ROOTNET.NTH1I[] peHistos = new ROOTNET.NTH1I[64]; //Histograms used to determine gains
+                ROOTNET.NTSpectrum[] peakFinders = new ROOTNET.NTSpectrum[2];
+                HistoHelper hist_helper = new HistoHelper(ref PP.FEB1, 0xFFE);//0x400);
+                ROOTNET.NTH1I[] histos = new ROOTNET.NTH1I[2];
+                ROOTNET.NTF1[] peakFits;
+                cmbInfoBox.Text = "Calibrating"; cmbInfoBox.Update();
+                for (uint channel = 0; channel < 4; channel++)
+                {
+                    if (peHistos[channel] == null) //skip the channels that have already been histogrammed (due to the two channel histograms return from the FEB)
+                    {
+                        histos = hist_helper.GetHistogram(channel, 1);
+                        uint[] channels = { channel, Convert.ToUInt32(histos[1].GetTitle()) }; //Lazily grab the other channel's label from the histogram title...
+                        System.Console.WriteLine("Histo Chans: " + channels[0] + ", " + channels[1]);
+
+                        for (int chanI = 0; chanI < 2; chanI++)//Loop over each of the two histograms
+                        {
+                            peHistos[channels[chanI]] = histos[chanI];
+                            peakFinders[chanI] = new ROOTNET.NTSpectrum(3); //Only try and compute the gain from pedestal, 1st, and possibly 2nd PE
+                            int peaksFound = peakFinders[chanI].Search(peHistos[channels[chanI]], 1.5, "nobackground", 0.00001); //Don't try and estimate background, and set the threshold to only include pedestal, 1st, and 2nd PE
+                            if (peaksFound < 2) { System.Console.WriteLine("Cannot find 1+ PE for Chan {0}", channels[chanI]); continue; } //Need this beacuse we need to know the gain, which is impossible if we can't see first PE
+                            var peakPositions = peakFinders[chanI].GetPositionX();
+                            peakFits = new ROOTNET.NTF1[peaksFound];
+                            for (uint peak = 0; peak < peaksFound; peak++)
+                            {
+                                float x_loc = peakPositions[(int)peak];
+                                peakFits[peak] = new ROOTNET.NTF1("Ch" + channels[chanI].ToString() + "peak" + peak.ToString(), "gaus", x_loc - 2.5, x_loc + 2.5);
+                                peakFits[peak].SetLineColor(Convert.ToInt16(peak + 2));
+                                peHistos[channels[chanI]].Fit(peakFits[peak], "R+");// R option forces the function to fit only over its specified range, + option tells it to add fit to histogram list without deleting previous fits
+                            }
+                            pedestals[channels[chanI]] = peakFits[0].GetParameter(1);
+                            gains[channels[chanI]] = peakFits[1].GetParameter(1) - pedestals[channels[chanI]];
+                            if (peakFits.Length > 2)
+                                gains[channels[chanI]] = (gains[channels[chanI]] + peakFits[2].GetParameter(1) - peakFits[1].GetParameter(1)) / 2.0;
+
+                        }
+                    }
+                }
+
+                peHistos[0].Draw();
+                
                 var histo_file = ROOTNET.NTFile.Open("D:/Calibrations.root", "RECREATE");
                 if (histo_file == null)
                 {
-                    throw new AccessViolationException("Cannot open/modify D:/Calibrations.root");
-                    return; //if the file can't be opened, don't waste any time doing anything else
+                    histo_file = ROOTNET.NTFile.Open("D:/Calib_BACKUP_" + System.DateTime.Now.ToFileTime().ToString() + ".root", "RECREATE");
+                    System.Console.WriteLine("Cannot open/modify D:/Calibrations.root. A backup has been created.");
                 }
-
-                //Use histogramming in FEB to establish gains
-                //
-
+                
                 histo_file.Write();
                 foreach (var histo in peHistos)
-                    if(histo != null)
+                    if (histo != null)
+                    {
+                        histo.Write();
                         histo.Delete();
+                    }
                 histo_file.Close();
+
+                passed_calibration = false; //find a new home for this guy
+
+                //return; //FULL STOP, DONT DO ANYTHING MORE, SHIT BELOW IS ABSOLUTELY CRAY CRAY
+                #endregion Pedestal/Calibration
+                
+
+                #region LED Response Evaluation
+                uint spill_status = 0;
+                uint spill_num = 0;
+                uint trig_num = 0;
+                numTrigsDisp.Text = trig_num.ToString();
+                numTrigsDisp.Update();
+
+                if (passed_calibration)
+                {
+                    //This is for evaluating response to CMB LEDs
+                    //Need to get the LED Flasher DACs
+                    //Need to get the flash gate control register
+                    //Need to use the trigControlReg to set the GPO select
+                    //Need to use the testPulseFreqReg to set the on-board pulser frequency, which will send pulses out the GPO port
+                    //Need to use the Flash Gate Control to set the routing on each FPGA
+                    //Histogram SiPM Response to LEDs or Use pin-diode to measure current
+
+                    //SiPM response to external LED flash
+                    //[X] Need to set the flash gate control register to flash gate and not CMB LEDs (set 0x300 to 2)
+                    //[X] Need to set the trigControlReg to set the GPO select
+                    //[X] Need to set the test pulser frequency
+                    //[?] Need to set the delay between internal pulser and external LED (hit-pipeline delay if it affects the raw SiPM data for histogramming)
+                    //[X] Get histograms
+                    //[ ] Fit data
+                    //[ ] Report evaluation
+
+                    Mu2e_Register.WriteReg(0x2, ref flashGateControlReg, ref PP.FEB1.client); //Set the CMB Pulse routing to the Flash Gate (to LED flasher will create interference on CMB)
+                    Mu2e_Register.WriteReg(0x100, ref trigControlReg, ref PP.FEB1.client); //Enable the on-board test pulser, output of this signal will be delivered to external pulser to flash LED
+                    Mu2e_Register.WriteReg(0x1F07AC, ref testPulseFreqReg, ref PP.FEB1.client); //Set the on-board test pulser's frequency to ~140kHz
+                    Mu2e_Register.WriteReg(0x1, ref hitPipelineDelayReg, ref PP.FEB1.client); //Set the hit pipeline delay to minimum value (12.56ns)
+
+                    //ROOTNET.NTSpectrum[] peakFinders = new ROOTNET.NTSpectrum[2];
+                    //HistoHelper hist_helper = new HistoHelper(ref PP.FEB1, 0x400);
+                    //ROOTNET.NTH1I[] histos = new ROOTNET.NTH1I[2];
+                    //ROOTNET.NTF1[] peakFits;
+                    ROOTNET.NTH1I[] ledHistos = new ROOTNET.NTH1I[64]; //Histograms from LED flash
+                    cmbInfoBox.Text = "Flashing LED"; cmbInfoBox.Update();
+                    for (uint channel = 0; channel < 4; channel++)
+                    {
+                        if (ledHistos[channel] == null) //skip the channels that have already been histogrammed (due to the two channel histograms return from the FEB)
+                        {
+                            hist_helper.SetAccumulation_interval(0xFFE); //Set a long accumulation interval
+                            histos = hist_helper.GetHistogram(channel, 1);
+                            uint[] channels = { channel, Convert.ToUInt32(histos[1].GetTitle()) }; //Lazily grab the other channel's label from the histogram title...
+                            System.Console.WriteLine("Histo Chans: " + channels[0] + ", " + channels[1]);
+
+                            for (int chanI = 0; chanI < 2; chanI++)//Loop over each of the two histograms
+                            {
+                                ledHistos[channels[chanI]] = histos[chanI];
+                                peakFinders[chanI] = new ROOTNET.NTSpectrum(10); //Maybe try and get all the PEs
+                                int peaksFound = peakFinders[chanI].Search(ledHistos[channels[chanI]], 1.5, "nobackground", 0.001); //Don't try and estimate background, and set the threshold to only include pedestal, 1st, and 2nd PE
+                                //if (peaksFound < 2) { System.Console.WriteLine("Cannot find 1+ PE for Chan {0}", channels[chanI]); continue; } //Need this beacuse we need to know the gain, which is impossible if we can't see first PE
+                                //var peakPositions = peakFinders[chanI].GetPositionX();
+                                //peakFits = new ROOTNET.NTF1[peaksFound];
+                                //for (uint peak = 0; peak < peaksFound; peak++)
+                                //{
+                                //    float x_loc = peakPositions[(int)peak];
+                                //    peakFits[peak] = new ROOTNET.NTF1("Ch" + channels[chanI].ToString() + "peak" + peak.ToString(), "gaus", x_loc - 2.5, x_loc + 2.5);
+                                //    peakFits[peak].SetLineColor(Convert.ToInt16(peak + 2));
+                                //    ledHistos[channels[chanI]].Fit(peakFits[peak], "R+");// R option forces the function to fit only over its specified range, + option tells it to add fit to histogram list without deleting previous fits
+                                //}
+                                //pedestals[channels[chanI]] = peakFits[0].GetParameter(1);
+                                //gains[channels[chanI]] = peakFits[1].GetParameter(1) - pedestals[channels[chanI]];
+                                //if (peakFits.Length > 2)
+                                //gains[channels[chanI]] = (gains[channels[chanI]] + peakFits[2].GetParameter(1) - peakFits[1].GetParameter(1)) / 2.0;
+                            }
+                        }
+                    }
+
+                    histo_file = ROOTNET.NTFile.Open("D:/Responses.root", "RECREATE");
+                    if (histo_file == null)
+                    {
+                        histo_file = ROOTNET.NTFile.Open("D:/Resp_BACKUP_" + System.DateTime.Now.ToFileTime().ToString() + ".root", "RECREATE");
+                        System.Console.WriteLine("Cannot open/modify D:/Responses.root. A backup has been created.");
+                    }
+
+                    foreach (var histo in ledHistos)
+                        if (histo != null)
+                        {
+                            histo.Write();
+                            histo.Delete();
+                        }
+                    histo_file.Close();
+                }
+
+                Mu2e_Register.WriteReg(0x0, ref trigControlReg, ref PP.FEB1.client); //Disable the on-board test pulser
+                Mu2e_Register.WriteReg(0x0, ref testPulseFreqReg, ref PP.FEB1.client); //Set the on-board test pulser's frequency to 0
+
+                //Turn off bias for SiPMs
+                for (uint fpga = 0; fpga < 4; fpga++)
+                    PP.FEB1.SetV(0.0, (int)fpga);
+
+                cmbInfoBox.Text = ""; cmbInfoBox.Update();
+
+                return;
 
                 #region Move this
                 febSocket.Send(sendRDB);
@@ -2856,17 +2983,6 @@ namespace TB_mu2e
                 for (int iByte = 0; iByte < lret - 1; iByte++)
                     rec_buf[iByte] = rec_buf[iByte + 1]; //ignore 0x3e at the beginning of data
                 #endregion Move this
-
-                #endregion Pedestal/Calibration
-
-
-                #region LED Response Evaluation
-
-                uint spill_status = 0;
-                uint spill_num = 0;
-                uint trig_num = 0;
-                numTrigsDisp.Text = trig_num.ToString();
-                numTrigsDisp.Update();
 
                 if (passed_calibration)
                 {
@@ -2956,6 +3072,7 @@ namespace TB_mu2e
                 }
                 #endregion LED Response Evaluation
 
+
                 //Turn off bias for SiPMs
                 for (uint fpga = 0; fpga < 4; fpga++)
                     PP.FEB1.SetV(0.0, (int)fpga);
@@ -2970,7 +3087,7 @@ namespace TB_mu2e
             else
             {
                 cmbBias.Enabled = false;
-                cmbBias.Text = "56.0";
+                cmbBias.Text = "57.0";
             }
         }
 
@@ -2982,7 +3099,7 @@ namespace TB_mu2e
             if (string.IsNullOrWhiteSpace(cmbBias.Text))
                 cmbBias.BackColor = Color.Red; 
             else if (!parsed || isNumber < 0 || isNumber > 80)
-                cmbBias.Text = "56.0";
+                cmbBias.Text = "57.0";
         }
 
         private void RequestNumTrigs_TextChanged(object sender, EventArgs e)

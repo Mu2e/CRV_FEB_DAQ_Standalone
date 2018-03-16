@@ -95,15 +95,13 @@ namespace TB_mu2e
         }
         public void ReadTemp(out double CMB0_temp, out double CMB1_temp, out double CMB2_temp, out double CMB3_temp, int fpga =0)
         {
-            string a;
-            int r;
             CMB0_temp = 0;
             CMB1_temp = 0;
             CMB2_temp = 0;
             CMB3_temp = 0;
 
             SendStr("STAB" );
-            ReadStr(out a, out r);
+            ReadStr(out string a, out int r);
             if (a.Length > 40)
             {
                 char[] sep = new char[3];
@@ -148,12 +146,10 @@ namespace TB_mu2e
         public double ReadV(int fpga = 0)
         {
             if (fpga > 3) { fpga = 0; }
-            UInt32 counts;
-            string a;
-            int r;
+            //UInt32 counts;
             double V;
             SendStr("rd " + Convert.ToString(4 * fpga, 16) + "44");
-            ReadStr(out a, out r);
+            ReadStr(out string a, out int r);
             if (a.Length > 4)
             { a = a.Substring(0, 4); }
 
@@ -167,8 +163,6 @@ namespace TB_mu2e
 
         public double ReadA0(int fpga = 0, int ch = 0)
         {
-            int dt;
-            string t;
             if (ch == 0)
             { SendStr("wr " + Convert.ToString(4 * fpga, 16) + "20 10"); }
             else
@@ -182,7 +176,7 @@ namespace TB_mu2e
             Thread.Sleep(20);
             SendStr("gain 8");
             Thread.Sleep(20);
-            ReadStr(out t, out dt, 100);
+            ReadStr(out string t, out int dt, 100);
             SendStr("A0 2");
             Thread.Sleep(250);
             ReadStr(out t, out dt, 100);
@@ -260,12 +254,9 @@ namespace TB_mu2e
 
         public bool CheckStatus(out uint spill_state, out uint spill_num, out uint trig_num)
         {
-            Mu2e_Register reg_spill_state;
-            Mu2e_Register.FindAddr(0x76, ref arrReg, out reg_spill_state);
-            Mu2e_Register reg_spill_num;
-            Mu2e_Register.FindAddr(0x68, ref arrReg, out reg_spill_num);
-            Mu2e_Register reg_trig_count;
-            Mu2e_Register.FindAddr(0x67, ref arrReg, out reg_trig_count);
+            Mu2e_Register.FindAddr(0x76, ref arrReg, out Mu2e_Register reg_spill_state);
+            Mu2e_Register.FindAddr(0x68, ref arrReg, out Mu2e_Register reg_spill_num);
+            Mu2e_Register.FindAddr(0x67, ref arrReg, out Mu2e_Register reg_trig_count);
 
             Mu2e_Register.ReadReg(ref reg_spill_state, ref client);
             Mu2e_Register.ReadReg(ref reg_spill_num, ref client);
@@ -290,25 +281,18 @@ namespace TB_mu2e
             CMB_ROM = "";
             try
             {
-                if (_ClientOpen)
+                if (_ClientOpen && FPGAnum < 4)
                 {
-                    Mu2e_Register CMB_set; //addr25
-                    Mu2e_Register.FindAddr(0x25, ref this.arrReg, out CMB_set);
-                    Mu2e_Register CMB_cmnd; //addr24
-                    Mu2e_Register.FindAddr(0x24, ref this.arrReg, out CMB_cmnd);
-                    Mu2e_Register CMB_read; //addr26
-                    Mu2e_Register.FindAddr(0x26, ref this.arrReg, out CMB_read);
+                    //CMB_set.fpga_index = Convert.ToUInt16(FPGAnum);
+                    //CMB_cmnd.fpga_index = Convert.ToUInt16(FPGAnum);
+                    //CMB_read.fpga_index = Convert.ToUInt16(FPGAnum);
+                    //addr25
+                    Mu2e_Register.FindAddrFPGA(0x25, (uint)FPGAnum, ref this.arrReg, out Mu2e_Register CMB_set);
+                    //addr24
+                    Mu2e_Register.FindAddrFPGA(0x24, (uint)FPGAnum, ref this.arrReg, out Mu2e_Register CMB_cmnd);
+                    //addr26
+                    Mu2e_Register.FindAddrFPGA(0x26, (uint)FPGAnum, ref this.arrReg, out Mu2e_Register CMB_read);
 
-                    try
-                    {
-                        if (FPGAnum < 4)
-                        {
-                            CMB_set.fpga_index = Convert.ToUInt16(FPGAnum);
-                            CMB_cmnd.fpga_index = Convert.ToUInt16(FPGAnum);
-                            CMB_read.fpga_index = Convert.ToUInt16(FPGAnum);
-                        }
-                    }
-                    catch { }
 
                     switch (CMB_num)
                     {
@@ -330,10 +314,8 @@ namespace TB_mu2e
                     }
                     Mu2e_Register.WriteReg(0x200, ref CMB_cmnd, ref this.client);
 
-                    SendStr("rdi 26");
-                    string t = "";
-                    int rt = 0;
-                    ReadStr(out t, out rt);
+                    SendStr("rdi 26"); //This only reads the first FPGA, is this intended?
+                    ReadStr(out string t, out int rt);
                     CMB_ROM = t;
                     return true;
                 }
@@ -471,7 +453,7 @@ namespace TB_mu2e
         //    return lines;
         //}
 
-        public void checkFEB_connection()
+        public void CheckFEB_connection()
         {
             if (!client.Connected)
             {
@@ -488,7 +470,7 @@ namespace TB_mu2e
             _ClientOpen = false;
         }
 
-        public static int count_bits(int val)
+        public static int Count_bits(int val)
         {
             int count = 0;
             try

@@ -301,9 +301,13 @@
     <Reference Include="libXMLIOWrapper, Version=13.13.6037.39843, Culture=neutral, processorArchitecture=x86">
       <HintPath>packages\ROOT.NET.All.5.34.36.13\lib\net40\libXMLIOWrapper.dll</HintPath>
     </Reference>
+    <Reference Include="log4net, Version=2.0.8.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
+      <HintPath>packages\log4net.2.0.8\lib\net45-full\log4net.dll</HintPath>
+    </Reference>
     <Reference Include="PresentationCore" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Windows.Forms.DataVisualization" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="System.Data" />
@@ -327,6 +331,7 @@
       <DependentUpon>ClientNameChange.cs</DependentUpon>
     </Compile>
     <Compile Include="DAQ_server.cs" />
+    <Compile Include="HistoHelper.cs" />
     <Compile Include="mu2e_registers.cs" />
     <Compile Include="Histo1_helper.cs" />
     <Compile Include="Mu2e_FECC_client.cs" />
@@ -372,6 +377,9 @@
       <SubType>Designer</SubType>
     </EmbeddedResource>
     <None Include="packages.config" />
+    <None Include="Properties\DataSources\ROOTNET.NTArrayI.datasource" />
+    <None Include="Properties\DataSources\TH1.datasource" />
+    <None Include="Properties\DataSources\TH1I.datasource" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -381,7 +389,6 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
-    <None Include="TB_mu2e_TemporaryKey.pfx" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

@@ -259,10 +259,12 @@
             this.qaBiasLbl = new System.Windows.Forms.Label();
             this.qaBias = new System.Windows.Forms.TextBox();
             this.tabCMBTester = new System.Windows.Forms.TabPage();
+            this.cmbHistoBox = new System.Windows.Forms.GroupBox();
             this.cmbTestControl = new System.Windows.Forms.GroupBox();
+            this.updateFilesChkBox = new System.Windows.Forms.CheckBox();
+            this.cmbInfoBox = new System.Windows.Forms.TextBox();
             this.requestNumTrigsLabel = new System.Windows.Forms.Label();
             this.requestNumTrigs = new System.Windows.Forms.TextBox();
-            this.cmbBiasTicker = new System.Windows.Forms.Label();
             this.numTrigsDisp = new System.Windows.Forms.Label();
             this.numTrigLabel = new System.Windows.Forms.Label();
             this.sipmControl = new System.Windows.Forms.GroupBox();
@@ -309,6 +311,7 @@
             this.dicounterQAGroup.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numAvg)).BeginInit();
             this.tabCMBTester.SuspendLayout();
+            this.cmbHistoBox.SuspendLayout();
             this.cmbTestControl.SuspendLayout();
             this.sipmControl.SuspendLayout();
             this.SuspendLayout();
@@ -3132,6 +3135,7 @@
             // 
             // tabCMBTester
             // 
+            this.tabCMBTester.Controls.Add(this.cmbHistoBox);
             this.tabCMBTester.Controls.Add(this.cmbTestControl);
             this.tabCMBTester.Location = new System.Drawing.Point(4, 29);
             this.tabCMBTester.Name = "tabCMBTester";
@@ -3141,26 +3145,54 @@
             this.tabCMBTester.Text = "CMB Tester";
             this.tabCMBTester.UseVisualStyleBackColor = true;
             // 
+            // cmbHistoBox
+            // 
+            this.cmbHistoBox.Location = new System.Drawing.Point(517, 23);
+            this.cmbHistoBox.Name = "cmbHistoBox";
+            this.cmbHistoBox.Size = new System.Drawing.Size(710, 419);
+            this.cmbHistoBox.TabIndex = 1;
+            this.cmbHistoBox.TabStop = false;
+            this.cmbHistoBox.Text = "CMB Histos";
+            // 
             // cmbTestControl
             // 
+            this.cmbTestControl.Controls.Add(this.updateFilesChkBox);
+            this.cmbTestControl.Controls.Add(this.cmbInfoBox);
             this.cmbTestControl.Controls.Add(this.requestNumTrigsLabel);
             this.cmbTestControl.Controls.Add(this.requestNumTrigs);
-            this.cmbTestControl.Controls.Add(this.cmbBiasTicker);
             this.cmbTestControl.Controls.Add(this.numTrigsDisp);
             this.cmbTestControl.Controls.Add(this.numTrigLabel);
             this.cmbTestControl.Controls.Add(this.sipmControl);
             this.cmbTestControl.Controls.Add(this.cmbTestBtn);
             this.cmbTestControl.Location = new System.Drawing.Point(16, 15);
             this.cmbTestControl.Name = "cmbTestControl";
-            this.cmbTestControl.Size = new System.Drawing.Size(436, 162);
+            this.cmbTestControl.Size = new System.Drawing.Size(436, 198);
             this.cmbTestControl.TabIndex = 0;
             this.cmbTestControl.TabStop = false;
             this.cmbTestControl.Text = "CMB Test Control";
             // 
+            // updateFilesChkBox
+            // 
+            this.updateFilesChkBox.AutoSize = true;
+            this.updateFilesChkBox.Location = new System.Drawing.Point(250, 21);
+            this.updateFilesChkBox.Name = "updateFilesChkBox";
+            this.updateFilesChkBox.Size = new System.Drawing.Size(114, 21);
+            this.updateFilesChkBox.TabIndex = 9;
+            this.updateFilesChkBox.Text = "Update Files?";
+            this.updateFilesChkBox.UseVisualStyleBackColor = true;
+            // 
+            // cmbInfoBox
+            // 
+            this.cmbInfoBox.Location = new System.Drawing.Point(33, 108);
+            this.cmbInfoBox.Name = "cmbInfoBox";
+            this.cmbInfoBox.ReadOnly = true;
+            this.cmbInfoBox.Size = new System.Drawing.Size(147, 23);
+            this.cmbInfoBox.TabIndex = 8;
+            // 
             // requestNumTrigsLabel
             // 
             this.requestNumTrigsLabel.AutoSize = true;
-            this.requestNumTrigsLabel.Location = new System.Drawing.Point(206, 94);
+            this.requestNumTrigsLabel.Location = new System.Drawing.Point(206, 120);
             this.requestNumTrigsLabel.Name = "requestNumTrigsLabel";
             this.requestNumTrigsLabel.Size = new System.Drawing.Size(113, 17);
             this.requestNumTrigsLabel.TabIndex = 7;
@@ -3168,24 +3200,16 @@
             // 
             // requestNumTrigs
             // 
-            this.requestNumTrigs.Location = new System.Drawing.Point(325, 91);
+            this.requestNumTrigs.Location = new System.Drawing.Point(325, 117);
             this.requestNumTrigs.Name = "requestNumTrigs";
             this.requestNumTrigs.Size = new System.Drawing.Size(73, 23);
             this.requestNumTrigs.TabIndex = 6;
             this.requestNumTrigs.Text = "100";
             // 
-            // cmbBiasTicker
-            // 
-            this.cmbBiasTicker.AutoSize = true;
-            this.cmbBiasTicker.Location = new System.Drawing.Point(33, 116);
-            this.cmbBiasTicker.Name = "cmbBiasTicker";
-            this.cmbBiasTicker.Size = new System.Drawing.Size(0, 17);
-            this.cmbBiasTicker.TabIndex = 5;
-            // 
             // numTrigsDisp
             // 
             this.numTrigsDisp.AutoSize = true;
-            this.numTrigsDisp.Location = new System.Drawing.Point(325, 121);
+            this.numTrigsDisp.Location = new System.Drawing.Point(325, 147);
             this.numTrigsDisp.Name = "numTrigsDisp";
             this.numTrigsDisp.Size = new System.Drawing.Size(16, 17);
             this.numTrigsDisp.TabIndex = 4;
@@ -3194,7 +3218,7 @@
             // numTrigLabel
             // 
             this.numTrigLabel.AutoSize = true;
-            this.numTrigLabel.Location = new System.Drawing.Point(206, 121);
+            this.numTrigLabel.Location = new System.Drawing.Point(206, 147);
             this.numTrigLabel.Name = "numTrigLabel";
             this.numTrigLabel.Size = new System.Drawing.Size(73, 17);
             this.numTrigLabel.TabIndex = 3;
@@ -3204,7 +3228,7 @@
             // 
             this.sipmControl.Controls.Add(this.cmbBias);
             this.sipmControl.Controls.Add(this.cmbBiasOverride);
-            this.sipmControl.Location = new System.Drawing.Point(209, 22);
+            this.sipmControl.Location = new System.Drawing.Point(209, 48);
             this.sipmControl.Name = "sipmControl";
             this.sipmControl.Size = new System.Drawing.Size(189, 55);
             this.sipmControl.TabIndex = 2;
@@ -3218,7 +3242,7 @@
             this.cmbBias.Name = "cmbBias";
             this.cmbBias.Size = new System.Drawing.Size(65, 23);
             this.cmbBias.TabIndex = 1;
-            this.cmbBias.Text = "56.0";
+            this.cmbBias.Text = "57.0";
             this.cmbBias.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             this.cmbBias.TextChanged += new System.EventHandler(this.CmbBias_TextChanged);
             // 
@@ -3235,7 +3259,6 @@
             // 
             // cmbTestBtn
             // 
-            this.cmbTestBtn.Enabled = false;
             this.cmbTestBtn.Location = new System.Drawing.Point(33, 43);
             this.cmbTestBtn.Name = "cmbTestBtn";
             this.cmbTestBtn.Size = new System.Drawing.Size(147, 59);
@@ -3361,6 +3384,7 @@
             this.dicounterQAGroup.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numAvg)).EndInit();
             this.tabCMBTester.ResumeLayout(false);
+            this.cmbHistoBox.ResumeLayout(false);
             this.cmbTestControl.ResumeLayout(false);
             this.cmbTestControl.PerformLayout();
             this.sipmControl.ResumeLayout(false);
@@ -3617,8 +3641,10 @@
         private System.Windows.Forms.CheckBox cmbBiasOverride;
         private System.Windows.Forms.Label numTrigsDisp;
         private System.Windows.Forms.Label numTrigLabel;
-        private System.Windows.Forms.Label cmbBiasTicker;
         private System.Windows.Forms.TextBox requestNumTrigs;
         private System.Windows.Forms.Label requestNumTrigsLabel;
+        private System.Windows.Forms.TextBox cmbInfoBox;
+        private System.Windows.Forms.CheckBox updateFilesChkBox;
+        private System.Windows.Forms.GroupBox cmbHistoBox;
     }
 }

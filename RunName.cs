@@ -24,21 +24,21 @@ namespace TB_mu2e
                 myFEB = PP.FEB1;
                 Mu2e_Register r1;
 
-                Mu2e_Register.FindName("AFE_VGA0", ref myFEB.arrReg, out r1);
+                Mu2e_Register.FindName("AFE_VGA0", 0, ref myFEB.arrReg, out r1);
                 r1.fpga_index = 0;
                 Mu2e_Register.ReadReg(ref r1, ref myFEB.client);
                 this.GainTextBox.Text = r1.val.ToString();
 
-                Mu2e_Register.FindName("AFE_VGA1", ref myFEB.arrReg, out r1);
+                Mu2e_Register.FindName("AFE_VGA1", 0, ref myFEB.arrReg, out r1);
                 r1.fpga_index = 0;
                 Mu2e_Register.ReadReg(ref r1, ref myFEB.client);
                 this.GainTextBox.Text += "-" + r1.val.ToString();
 
-                Mu2e_Register.FindName("AFE_VGA0", ref myFEB.arrReg, out r1);
+                Mu2e_Register.FindName("AFE_VGA0", 1, ref myFEB.arrReg, out r1);
                 r1.fpga_index = 1;
                 Mu2e_Register.ReadReg(ref r1, ref myFEB.client);
                 this.GainTextBox.Text += "-" + r1.val.ToString();
-                Mu2e_Register.FindName("AFE_VGA1", ref myFEB.arrReg, out r1);
+                Mu2e_Register.FindName("AFE_VGA1", 1, ref myFEB.arrReg, out r1);
                 r1.fpga_index = 1;
                 Mu2e_Register.ReadReg(ref r1, ref myFEB.client);
                 this.GainTextBox.Text += "-" + r1.val.ToString();
