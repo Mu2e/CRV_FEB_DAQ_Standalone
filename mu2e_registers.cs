@@ -608,6 +608,21 @@ namespace TB_mu2e
             r1.bit_comment[2] = "[2] Spill Gate.";
             list_of_reg.Add(r1);
 
+            r1 = new Mu2e_Register()
+            {
+                name = "FLASH_GATE_CONTROL",
+                addr = 0x300,
+                broadcast = false,
+                fpga_offset_mult = 0x400,
+                comment = "Flash gate control.",
+                bit_comment = new string[16]
+            };
+            r1.bit_comment[0] = "[0] Enable the flash gate.";
+            r1.bit_comment[1] = "[1] Select the CMB pulse routing. 0: Flash Gate, 1: LED flasher.";
+            r1.bit_comment[2] = "[2] LED Flasher signal source. 0: Test pulser, 1: Flash Gate.";
+            list_of_reg.Add(r1);
+
+
             int reg_list_count = list_of_reg.Count;
             for(uint fpga = 1; fpga < 4; fpga++) //populate the list with a copy for each FPGA
             {
@@ -620,20 +635,6 @@ namespace TB_mu2e
             
 
             #region Broadcast Registers
-            r1 = new Mu2e_Register()
-            {
-                name = "FLASH_GATE_CONTROL",
-                addr = 0x300,
-                broadcast = true,
-                fpga_offset_mult = 0x400,
-                comment = "Broadcast. Flash gate control.",
-                bit_comment = new string[16]
-            };
-            r1.bit_comment[0] = "[0] Enable the flash gate.";
-            r1.bit_comment[1] = "[1] Select the CMB pulse routing. 0: Flash Gate, 1: LED flasher.";
-            r1.bit_comment[2] = "[2] LED Flasher signal source. 0: Test pulser, 1: Flash Gate.";
-            list_of_reg.Add(r1);
-
             r1 = new Mu2e_Register()
             {
                 name = "FLASH_GATE_TURN_ON",
