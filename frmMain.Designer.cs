@@ -96,13 +96,13 @@
             this.zg1 = new ZedGraph.ZedGraphControl();
             this.tabConsole = new System.Windows.Forms.TabPage();
             this.dbgWC = new System.Windows.Forms.Button();
-            this.dbgFEB2 = new System.Windows.Forms.Button();
-            this.dbgFEB1 = new System.Windows.Forms.Button();
-            this.groupBox3 = new System.Windows.Forms.GroupBox();
             this.button4 = new System.Windows.Forms.Button();
+            this.dbgFEB2 = new System.Windows.Forms.Button();
             this.btnDebugLogging = new System.Windows.Forms.Button();
-            this.lblConsole_disp = new System.Windows.Forms.Label();
+            this.dbgFEB1 = new System.Windows.Forms.Button();
             this.textBox1 = new System.Windows.Forms.TextBox();
+            this.groupBox3 = new System.Windows.Forms.GroupBox();
+            this.console_Disp = new System.Windows.Forms.RichTextBox();
             this.tabFEB1 = new System.Windows.Forms.TabPage();
             this.BDVoltsLabel15 = new System.Windows.Forms.Label();
             this.BDVoltsLabel14 = new System.Windows.Forms.Label();
@@ -184,16 +184,16 @@
             this.btnWC = new System.Windows.Forms.Button();
             this.tabQA = new System.Windows.Forms.TabPage();
             this.lightCheckGroup = new System.Windows.Forms.GroupBox();
+            this.lightNumChecks = new System.Windows.Forms.NumericUpDown();
+            this.lightModuleSideLabel = new System.Windows.Forms.Label();
+            this.lightModuleLayerLabel = new System.Windows.Forms.Label();
+            this.lightModuleLayer = new System.Windows.Forms.NumericUpDown();
+            this.lightModuleSide = new System.Windows.Forms.ComboBox();
+            this.lightModuleLabelLabel = new System.Windows.Forms.Label();
+            this.lightModuleLabel = new System.Windows.Forms.TextBox();
+            this.lightWriteToFileBox = new System.Windows.Forms.CheckBox();
+            this.lightCheckFPGApanel = new System.Windows.Forms.TableLayoutPanel();
             this.label16 = new System.Windows.Forms.Label();
-            this.numTimesToCheckTextBox = new System.Windows.Forms.TextBox();
-            this.j18 = new System.Windows.Forms.Label();
-            this.j17 = new System.Windows.Forms.Label();
-            this.j16 = new System.Windows.Forms.Label();
-            this.j15 = new System.Windows.Forms.Label();
-            this.j14 = new System.Windows.Forms.Label();
-            this.j13 = new System.Windows.Forms.Label();
-            this.j12 = new System.Windows.Forms.Label();
-            this.j11 = new System.Windows.Forms.Label();
             this.lightCheckResetThresh = new System.Windows.Forms.Button();
             this.lightAutoThreshProgress = new System.Windows.Forms.ProgressBar();
             this.lightCheckChanThreshBtn = new System.Windows.Forms.Button();
@@ -204,56 +204,18 @@
             this.autoThreshBtn = new System.Windows.Forms.Button();
             this.globalThreshChkBox = new System.Windows.Forms.CheckBox();
             this.lightGlobalThreshLbl = new System.Windows.Forms.Label();
-            this.lightBut31 = new System.Windows.Forms.RadioButton();
             this.lightGlobalThresh = new System.Windows.Forms.TextBox();
-            this.lightBut0 = new System.Windows.Forms.RadioButton();
             this.lightCheckBtn = new System.Windows.Forms.Button();
-            this.lightBut1 = new System.Windows.Forms.RadioButton();
-            this.lightBut2 = new System.Windows.Forms.RadioButton();
-            this.lightBut3 = new System.Windows.Forms.RadioButton();
-            this.lightBut4 = new System.Windows.Forms.RadioButton();
-            this.lightBut30 = new System.Windows.Forms.RadioButton();
-            this.lightBut5 = new System.Windows.Forms.RadioButton();
-            this.lightBut29 = new System.Windows.Forms.RadioButton();
-            this.lightBut6 = new System.Windows.Forms.RadioButton();
-            this.lightBut28 = new System.Windows.Forms.RadioButton();
-            this.lightBut7 = new System.Windows.Forms.RadioButton();
-            this.lightBut27 = new System.Windows.Forms.RadioButton();
-            this.lightBut8 = new System.Windows.Forms.RadioButton();
-            this.lightBut26 = new System.Windows.Forms.RadioButton();
-            this.lightBut9 = new System.Windows.Forms.RadioButton();
-            this.lightBut25 = new System.Windows.Forms.RadioButton();
-            this.lightBut10 = new System.Windows.Forms.RadioButton();
-            this.lightBut24 = new System.Windows.Forms.RadioButton();
-            this.lightBut11 = new System.Windows.Forms.RadioButton();
-            this.lightBut23 = new System.Windows.Forms.RadioButton();
-            this.lightBut12 = new System.Windows.Forms.RadioButton();
-            this.lightBut22 = new System.Windows.Forms.RadioButton();
-            this.lightBut13 = new System.Windows.Forms.RadioButton();
-            this.lightBut21 = new System.Windows.Forms.RadioButton();
-            this.lightBut14 = new System.Windows.Forms.RadioButton();
-            this.lightBut20 = new System.Windows.Forms.RadioButton();
-            this.lightBut15 = new System.Windows.Forms.RadioButton();
-            this.lightBut19 = new System.Windows.Forms.RadioButton();
-            this.lightBut16 = new System.Windows.Forms.RadioButton();
-            this.lightBut18 = new System.Windows.Forms.RadioButton();
-            this.lightBut17 = new System.Windows.Forms.RadioButton();
             this.dicounterQAGroup = new System.Windows.Forms.GroupBox();
+            this.qaOutputFileName = new System.Windows.Forms.TextBox();
+            this.qaOutputFileNameLabel = new System.Windows.Forms.Label();
             this.oneReadout = new System.Windows.Forms.CheckBox();
-            this.numAvg = new System.Windows.Forms.NumericUpDown();
-            this.label22 = new System.Windows.Forms.Label();
-            this.but7 = new System.Windows.Forms.RadioButton();
-            this.but3 = new System.Windows.Forms.RadioButton();
-            this.but2 = new System.Windows.Forms.RadioButton();
-            this.but1 = new System.Windows.Forms.RadioButton();
-            this.but0 = new System.Windows.Forms.RadioButton();
-            this.but5 = new System.Windows.Forms.RadioButton();
-            this.but4 = new System.Windows.Forms.RadioButton();
-            this.but6 = new System.Windows.Forms.RadioButton();
-            this.label21 = new System.Windows.Forms.Label();
-            this.iWarningThresh = new System.Windows.Forms.TextBox();
+            this.qaDiNumAvg = new System.Windows.Forms.NumericUpDown();
+            this.qaDiNumAvgLabel = new System.Windows.Forms.Label();
+            this.qaDiIWarningThreshLabel = new System.Windows.Forms.Label();
+            this.qaDiIWarningThresh = new System.Windows.Forms.TextBox();
             this.autoDataProgress = new System.Windows.Forms.ProgressBar();
-            this.numButton = new System.Windows.Forms.Button();
+            this.qaStartButton = new System.Windows.Forms.Button();
             this.numLabel = new System.Windows.Forms.Label();
             this.numTextBox = new System.Windows.Forms.TextBox();
             this.qaBiasLbl = new System.Windows.Forms.Label();
@@ -271,15 +233,8 @@
             this.cmbBias = new System.Windows.Forms.TextBox();
             this.cmbBiasOverride = new System.Windows.Forms.CheckBox();
             this.cmbTestBtn = new System.Windows.Forms.Button();
-            this.comPortStatus = new System.Windows.Forms.Label();
-            this.comPortListLabel = new System.Windows.Forms.Label();
-            this.comStatus = new System.Windows.Forms.Label();
-            this.getCOMPorts = new System.Windows.Forms.Button();
-            this.comPortList = new System.Windows.Forms.ComboBox();
-            this.comPortDisconnect = new System.Windows.Forms.Button();
-            this.comPortConnect = new System.Windows.Forms.Button();
             this.timer1 = new System.Windows.Forms.Timer(this.components);
-            this.serialPort1 = new System.IO.Ports.SerialPort(this.components);
+            this.runLog = new System.Windows.Forms.RichTextBox();
             this.statusStrip1.SuspendLayout();
             this.tabControl.SuspendLayout();
             this.tabRUN.SuspendLayout();
@@ -307,11 +262,12 @@
             this.groupBox6.SuspendLayout();
             this.tabQA.SuspendLayout();
             this.lightCheckGroup.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.lightNumChecks)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.lightModuleLayer)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.lightCheckChanSelec)).BeginInit();
             this.dicounterQAGroup.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.numAvg)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.qaDiNumAvg)).BeginInit();
             this.tabCMBTester.SuspendLayout();
-            this.cmbHistoBox.SuspendLayout();
             this.cmbTestControl.SuspendLayout();
             this.sipmControl.SuspendLayout();
             this.SuspendLayout();
@@ -379,6 +335,7 @@
             // 
             // tabRUN
             // 
+            this.tabRUN.Controls.Add(this.runLog);
             this.tabRUN.Controls.Add(this.label14);
             this.tabRUN.Controls.Add(this.label13);
             this.tabRUN.Controls.Add(this.label12);
@@ -435,7 +392,6 @@
             this.label10.Size = new System.Drawing.Size(89, 17);
             this.label10.TabIndex = 36;
             this.label10.Text = "<maxADC0>:";
-            this.label10.Click += new System.EventHandler(this.Label10_Click);
             // 
             // lblMaxADC3
             // 
@@ -1034,8 +990,11 @@
             // tabConsole
             // 
             this.tabConsole.Controls.Add(this.dbgWC);
+            this.tabConsole.Controls.Add(this.button4);
             this.tabConsole.Controls.Add(this.dbgFEB2);
+            this.tabConsole.Controls.Add(this.btnDebugLogging);
             this.tabConsole.Controls.Add(this.dbgFEB1);
+            this.tabConsole.Controls.Add(this.textBox1);
             this.tabConsole.Controls.Add(this.groupBox3);
             this.tabConsole.Location = new System.Drawing.Point(4, 29);
             this.tabConsole.Name = "tabConsole";
@@ -1055,6 +1014,15 @@
             this.dbgWC.UseVisualStyleBackColor = true;
             this.dbgWC.Click += new System.EventHandler(this.DbgFEB_Click);
             // 
+            // button4
+            // 
+            this.button4.Location = new System.Drawing.Point(1099, 640);
+            this.button4.Name = "button4";
+            this.button4.Size = new System.Drawing.Size(148, 25);
+            this.button4.TabIndex = 3;
+            this.button4.Text = "LOAD";
+            this.button4.UseVisualStyleBackColor = true;
+            // 
             // dbgFEB2
             // 
             this.dbgFEB2.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
@@ -1065,6 +1033,16 @@
             this.dbgFEB2.Text = "FEB2";
             this.dbgFEB2.UseVisualStyleBackColor = true;
             this.dbgFEB2.Click += new System.EventHandler(this.DbgFEB_Click);
+            // 
+            // btnDebugLogging
+            // 
+            this.btnDebugLogging.Location = new System.Drawing.Point(945, 640);
+            this.btnDebugLogging.Name = "btnDebugLogging";
+            this.btnDebugLogging.Size = new System.Drawing.Size(148, 25);
+            this.btnDebugLogging.TabIndex = 2;
+            this.btnDebugLogging.Text = "START LOG";
+            this.btnDebugLogging.UseVisualStyleBackColor = true;
+            this.btnDebugLogging.Click += new System.EventHandler(this.BtnDebugLogging_Click);
             // 
             // dbgFEB1
             // 
@@ -1077,58 +1055,37 @@
             this.dbgFEB1.UseVisualStyleBackColor = true;
             this.dbgFEB1.Click += new System.EventHandler(this.DbgFEB_Click);
             // 
+            // textBox1
+            // 
+            this.textBox1.Location = new System.Drawing.Point(3, 641);
+            this.textBox1.Multiline = true;
+            this.textBox1.Name = "textBox1";
+            this.textBox1.Size = new System.Drawing.Size(936, 24);
+            this.textBox1.TabIndex = 0;
+            this.textBox1.TextChanged += new System.EventHandler(this.TextBox1_TextChanged);
+            this.textBox1.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.TextBox1_KeyPress);
+            // 
             // groupBox3
             // 
-            this.groupBox3.Controls.Add(this.button4);
-            this.groupBox3.Controls.Add(this.btnDebugLogging);
-            this.groupBox3.Controls.Add(this.lblConsole_disp);
-            this.groupBox3.Controls.Add(this.textBox1);
+            this.groupBox3.Controls.Add(this.console_Disp);
             this.groupBox3.Location = new System.Drawing.Point(3, 40);
             this.groupBox3.Name = "groupBox3";
-            this.groupBox3.Size = new System.Drawing.Size(1249, 626);
+            this.groupBox3.Size = new System.Drawing.Size(1249, 595);
             this.groupBox3.TabIndex = 4;
             this.groupBox3.TabStop = false;
             this.groupBox3.Text = "CONSOLE";
             // 
-            // button4
+            // console_Disp
             // 
-            this.button4.Location = new System.Drawing.Point(1066, 580);
-            this.button4.Name = "button4";
-            this.button4.Size = new System.Drawing.Size(148, 25);
-            this.button4.TabIndex = 3;
-            this.button4.Text = "LOAD";
-            this.button4.UseVisualStyleBackColor = true;
-            // 
-            // btnDebugLogging
-            // 
-            this.btnDebugLogging.Location = new System.Drawing.Point(912, 580);
-            this.btnDebugLogging.Name = "btnDebugLogging";
-            this.btnDebugLogging.Size = new System.Drawing.Size(148, 25);
-            this.btnDebugLogging.TabIndex = 2;
-            this.btnDebugLogging.Text = "START LOG";
-            this.btnDebugLogging.UseVisualStyleBackColor = true;
-            this.btnDebugLogging.Click += new System.EventHandler(this.BtnDebugLogging_Click);
-            // 
-            // lblConsole_disp
-            // 
-            this.lblConsole_disp.AutoSize = true;
-            this.lblConsole_disp.BackColor = System.Drawing.SystemColors.Info;
-            this.lblConsole_disp.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.150944F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblConsole_disp.Location = new System.Drawing.Point(0, 20);
-            this.lblConsole_disp.Name = "lblConsole_disp";
-            this.lblConsole_disp.Size = new System.Drawing.Size(114, 13);
-            this.lblConsole_disp.TabIndex = 1;
-            this.lblConsole_disp.Text = "console text goes here";
-            // 
-            // textBox1
-            // 
-            this.textBox1.Location = new System.Drawing.Point(-3, 582);
-            this.textBox1.Multiline = true;
-            this.textBox1.Name = "textBox1";
-            this.textBox1.Size = new System.Drawing.Size(894, 24);
-            this.textBox1.TabIndex = 0;
-            this.textBox1.TextChanged += new System.EventHandler(this.TextBox1_TextChanged);
-            this.textBox1.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.TextBox1_KeyPress);
+            this.console_Disp.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.console_Disp.Location = new System.Drawing.Point(3, 19);
+            this.console_Disp.Name = "console_Disp";
+            this.console_Disp.ReadOnly = true;
+            this.console_Disp.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.ForcedVertical;
+            this.console_Disp.Size = new System.Drawing.Size(1243, 573);
+            this.console_Disp.TabIndex = 2;
+            this.console_Disp.Text = "";
+            this.console_Disp.TextChanged += new System.EventHandler(this.Console_Disp_TextChanged);
             // 
             // tabFEB1
             // 
@@ -1376,7 +1333,6 @@
             this.label15.Size = new System.Drawing.Size(67, 16);
             this.label15.TabIndex = 59;
             this.label15.Text = "Num read";
-            this.label15.Click += new System.EventHandler(this.Label15_Click);
             // 
             // ShowSpect
             // 
@@ -2078,16 +2034,16 @@
             // 
             // lightCheckGroup
             // 
+            this.lightCheckGroup.Controls.Add(this.lightNumChecks);
+            this.lightCheckGroup.Controls.Add(this.lightModuleSideLabel);
+            this.lightCheckGroup.Controls.Add(this.lightModuleLayerLabel);
+            this.lightCheckGroup.Controls.Add(this.lightModuleLayer);
+            this.lightCheckGroup.Controls.Add(this.lightModuleSide);
+            this.lightCheckGroup.Controls.Add(this.lightModuleLabelLabel);
+            this.lightCheckGroup.Controls.Add(this.lightModuleLabel);
+            this.lightCheckGroup.Controls.Add(this.lightWriteToFileBox);
+            this.lightCheckGroup.Controls.Add(this.lightCheckFPGApanel);
             this.lightCheckGroup.Controls.Add(this.label16);
-            this.lightCheckGroup.Controls.Add(this.numTimesToCheckTextBox);
-            this.lightCheckGroup.Controls.Add(this.j18);
-            this.lightCheckGroup.Controls.Add(this.j17);
-            this.lightCheckGroup.Controls.Add(this.j16);
-            this.lightCheckGroup.Controls.Add(this.j15);
-            this.lightCheckGroup.Controls.Add(this.j14);
-            this.lightCheckGroup.Controls.Add(this.j13);
-            this.lightCheckGroup.Controls.Add(this.j12);
-            this.lightCheckGroup.Controls.Add(this.j11);
             this.lightCheckGroup.Controls.Add(this.lightCheckResetThresh);
             this.lightCheckGroup.Controls.Add(this.lightAutoThreshProgress);
             this.lightCheckGroup.Controls.Add(this.lightCheckChanThreshBtn);
@@ -2098,156 +2054,151 @@
             this.lightCheckGroup.Controls.Add(this.autoThreshBtn);
             this.lightCheckGroup.Controls.Add(this.globalThreshChkBox);
             this.lightCheckGroup.Controls.Add(this.lightGlobalThreshLbl);
-            this.lightCheckGroup.Controls.Add(this.lightBut31);
             this.lightCheckGroup.Controls.Add(this.lightGlobalThresh);
-            this.lightCheckGroup.Controls.Add(this.lightBut0);
             this.lightCheckGroup.Controls.Add(this.lightCheckBtn);
-            this.lightCheckGroup.Controls.Add(this.lightBut1);
-            this.lightCheckGroup.Controls.Add(this.lightBut2);
-            this.lightCheckGroup.Controls.Add(this.lightBut3);
-            this.lightCheckGroup.Controls.Add(this.lightBut4);
-            this.lightCheckGroup.Controls.Add(this.lightBut30);
-            this.lightCheckGroup.Controls.Add(this.lightBut5);
-            this.lightCheckGroup.Controls.Add(this.lightBut29);
-            this.lightCheckGroup.Controls.Add(this.lightBut6);
-            this.lightCheckGroup.Controls.Add(this.lightBut28);
-            this.lightCheckGroup.Controls.Add(this.lightBut7);
-            this.lightCheckGroup.Controls.Add(this.lightBut27);
-            this.lightCheckGroup.Controls.Add(this.lightBut8);
-            this.lightCheckGroup.Controls.Add(this.lightBut26);
-            this.lightCheckGroup.Controls.Add(this.lightBut9);
-            this.lightCheckGroup.Controls.Add(this.lightBut25);
-            this.lightCheckGroup.Controls.Add(this.lightBut10);
-            this.lightCheckGroup.Controls.Add(this.lightBut24);
-            this.lightCheckGroup.Controls.Add(this.lightBut11);
-            this.lightCheckGroup.Controls.Add(this.lightBut23);
-            this.lightCheckGroup.Controls.Add(this.lightBut12);
-            this.lightCheckGroup.Controls.Add(this.lightBut22);
-            this.lightCheckGroup.Controls.Add(this.lightBut13);
-            this.lightCheckGroup.Controls.Add(this.lightBut21);
-            this.lightCheckGroup.Controls.Add(this.lightBut14);
-            this.lightCheckGroup.Controls.Add(this.lightBut20);
-            this.lightCheckGroup.Controls.Add(this.lightBut15);
-            this.lightCheckGroup.Controls.Add(this.lightBut19);
-            this.lightCheckGroup.Controls.Add(this.lightBut16);
-            this.lightCheckGroup.Controls.Add(this.lightBut18);
-            this.lightCheckGroup.Controls.Add(this.lightBut17);
             this.lightCheckGroup.Location = new System.Drawing.Point(21, 177);
             this.lightCheckGroup.Name = "lightCheckGroup";
-            this.lightCheckGroup.Size = new System.Drawing.Size(512, 346);
+            this.lightCheckGroup.Size = new System.Drawing.Size(1135, 474);
             this.lightCheckGroup.TabIndex = 135;
             this.lightCheckGroup.TabStop = false;
             this.lightCheckGroup.Text = "Light Check";
             // 
+            // lightNumChecks
+            // 
+            this.lightNumChecks.Location = new System.Drawing.Point(108, 111);
+            this.lightNumChecks.Maximum = new decimal(new int[] {
+            10,
+            0,
+            0,
+            0});
+            this.lightNumChecks.Minimum = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+            this.lightNumChecks.Name = "lightNumChecks";
+            this.lightNumChecks.Size = new System.Drawing.Size(63, 23);
+            this.lightNumChecks.TabIndex = 200;
+            this.lightNumChecks.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            this.lightNumChecks.UpDownAlign = System.Windows.Forms.LeftRightAlignment.Left;
+            this.lightNumChecks.Value = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+            // 
+            // lightModuleSideLabel
+            // 
+            this.lightModuleSideLabel.AutoSize = true;
+            this.lightModuleSideLabel.Location = new System.Drawing.Point(402, 14);
+            this.lightModuleSideLabel.Name = "lightModuleSideLabel";
+            this.lightModuleSideLabel.Size = new System.Drawing.Size(36, 17);
+            this.lightModuleSideLabel.TabIndex = 199;
+            this.lightModuleSideLabel.Text = "Side";
+            // 
+            // lightModuleLayerLabel
+            // 
+            this.lightModuleLayerLabel.AutoSize = true;
+            this.lightModuleLayerLabel.Location = new System.Drawing.Point(461, 14);
+            this.lightModuleLayerLabel.Name = "lightModuleLayerLabel";
+            this.lightModuleLayerLabel.Size = new System.Drawing.Size(44, 17);
+            this.lightModuleLayerLabel.TabIndex = 198;
+            this.lightModuleLayerLabel.Text = "Layer";
+            // 
+            // lightModuleLayer
+            // 
+            this.lightModuleLayer.Enabled = false;
+            this.lightModuleLayer.Location = new System.Drawing.Point(459, 34);
+            this.lightModuleLayer.Maximum = new decimal(new int[] {
+            4,
+            0,
+            0,
+            0});
+            this.lightModuleLayer.Minimum = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+            this.lightModuleLayer.Name = "lightModuleLayer";
+            this.lightModuleLayer.Size = new System.Drawing.Size(49, 23);
+            this.lightModuleLayer.TabIndex = 197;
+            this.lightModuleLayer.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            this.lightModuleLayer.Value = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+            // 
+            // lightModuleSide
+            // 
+            this.lightModuleSide.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.lightModuleSide.Enabled = false;
+            this.lightModuleSide.FormattingEnabled = true;
+            this.lightModuleSide.Items.AddRange(new object[] {
+            "A",
+            "B"});
+            this.lightModuleSide.Location = new System.Drawing.Point(396, 33);
+            this.lightModuleSide.Name = "lightModuleSide";
+            this.lightModuleSide.Size = new System.Drawing.Size(49, 25);
+            this.lightModuleSide.TabIndex = 196;
+            // 
+            // lightModuleLabelLabel
+            // 
+            this.lightModuleLabelLabel.AutoSize = true;
+            this.lightModuleLabelLabel.Location = new System.Drawing.Point(287, 16);
+            this.lightModuleLabelLabel.Name = "lightModuleLabelLabel";
+            this.lightModuleLabelLabel.Size = new System.Drawing.Size(93, 17);
+            this.lightModuleLabelLabel.TabIndex = 195;
+            this.lightModuleLabelLabel.Text = "Module Label";
+            // 
+            // lightModuleLabel
+            // 
+            this.lightModuleLabel.BackColor = System.Drawing.Color.Yellow;
+            this.lightModuleLabel.Location = new System.Drawing.Point(287, 34);
+            this.lightModuleLabel.Name = "lightModuleLabel";
+            this.lightModuleLabel.Size = new System.Drawing.Size(95, 23);
+            this.lightModuleLabel.TabIndex = 194;
+            this.lightModuleLabel.TextChanged += new System.EventHandler(this.LightModuleLabel_TextChanged);
+            // 
+            // lightWriteToFileBox
+            // 
+            this.lightWriteToFileBox.AutoSize = true;
+            this.lightWriteToFileBox.CheckAlign = System.Drawing.ContentAlignment.BottomCenter;
+            this.lightWriteToFileBox.Enabled = false;
+            this.lightWriteToFileBox.Location = new System.Drawing.Point(522, 17);
+            this.lightWriteToFileBox.Name = "lightWriteToFileBox";
+            this.lightWriteToFileBox.Size = new System.Drawing.Size(87, 35);
+            this.lightWriteToFileBox.TabIndex = 193;
+            this.lightWriteToFileBox.Text = "Write to File";
+            this.lightWriteToFileBox.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
+            this.lightWriteToFileBox.UseVisualStyleBackColor = true;
+            this.lightWriteToFileBox.CheckedChanged += new System.EventHandler(this.LightWriteToFileBox_CheckedChanged);
+            // 
+            // lightCheckFPGApanel
+            // 
+            this.lightCheckFPGApanel.ColumnCount = 2;
+            this.lightCheckFPGApanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
+            this.lightCheckFPGApanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
+            this.lightCheckFPGApanel.Location = new System.Drawing.Point(286, 71);
+            this.lightCheckFPGApanel.Name = "lightCheckFPGApanel";
+            this.lightCheckFPGApanel.RowCount = 2;
+            this.lightCheckFPGApanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
+            this.lightCheckFPGApanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
+            this.lightCheckFPGApanel.Size = new System.Drawing.Size(843, 397);
+            this.lightCheckFPGApanel.TabIndex = 192;
+            // 
             // label16
             // 
             this.label16.AutoSize = true;
-            this.label16.Location = new System.Drawing.Point(15, 87);
+            this.label16.Location = new System.Drawing.Point(43, 91);
             this.label16.Name = "label16";
-            this.label16.Size = new System.Drawing.Size(175, 17);
+            this.label16.Size = new System.Drawing.Size(168, 17);
             this.label16.TabIndex = 191;
-            this.label16.Text = "Number of Times to Check";
-            // 
-            // numTimesToCheckTextBox
-            // 
-            this.numTimesToCheckTextBox.Location = new System.Drawing.Point(34, 107);
-            this.numTimesToCheckTextBox.Name = "numTimesToCheckTextBox";
-            this.numTimesToCheckTextBox.Size = new System.Drawing.Size(61, 23);
-            this.numTimesToCheckTextBox.TabIndex = 190;
-            this.numTimesToCheckTextBox.Text = "1";
-            this.numTimesToCheckTextBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
-            // 
-            // j18
-            // 
-            this.j18.AutoSize = true;
-            this.j18.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.j18.Location = new System.Drawing.Point(447, 303);
-            this.j18.Name = "j18";
-            this.j18.Size = new System.Drawing.Size(33, 19);
-            this.j18.TabIndex = 189;
-            this.j18.Text = "J18";
-            this.j18.Click += new System.EventHandler(this.J18_Click);
-            // 
-            // j17
-            // 
-            this.j17.AutoSize = true;
-            this.j17.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.j17.Location = new System.Drawing.Point(447, 271);
-            this.j17.Name = "j17";
-            this.j17.Size = new System.Drawing.Size(33, 19);
-            this.j17.TabIndex = 188;
-            this.j17.Text = "J17";
-            this.j17.Click += new System.EventHandler(this.J17_Click);
-            // 
-            // j16
-            // 
-            this.j16.AutoSize = true;
-            this.j16.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.j16.Location = new System.Drawing.Point(447, 239);
-            this.j16.Name = "j16";
-            this.j16.Size = new System.Drawing.Size(33, 19);
-            this.j16.TabIndex = 187;
-            this.j16.Text = "J16";
-            this.j16.Click += new System.EventHandler(this.J16_Click);
-            // 
-            // j15
-            // 
-            this.j15.AutoSize = true;
-            this.j15.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.j15.Location = new System.Drawing.Point(447, 207);
-            this.j15.Name = "j15";
-            this.j15.Size = new System.Drawing.Size(33, 19);
-            this.j15.TabIndex = 186;
-            this.j15.Text = "J15";
-            this.j15.Click += new System.EventHandler(this.J15_Click);
-            // 
-            // j14
-            // 
-            this.j14.AutoSize = true;
-            this.j14.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.j14.Location = new System.Drawing.Point(447, 175);
-            this.j14.Name = "j14";
-            this.j14.Size = new System.Drawing.Size(33, 19);
-            this.j14.TabIndex = 185;
-            this.j14.Text = "J14";
-            this.j14.Click += new System.EventHandler(this.J14_Click);
-            // 
-            // j13
-            // 
-            this.j13.AutoSize = true;
-            this.j13.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.j13.Location = new System.Drawing.Point(447, 143);
-            this.j13.Name = "j13";
-            this.j13.Size = new System.Drawing.Size(33, 19);
-            this.j13.TabIndex = 184;
-            this.j13.Text = "J13";
-            this.j13.Click += new System.EventHandler(this.J13_Click);
-            // 
-            // j12
-            // 
-            this.j12.AutoSize = true;
-            this.j12.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.j12.Location = new System.Drawing.Point(447, 111);
-            this.j12.Name = "j12";
-            this.j12.Size = new System.Drawing.Size(33, 19);
-            this.j12.TabIndex = 183;
-            this.j12.Text = "J12";
-            this.j12.Click += new System.EventHandler(this.J12_Click);
-            // 
-            // j11
-            // 
-            this.j11.AutoSize = true;
-            this.j11.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.j11.Location = new System.Drawing.Point(447, 79);
-            this.j11.Name = "j11";
-            this.j11.Size = new System.Drawing.Size(33, 19);
-            this.j11.TabIndex = 182;
-            this.j11.Text = "J11";
-            this.j11.Click += new System.EventHandler(this.J11_Click);
+            this.label16.Text = "Number of times to check";
             // 
             // lightCheckResetThresh
             // 
-            this.lightCheckResetThresh.Location = new System.Drawing.Point(60, 252);
+            this.lightCheckResetThresh.Location = new System.Drawing.Point(116, 252);
             this.lightCheckResetThresh.Name = "lightCheckResetThresh";
             this.lightCheckResetThresh.Size = new System.Drawing.Size(55, 34);
             this.lightCheckResetThresh.TabIndex = 181;
@@ -2257,17 +2208,17 @@
             // 
             // lightAutoThreshProgress
             // 
-            this.lightAutoThreshProgress.Location = new System.Drawing.Point(21, 301);
+            this.lightAutoThreshProgress.Location = new System.Drawing.Point(24, 301);
             this.lightAutoThreshProgress.Maximum = 31;
             this.lightAutoThreshProgress.Name = "lightAutoThreshProgress";
-            this.lightAutoThreshProgress.Size = new System.Drawing.Size(244, 23);
+            this.lightAutoThreshProgress.Size = new System.Drawing.Size(239, 23);
             this.lightAutoThreshProgress.Step = 1;
             this.lightAutoThreshProgress.TabIndex = 180;
             // 
             // lightCheckChanThreshBtn
             // 
             this.lightCheckChanThreshBtn.Font = new System.Drawing.Font("Consolas", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lightCheckChanThreshBtn.Location = new System.Drawing.Point(165, 167);
+            this.lightCheckChanThreshBtn.Location = new System.Drawing.Point(199, 167);
             this.lightCheckChanThreshBtn.Name = "lightCheckChanThreshBtn";
             this.lightCheckChanThreshBtn.Size = new System.Drawing.Size(24, 23);
             this.lightCheckChanThreshBtn.TabIndex = 177;
@@ -2278,7 +2229,7 @@
             // lightCheckChanThreshLbl
             // 
             this.lightCheckChanThreshLbl.AutoSize = true;
-            this.lightCheckChanThreshLbl.Location = new System.Drawing.Point(79, 148);
+            this.lightCheckChanThreshLbl.Location = new System.Drawing.Point(113, 148);
             this.lightCheckChanThreshLbl.Name = "lightCheckChanThreshLbl";
             this.lightCheckChanThreshLbl.Size = new System.Drawing.Size(53, 17);
             this.lightCheckChanThreshLbl.TabIndex = 176;
@@ -2286,7 +2237,7 @@
             // 
             // lightCheckChanThresh
             // 
-            this.lightCheckChanThresh.Location = new System.Drawing.Point(79, 167);
+            this.lightCheckChanThresh.Location = new System.Drawing.Point(112, 167);
             this.lightCheckChanThresh.Name = "lightCheckChanThresh";
             this.lightCheckChanThresh.Size = new System.Drawing.Size(79, 23);
             this.lightCheckChanThresh.TabIndex = 175;
@@ -2295,7 +2246,7 @@
             // lightCheckChanSelecLbl
             // 
             this.lightCheckChanSelecLbl.AutoSize = true;
-            this.lightCheckChanSelecLbl.Location = new System.Drawing.Point(14, 148);
+            this.lightCheckChanSelecLbl.Location = new System.Drawing.Point(48, 148);
             this.lightCheckChanSelecLbl.Name = "lightCheckChanSelecLbl";
             this.lightCheckChanSelecLbl.Size = new System.Drawing.Size(41, 17);
             this.lightCheckChanSelecLbl.TabIndex = 174;
@@ -2303,7 +2254,7 @@
             // 
             // lightCheckChanSelec
             // 
-            this.lightCheckChanSelec.Location = new System.Drawing.Point(14, 167);
+            this.lightCheckChanSelec.Location = new System.Drawing.Point(48, 167);
             this.lightCheckChanSelec.Maximum = new decimal(new int[] {
             31,
             0,
@@ -2318,7 +2269,7 @@
             // 
             // autoThreshBtn
             // 
-            this.autoThreshBtn.Location = new System.Drawing.Point(36, 205);
+            this.autoThreshBtn.Location = new System.Drawing.Point(89, 205);
             this.autoThreshBtn.Name = "autoThreshBtn";
             this.autoThreshBtn.Size = new System.Drawing.Size(108, 34);
             this.autoThreshBtn.TabIndex = 172;
@@ -2329,7 +2280,7 @@
             // globalThreshChkBox
             // 
             this.globalThreshChkBox.AutoSize = true;
-            this.globalThreshChkBox.Location = new System.Drawing.Point(112, 49);
+            this.globalThreshChkBox.Location = new System.Drawing.Point(109, 57);
             this.globalThreshChkBox.Name = "globalThreshChkBox";
             this.globalThreshChkBox.Size = new System.Drawing.Size(154, 21);
             this.globalThreshChkBox.TabIndex = 171;
@@ -2339,56 +2290,25 @@
             // lightGlobalThreshLbl
             // 
             this.lightGlobalThreshLbl.AutoSize = true;
-            this.lightGlobalThreshLbl.Location = new System.Drawing.Point(14, 27);
+            this.lightGlobalThreshLbl.Location = new System.Drawing.Point(25, 37);
             this.lightGlobalThreshLbl.Name = "lightGlobalThreshLbl";
             this.lightGlobalThreshLbl.Size = new System.Drawing.Size(117, 17);
             this.lightGlobalThreshLbl.TabIndex = 169;
             this.lightGlobalThreshLbl.Text = "Global Threshold";
             // 
-            // lightBut31
-            // 
-            this.lightBut31.Appearance = System.Windows.Forms.Appearance.Button;
-            this.lightBut31.AutoCheck = false;
-            this.lightBut31.BackColor = System.Drawing.Color.Green;
-            this.lightBut31.Cursor = System.Windows.Forms.Cursors.Cross;
-            this.lightBut31.Font = new System.Drawing.Font("Microsoft Sans Serif", 8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lightBut31.Location = new System.Drawing.Point(389, 299);
-            this.lightBut31.Name = "lightBut31";
-            this.lightBut31.Size = new System.Drawing.Size(40, 40);
-            this.lightBut31.TabIndex = 168;
-            this.lightBut31.Text = "31";
-            this.lightBut31.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            this.lightBut31.UseVisualStyleBackColor = false;
-            this.lightBut31.Click += new System.EventHandler(this.LightBut31_Click);
-            // 
             // lightGlobalThresh
             // 
-            this.lightGlobalThresh.Location = new System.Drawing.Point(36, 47);
+            this.lightGlobalThresh.Location = new System.Drawing.Point(31, 56);
             this.lightGlobalThresh.Name = "lightGlobalThresh";
             this.lightGlobalThresh.Size = new System.Drawing.Size(61, 23);
             this.lightGlobalThresh.TabIndex = 167;
             this.lightGlobalThresh.Text = "0.25";
             this.lightGlobalThresh.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
-            // 
-            // lightBut0
-            // 
-            this.lightBut0.Appearance = System.Windows.Forms.Appearance.Button;
-            this.lightBut0.AutoCheck = false;
-            this.lightBut0.BackColor = System.Drawing.Color.Green;
-            this.lightBut0.Cursor = System.Windows.Forms.Cursors.Cross;
-            this.lightBut0.Font = new System.Drawing.Font("Microsoft Sans Serif", 8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lightBut0.Location = new System.Drawing.Point(287, 75);
-            this.lightBut0.Name = "lightBut0";
-            this.lightBut0.Size = new System.Drawing.Size(40, 40);
-            this.lightBut0.TabIndex = 134;
-            this.lightBut0.Text = "0";
-            this.lightBut0.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            this.lightBut0.UseVisualStyleBackColor = false;
-            this.lightBut0.Click += new System.EventHandler(this.LightBut0_Click);
+            this.lightGlobalThresh.TextChanged += new System.EventHandler(this.LightGlobalThresh_TextChanged);
             // 
             // lightCheckBtn
             // 
-            this.lightCheckBtn.Location = new System.Drawing.Point(287, 27);
+            this.lightCheckBtn.Location = new System.Drawing.Point(623, 23);
             this.lightCheckBtn.Name = "lightCheckBtn";
             this.lightCheckBtn.Size = new System.Drawing.Size(130, 35);
             this.lightCheckBtn.TabIndex = 166;
@@ -2396,684 +2316,102 @@
             this.lightCheckBtn.UseVisualStyleBackColor = true;
             this.lightCheckBtn.Click += new System.EventHandler(this.LightCheckBtn_Click);
             // 
-            // lightBut1
-            // 
-            this.lightBut1.Appearance = System.Windows.Forms.Appearance.Button;
-            this.lightBut1.AutoCheck = false;
-            this.lightBut1.BackColor = System.Drawing.Color.Green;
-            this.lightBut1.Cursor = System.Windows.Forms.Cursors.Cross;
-            this.lightBut1.Font = new System.Drawing.Font("Microsoft Sans Serif", 8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lightBut1.Location = new System.Drawing.Point(321, 75);
-            this.lightBut1.Name = "lightBut1";
-            this.lightBut1.Size = new System.Drawing.Size(40, 40);
-            this.lightBut1.TabIndex = 135;
-            this.lightBut1.Text = "1";
-            this.lightBut1.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            this.lightBut1.UseVisualStyleBackColor = false;
-            this.lightBut1.Click += new System.EventHandler(this.LightBut1_Click);
-            // 
-            // lightBut2
-            // 
-            this.lightBut2.Appearance = System.Windows.Forms.Appearance.Button;
-            this.lightBut2.AutoCheck = false;
-            this.lightBut2.BackColor = System.Drawing.Color.Green;
-            this.lightBut2.Cursor = System.Windows.Forms.Cursors.Cross;
-            this.lightBut2.Font = new System.Drawing.Font("Microsoft Sans Serif", 8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lightBut2.Location = new System.Drawing.Point(355, 75);
-            this.lightBut2.Name = "lightBut2";
-            this.lightBut2.Size = new System.Drawing.Size(40, 40);
-            this.lightBut2.TabIndex = 136;
-            this.lightBut2.Text = "2";
-            this.lightBut2.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            this.lightBut2.UseVisualStyleBackColor = false;
-            this.lightBut2.Click += new System.EventHandler(this.LightBut2_Click);
-            // 
-            // lightBut3
-            // 
-            this.lightBut3.Appearance = System.Windows.Forms.Appearance.Button;
-            this.lightBut3.AutoCheck = false;
-            this.lightBut3.BackColor = System.Drawing.Color.Green;
-            this.lightBut3.Cursor = System.Windows.Forms.Cursors.Cross;
-            this.lightBut3.Font = new System.Drawing.Font("Microsoft Sans Serif", 8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lightBut3.Location = new System.Drawing.Point(389, 75);
-            this.lightBut3.Name = "lightBut3";
-            this.lightBut3.Size = new System.Drawing.Size(40, 40);
-            this.lightBut3.TabIndex = 137;
-            this.lightBut3.Text = "3";
-            this.lightBut3.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            this.lightBut3.UseVisualStyleBackColor = false;
-            this.lightBut3.Click += new System.EventHandler(this.LightBut3_Click);
-            // 
-            // lightBut4
-            // 
-            this.lightBut4.Appearance = System.Windows.Forms.Appearance.Button;
-            this.lightBut4.AutoCheck = false;
-            this.lightBut4.BackColor = System.Drawing.Color.Green;
-            this.lightBut4.Cursor = System.Windows.Forms.Cursors.Cross;
-            this.lightBut4.Font = new System.Drawing.Font("Microsoft Sans Serif", 8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lightBut4.Location = new System.Drawing.Point(287, 107);
-            this.lightBut4.Name = "lightBut4";
-            this.lightBut4.Size = new System.Drawing.Size(40, 40);
-            this.lightBut4.TabIndex = 138;
-            this.lightBut4.Text = "4";
-            this.lightBut4.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            this.lightBut4.UseVisualStyleBackColor = false;
-            this.lightBut4.Click += new System.EventHandler(this.LightBut4_Click);
-            // 
-            // lightBut30
-            // 
-            this.lightBut30.Appearance = System.Windows.Forms.Appearance.Button;
-            this.lightBut30.AutoCheck = false;
-            this.lightBut30.BackColor = System.Drawing.Color.Green;
-            this.lightBut30.Cursor = System.Windows.Forms.Cursors.Cross;
-            this.lightBut30.Font = new System.Drawing.Font("Microsoft Sans Serif", 8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lightBut30.Location = new System.Drawing.Point(355, 299);
-            this.lightBut30.Name = "lightBut30";
-            this.lightBut30.Size = new System.Drawing.Size(40, 40);
-            this.lightBut30.TabIndex = 164;
-            this.lightBut30.Text = "30";
-            this.lightBut30.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            this.lightBut30.UseVisualStyleBackColor = false;
-            this.lightBut30.Click += new System.EventHandler(this.LightBut30_Click);
-            // 
-            // lightBut5
-            // 
-            this.lightBut5.Appearance = System.Windows.Forms.Appearance.Button;
-            this.lightBut5.AutoCheck = false;
-            this.lightBut5.BackColor = System.Drawing.Color.Green;
-            this.lightBut5.Cursor = System.Windows.Forms.Cursors.Cross;
-            this.lightBut5.Font = new System.Drawing.Font("Microsoft Sans Serif", 8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lightBut5.Location = new System.Drawing.Point(321, 107);
-            this.lightBut5.Name = "lightBut5";
-            this.lightBut5.Size = new System.Drawing.Size(40, 40);
-            this.lightBut5.TabIndex = 139;
-            this.lightBut5.Text = "5";
-            this.lightBut5.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            this.lightBut5.UseVisualStyleBackColor = false;
-            this.lightBut5.Click += new System.EventHandler(this.LightBut5_Click);
-            // 
-            // lightBut29
-            // 
-            this.lightBut29.Appearance = System.Windows.Forms.Appearance.Button;
-            this.lightBut29.AutoCheck = false;
-            this.lightBut29.BackColor = System.Drawing.Color.Green;
-            this.lightBut29.Cursor = System.Windows.Forms.Cursors.Cross;
-            this.lightBut29.Font = new System.Drawing.Font("Microsoft Sans Serif", 8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lightBut29.Location = new System.Drawing.Point(321, 299);
-            this.lightBut29.Name = "lightBut29";
-            this.lightBut29.Size = new System.Drawing.Size(40, 40);
-            this.lightBut29.TabIndex = 163;
-            this.lightBut29.Text = "29";
-            this.lightBut29.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            this.lightBut29.UseVisualStyleBackColor = false;
-            this.lightBut29.Click += new System.EventHandler(this.LightBut29_Click);
-            // 
-            // lightBut6
-            // 
-            this.lightBut6.Appearance = System.Windows.Forms.Appearance.Button;
-            this.lightBut6.AutoCheck = false;
-            this.lightBut6.BackColor = System.Drawing.Color.Green;
-            this.lightBut6.Cursor = System.Windows.Forms.Cursors.Cross;
-            this.lightBut6.Font = new System.Drawing.Font("Microsoft Sans Serif", 8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lightBut6.Location = new System.Drawing.Point(355, 107);
-            this.lightBut6.Name = "lightBut6";
-            this.lightBut6.Size = new System.Drawing.Size(40, 40);
-            this.lightBut6.TabIndex = 140;
-            this.lightBut6.Text = "6";
-            this.lightBut6.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            this.lightBut6.UseVisualStyleBackColor = false;
-            this.lightBut6.Click += new System.EventHandler(this.LightBut6_Click);
-            // 
-            // lightBut28
-            // 
-            this.lightBut28.Appearance = System.Windows.Forms.Appearance.Button;
-            this.lightBut28.AutoCheck = false;
-            this.lightBut28.BackColor = System.Drawing.Color.Green;
-            this.lightBut28.Cursor = System.Windows.Forms.Cursors.Cross;
-            this.lightBut28.Font = new System.Drawing.Font("Microsoft Sans Serif", 8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lightBut28.Location = new System.Drawing.Point(287, 299);
-            this.lightBut28.Name = "lightBut28";
-            this.lightBut28.Size = new System.Drawing.Size(40, 40);
-            this.lightBut28.TabIndex = 162;
-            this.lightBut28.Text = "28";
-            this.lightBut28.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            this.lightBut28.UseVisualStyleBackColor = false;
-            this.lightBut28.Click += new System.EventHandler(this.LightBut28_Click);
-            // 
-            // lightBut7
-            // 
-            this.lightBut7.Appearance = System.Windows.Forms.Appearance.Button;
-            this.lightBut7.AutoCheck = false;
-            this.lightBut7.BackColor = System.Drawing.Color.Green;
-            this.lightBut7.Cursor = System.Windows.Forms.Cursors.Cross;
-            this.lightBut7.Font = new System.Drawing.Font("Microsoft Sans Serif", 8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lightBut7.Location = new System.Drawing.Point(389, 107);
-            this.lightBut7.Name = "lightBut7";
-            this.lightBut7.Size = new System.Drawing.Size(40, 40);
-            this.lightBut7.TabIndex = 141;
-            this.lightBut7.Text = "7";
-            this.lightBut7.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            this.lightBut7.UseVisualStyleBackColor = false;
-            this.lightBut7.Click += new System.EventHandler(this.LightBut7_Click);
-            // 
-            // lightBut27
-            // 
-            this.lightBut27.Appearance = System.Windows.Forms.Appearance.Button;
-            this.lightBut27.AutoCheck = false;
-            this.lightBut27.BackColor = System.Drawing.Color.Green;
-            this.lightBut27.Cursor = System.Windows.Forms.Cursors.Cross;
-            this.lightBut27.Font = new System.Drawing.Font("Microsoft Sans Serif", 8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lightBut27.Location = new System.Drawing.Point(389, 267);
-            this.lightBut27.Name = "lightBut27";
-            this.lightBut27.Size = new System.Drawing.Size(40, 40);
-            this.lightBut27.TabIndex = 161;
-            this.lightBut27.Text = "27";
-            this.lightBut27.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            this.lightBut27.UseVisualStyleBackColor = false;
-            this.lightBut27.Click += new System.EventHandler(this.LightBut27_Click);
-            // 
-            // lightBut8
-            // 
-            this.lightBut8.Appearance = System.Windows.Forms.Appearance.Button;
-            this.lightBut8.AutoCheck = false;
-            this.lightBut8.BackColor = System.Drawing.Color.Green;
-            this.lightBut8.Cursor = System.Windows.Forms.Cursors.Cross;
-            this.lightBut8.Font = new System.Drawing.Font("Microsoft Sans Serif", 8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lightBut8.Location = new System.Drawing.Point(287, 139);
-            this.lightBut8.Name = "lightBut8";
-            this.lightBut8.Size = new System.Drawing.Size(40, 40);
-            this.lightBut8.TabIndex = 142;
-            this.lightBut8.Text = "8";
-            this.lightBut8.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            this.lightBut8.UseVisualStyleBackColor = false;
-            this.lightBut8.Click += new System.EventHandler(this.LightBut8_Click);
-            // 
-            // lightBut26
-            // 
-            this.lightBut26.Appearance = System.Windows.Forms.Appearance.Button;
-            this.lightBut26.AutoCheck = false;
-            this.lightBut26.BackColor = System.Drawing.Color.Green;
-            this.lightBut26.Cursor = System.Windows.Forms.Cursors.Cross;
-            this.lightBut26.Font = new System.Drawing.Font("Microsoft Sans Serif", 8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lightBut26.Location = new System.Drawing.Point(355, 267);
-            this.lightBut26.Name = "lightBut26";
-            this.lightBut26.Size = new System.Drawing.Size(40, 40);
-            this.lightBut26.TabIndex = 160;
-            this.lightBut26.Text = "26";
-            this.lightBut26.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            this.lightBut26.UseVisualStyleBackColor = false;
-            this.lightBut26.Click += new System.EventHandler(this.LightBut26_Click);
-            // 
-            // lightBut9
-            // 
-            this.lightBut9.Appearance = System.Windows.Forms.Appearance.Button;
-            this.lightBut9.AutoCheck = false;
-            this.lightBut9.BackColor = System.Drawing.Color.Green;
-            this.lightBut9.Cursor = System.Windows.Forms.Cursors.Cross;
-            this.lightBut9.Font = new System.Drawing.Font("Microsoft Sans Serif", 8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lightBut9.Location = new System.Drawing.Point(321, 139);
-            this.lightBut9.Name = "lightBut9";
-            this.lightBut9.Size = new System.Drawing.Size(40, 40);
-            this.lightBut9.TabIndex = 143;
-            this.lightBut9.Text = "9";
-            this.lightBut9.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            this.lightBut9.UseVisualStyleBackColor = false;
-            this.lightBut9.Click += new System.EventHandler(this.LightBut9_Click);
-            // 
-            // lightBut25
-            // 
-            this.lightBut25.Appearance = System.Windows.Forms.Appearance.Button;
-            this.lightBut25.AutoCheck = false;
-            this.lightBut25.BackColor = System.Drawing.Color.Green;
-            this.lightBut25.Cursor = System.Windows.Forms.Cursors.Cross;
-            this.lightBut25.Font = new System.Drawing.Font("Microsoft Sans Serif", 8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lightBut25.Location = new System.Drawing.Point(321, 267);
-            this.lightBut25.Name = "lightBut25";
-            this.lightBut25.Size = new System.Drawing.Size(40, 40);
-            this.lightBut25.TabIndex = 159;
-            this.lightBut25.Text = "25";
-            this.lightBut25.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            this.lightBut25.UseVisualStyleBackColor = false;
-            this.lightBut25.Click += new System.EventHandler(this.LightBut25_Click);
-            // 
-            // lightBut10
-            // 
-            this.lightBut10.Appearance = System.Windows.Forms.Appearance.Button;
-            this.lightBut10.AutoCheck = false;
-            this.lightBut10.BackColor = System.Drawing.Color.Green;
-            this.lightBut10.Cursor = System.Windows.Forms.Cursors.Cross;
-            this.lightBut10.Font = new System.Drawing.Font("Microsoft Sans Serif", 8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lightBut10.Location = new System.Drawing.Point(355, 139);
-            this.lightBut10.Name = "lightBut10";
-            this.lightBut10.Size = new System.Drawing.Size(40, 40);
-            this.lightBut10.TabIndex = 144;
-            this.lightBut10.Text = "10";
-            this.lightBut10.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            this.lightBut10.UseVisualStyleBackColor = false;
-            this.lightBut10.Click += new System.EventHandler(this.LightBut10_Click);
-            // 
-            // lightBut24
-            // 
-            this.lightBut24.Appearance = System.Windows.Forms.Appearance.Button;
-            this.lightBut24.AutoCheck = false;
-            this.lightBut24.BackColor = System.Drawing.Color.Green;
-            this.lightBut24.CheckAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            this.lightBut24.Cursor = System.Windows.Forms.Cursors.Cross;
-            this.lightBut24.Font = new System.Drawing.Font("Microsoft Sans Serif", 8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lightBut24.Location = new System.Drawing.Point(287, 267);
-            this.lightBut24.Name = "lightBut24";
-            this.lightBut24.Size = new System.Drawing.Size(40, 40);
-            this.lightBut24.TabIndex = 158;
-            this.lightBut24.Text = "24";
-            this.lightBut24.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            this.lightBut24.UseVisualStyleBackColor = false;
-            this.lightBut24.Click += new System.EventHandler(this.LightBut24_Click);
-            // 
-            // lightBut11
-            // 
-            this.lightBut11.Appearance = System.Windows.Forms.Appearance.Button;
-            this.lightBut11.AutoCheck = false;
-            this.lightBut11.BackColor = System.Drawing.Color.Green;
-            this.lightBut11.Cursor = System.Windows.Forms.Cursors.Cross;
-            this.lightBut11.Font = new System.Drawing.Font("Microsoft Sans Serif", 8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lightBut11.Location = new System.Drawing.Point(389, 139);
-            this.lightBut11.Name = "lightBut11";
-            this.lightBut11.Size = new System.Drawing.Size(40, 40);
-            this.lightBut11.TabIndex = 145;
-            this.lightBut11.Text = "11";
-            this.lightBut11.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            this.lightBut11.UseVisualStyleBackColor = false;
-            this.lightBut11.Click += new System.EventHandler(this.LightBut11_Click);
-            // 
-            // lightBut23
-            // 
-            this.lightBut23.Appearance = System.Windows.Forms.Appearance.Button;
-            this.lightBut23.AutoCheck = false;
-            this.lightBut23.BackColor = System.Drawing.Color.Green;
-            this.lightBut23.Cursor = System.Windows.Forms.Cursors.Cross;
-            this.lightBut23.Font = new System.Drawing.Font("Microsoft Sans Serif", 8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lightBut23.Location = new System.Drawing.Point(389, 235);
-            this.lightBut23.Name = "lightBut23";
-            this.lightBut23.Size = new System.Drawing.Size(40, 40);
-            this.lightBut23.TabIndex = 157;
-            this.lightBut23.Text = "23";
-            this.lightBut23.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            this.lightBut23.UseVisualStyleBackColor = false;
-            this.lightBut23.Click += new System.EventHandler(this.LightBut23_Click);
-            // 
-            // lightBut12
-            // 
-            this.lightBut12.Appearance = System.Windows.Forms.Appearance.Button;
-            this.lightBut12.AutoCheck = false;
-            this.lightBut12.BackColor = System.Drawing.Color.Green;
-            this.lightBut12.Cursor = System.Windows.Forms.Cursors.Cross;
-            this.lightBut12.Font = new System.Drawing.Font("Microsoft Sans Serif", 8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lightBut12.Location = new System.Drawing.Point(287, 171);
-            this.lightBut12.Name = "lightBut12";
-            this.lightBut12.Size = new System.Drawing.Size(40, 40);
-            this.lightBut12.TabIndex = 146;
-            this.lightBut12.Text = "12";
-            this.lightBut12.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            this.lightBut12.UseVisualStyleBackColor = false;
-            this.lightBut12.Click += new System.EventHandler(this.LightBut12_Click);
-            // 
-            // lightBut22
-            // 
-            this.lightBut22.Appearance = System.Windows.Forms.Appearance.Button;
-            this.lightBut22.AutoCheck = false;
-            this.lightBut22.BackColor = System.Drawing.Color.Green;
-            this.lightBut22.Cursor = System.Windows.Forms.Cursors.Cross;
-            this.lightBut22.Font = new System.Drawing.Font("Microsoft Sans Serif", 8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lightBut22.Location = new System.Drawing.Point(355, 235);
-            this.lightBut22.Name = "lightBut22";
-            this.lightBut22.Size = new System.Drawing.Size(40, 40);
-            this.lightBut22.TabIndex = 156;
-            this.lightBut22.Text = "22";
-            this.lightBut22.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            this.lightBut22.UseVisualStyleBackColor = false;
-            this.lightBut22.Click += new System.EventHandler(this.LightBut22_Click);
-            // 
-            // lightBut13
-            // 
-            this.lightBut13.Appearance = System.Windows.Forms.Appearance.Button;
-            this.lightBut13.AutoCheck = false;
-            this.lightBut13.BackColor = System.Drawing.Color.Green;
-            this.lightBut13.Cursor = System.Windows.Forms.Cursors.Cross;
-            this.lightBut13.Font = new System.Drawing.Font("Microsoft Sans Serif", 8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lightBut13.Location = new System.Drawing.Point(321, 171);
-            this.lightBut13.Name = "lightBut13";
-            this.lightBut13.Size = new System.Drawing.Size(40, 40);
-            this.lightBut13.TabIndex = 147;
-            this.lightBut13.Text = "13";
-            this.lightBut13.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            this.lightBut13.UseVisualStyleBackColor = false;
-            this.lightBut13.Click += new System.EventHandler(this.LightBut13_Click);
-            // 
-            // lightBut21
-            // 
-            this.lightBut21.Appearance = System.Windows.Forms.Appearance.Button;
-            this.lightBut21.AutoCheck = false;
-            this.lightBut21.BackColor = System.Drawing.Color.Green;
-            this.lightBut21.Cursor = System.Windows.Forms.Cursors.Cross;
-            this.lightBut21.Font = new System.Drawing.Font("Microsoft Sans Serif", 8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lightBut21.Location = new System.Drawing.Point(321, 235);
-            this.lightBut21.Name = "lightBut21";
-            this.lightBut21.Size = new System.Drawing.Size(40, 40);
-            this.lightBut21.TabIndex = 155;
-            this.lightBut21.Text = "21";
-            this.lightBut21.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            this.lightBut21.UseVisualStyleBackColor = false;
-            this.lightBut21.Click += new System.EventHandler(this.LightBut21_Click);
-            // 
-            // lightBut14
-            // 
-            this.lightBut14.Appearance = System.Windows.Forms.Appearance.Button;
-            this.lightBut14.AutoCheck = false;
-            this.lightBut14.BackColor = System.Drawing.Color.Green;
-            this.lightBut14.Cursor = System.Windows.Forms.Cursors.Cross;
-            this.lightBut14.Font = new System.Drawing.Font("Microsoft Sans Serif", 8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lightBut14.Location = new System.Drawing.Point(355, 171);
-            this.lightBut14.Name = "lightBut14";
-            this.lightBut14.Size = new System.Drawing.Size(40, 40);
-            this.lightBut14.TabIndex = 148;
-            this.lightBut14.Text = "14";
-            this.lightBut14.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            this.lightBut14.UseVisualStyleBackColor = false;
-            this.lightBut14.Click += new System.EventHandler(this.LightBut14_Click);
-            // 
-            // lightBut20
-            // 
-            this.lightBut20.Appearance = System.Windows.Forms.Appearance.Button;
-            this.lightBut20.AutoCheck = false;
-            this.lightBut20.BackColor = System.Drawing.Color.Green;
-            this.lightBut20.Cursor = System.Windows.Forms.Cursors.Cross;
-            this.lightBut20.Font = new System.Drawing.Font("Microsoft Sans Serif", 8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lightBut20.Location = new System.Drawing.Point(287, 235);
-            this.lightBut20.Name = "lightBut20";
-            this.lightBut20.Size = new System.Drawing.Size(40, 40);
-            this.lightBut20.TabIndex = 154;
-            this.lightBut20.Text = "20";
-            this.lightBut20.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            this.lightBut20.UseVisualStyleBackColor = false;
-            this.lightBut20.Click += new System.EventHandler(this.LightBut20_Click);
-            // 
-            // lightBut15
-            // 
-            this.lightBut15.Appearance = System.Windows.Forms.Appearance.Button;
-            this.lightBut15.AutoCheck = false;
-            this.lightBut15.BackColor = System.Drawing.Color.Green;
-            this.lightBut15.Cursor = System.Windows.Forms.Cursors.Cross;
-            this.lightBut15.Font = new System.Drawing.Font("Microsoft Sans Serif", 8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lightBut15.Location = new System.Drawing.Point(389, 171);
-            this.lightBut15.Name = "lightBut15";
-            this.lightBut15.Size = new System.Drawing.Size(40, 40);
-            this.lightBut15.TabIndex = 149;
-            this.lightBut15.Text = "15";
-            this.lightBut15.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            this.lightBut15.UseVisualStyleBackColor = false;
-            this.lightBut15.Click += new System.EventHandler(this.LightBut15_Click);
-            // 
-            // lightBut19
-            // 
-            this.lightBut19.Appearance = System.Windows.Forms.Appearance.Button;
-            this.lightBut19.AutoCheck = false;
-            this.lightBut19.BackColor = System.Drawing.Color.Green;
-            this.lightBut19.Cursor = System.Windows.Forms.Cursors.Cross;
-            this.lightBut19.Font = new System.Drawing.Font("Microsoft Sans Serif", 8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lightBut19.Location = new System.Drawing.Point(389, 203);
-            this.lightBut19.Name = "lightBut19";
-            this.lightBut19.Size = new System.Drawing.Size(40, 40);
-            this.lightBut19.TabIndex = 153;
-            this.lightBut19.Text = "19";
-            this.lightBut19.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            this.lightBut19.UseVisualStyleBackColor = false;
-            this.lightBut19.Click += new System.EventHandler(this.LightBut19_Click);
-            // 
-            // lightBut16
-            // 
-            this.lightBut16.Appearance = System.Windows.Forms.Appearance.Button;
-            this.lightBut16.AutoCheck = false;
-            this.lightBut16.BackColor = System.Drawing.Color.Green;
-            this.lightBut16.Cursor = System.Windows.Forms.Cursors.Cross;
-            this.lightBut16.Font = new System.Drawing.Font("Microsoft Sans Serif", 8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lightBut16.Location = new System.Drawing.Point(287, 203);
-            this.lightBut16.Name = "lightBut16";
-            this.lightBut16.Size = new System.Drawing.Size(40, 40);
-            this.lightBut16.TabIndex = 150;
-            this.lightBut16.Text = "16";
-            this.lightBut16.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            this.lightBut16.UseVisualStyleBackColor = false;
-            this.lightBut16.Click += new System.EventHandler(this.LightBut16_Click);
-            // 
-            // lightBut18
-            // 
-            this.lightBut18.Appearance = System.Windows.Forms.Appearance.Button;
-            this.lightBut18.AutoCheck = false;
-            this.lightBut18.BackColor = System.Drawing.Color.Green;
-            this.lightBut18.Cursor = System.Windows.Forms.Cursors.Cross;
-            this.lightBut18.Font = new System.Drawing.Font("Microsoft Sans Serif", 8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lightBut18.Location = new System.Drawing.Point(355, 203);
-            this.lightBut18.Name = "lightBut18";
-            this.lightBut18.Size = new System.Drawing.Size(40, 40);
-            this.lightBut18.TabIndex = 152;
-            this.lightBut18.Text = "18";
-            this.lightBut18.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            this.lightBut18.UseVisualStyleBackColor = false;
-            this.lightBut18.Click += new System.EventHandler(this.LightBut18_Click);
-            // 
-            // lightBut17
-            // 
-            this.lightBut17.Appearance = System.Windows.Forms.Appearance.Button;
-            this.lightBut17.AutoCheck = false;
-            this.lightBut17.BackColor = System.Drawing.Color.Green;
-            this.lightBut17.Cursor = System.Windows.Forms.Cursors.Cross;
-            this.lightBut17.Font = new System.Drawing.Font("Microsoft Sans Serif", 8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lightBut17.Location = new System.Drawing.Point(321, 203);
-            this.lightBut17.Name = "lightBut17";
-            this.lightBut17.Size = new System.Drawing.Size(40, 40);
-            this.lightBut17.TabIndex = 151;
-            this.lightBut17.Text = "17";
-            this.lightBut17.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            this.lightBut17.UseVisualStyleBackColor = false;
-            this.lightBut17.Click += new System.EventHandler(this.LightBut17_Click);
-            // 
             // dicounterQAGroup
             // 
+            this.dicounterQAGroup.Controls.Add(this.qaOutputFileName);
+            this.dicounterQAGroup.Controls.Add(this.qaOutputFileNameLabel);
             this.dicounterQAGroup.Controls.Add(this.oneReadout);
-            this.dicounterQAGroup.Controls.Add(this.numAvg);
-            this.dicounterQAGroup.Controls.Add(this.label22);
-            this.dicounterQAGroup.Controls.Add(this.but7);
-            this.dicounterQAGroup.Controls.Add(this.but3);
-            this.dicounterQAGroup.Controls.Add(this.but2);
-            this.dicounterQAGroup.Controls.Add(this.but1);
-            this.dicounterQAGroup.Controls.Add(this.but0);
-            this.dicounterQAGroup.Controls.Add(this.but5);
-            this.dicounterQAGroup.Controls.Add(this.but4);
-            this.dicounterQAGroup.Controls.Add(this.but6);
-            this.dicounterQAGroup.Controls.Add(this.label21);
-            this.dicounterQAGroup.Controls.Add(this.iWarningThresh);
+            this.dicounterQAGroup.Controls.Add(this.qaDiNumAvg);
+            this.dicounterQAGroup.Controls.Add(this.qaDiNumAvgLabel);
+            this.dicounterQAGroup.Controls.Add(this.qaDiIWarningThreshLabel);
+            this.dicounterQAGroup.Controls.Add(this.qaDiIWarningThresh);
             this.dicounterQAGroup.Controls.Add(this.autoDataProgress);
-            this.dicounterQAGroup.Controls.Add(this.numButton);
+            this.dicounterQAGroup.Controls.Add(this.qaStartButton);
             this.dicounterQAGroup.Controls.Add(this.numLabel);
             this.dicounterQAGroup.Controls.Add(this.numTextBox);
             this.dicounterQAGroup.Location = new System.Drawing.Point(21, 60);
             this.dicounterQAGroup.Name = "dicounterQAGroup";
-            this.dicounterQAGroup.Size = new System.Drawing.Size(653, 100);
+            this.dicounterQAGroup.Size = new System.Drawing.Size(950, 100);
             this.dicounterQAGroup.TabIndex = 134;
             this.dicounterQAGroup.TabStop = false;
             this.dicounterQAGroup.Text = "DiCounter QA";
+            // 
+            // qaOutputFileName
+            // 
+            this.qaOutputFileName.Location = new System.Drawing.Point(751, 60);
+            this.qaOutputFileName.Name = "qaOutputFileName";
+            this.qaOutputFileName.Size = new System.Drawing.Size(112, 23);
+            this.qaOutputFileName.TabIndex = 119;
+            // 
+            // qaOutputFileNameLabel
+            // 
+            this.qaOutputFileNameLabel.AutoSize = true;
+            this.qaOutputFileNameLabel.Location = new System.Drawing.Point(524, 64);
+            this.qaOutputFileNameLabel.Name = "qaOutputFileNameLabel";
+            this.qaOutputFileNameLabel.Size = new System.Drawing.Size(371, 17);
+            this.qaOutputFileNameLabel.TabIndex = 118;
+            this.qaOutputFileNameLabel.Text = "Output File Name: \"ScanningData_                              .txt\"\r\n";
             // 
             // oneReadout
             // 
             this.oneReadout.AutoSize = true;
             this.oneReadout.Location = new System.Drawing.Point(527, 30);
             this.oneReadout.Name = "oneReadout";
-            this.oneReadout.Size = new System.Drawing.Size(120, 21);
+            this.oneReadout.Size = new System.Drawing.Size(153, 21);
             this.oneReadout.TabIndex = 117;
-            this.oneReadout.Text = "One Readout?";
+            this.oneReadout.Text = "First Readout Only?";
             this.oneReadout.UseVisualStyleBackColor = true;
+            this.oneReadout.CheckedChanged += new System.EventHandler(this.OneReadout_CheckedChanged);
             // 
-            // numAvg
+            // qaDiNumAvg
             // 
-            this.numAvg.Location = new System.Drawing.Point(251, 54);
-            this.numAvg.Maximum = new decimal(new int[] {
+            this.qaDiNumAvg.Location = new System.Drawing.Point(251, 54);
+            this.qaDiNumAvg.Maximum = new decimal(new int[] {
             1000,
             0,
             0,
             0});
-            this.numAvg.Minimum = new decimal(new int[] {
+            this.qaDiNumAvg.Minimum = new decimal(new int[] {
             1,
             0,
             0,
             0});
-            this.numAvg.Name = "numAvg";
-            this.numAvg.Size = new System.Drawing.Size(57, 23);
-            this.numAvg.TabIndex = 115;
-            this.numAvg.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
-            this.numAvg.Value = new decimal(new int[] {
+            this.qaDiNumAvg.Name = "qaDiNumAvg";
+            this.qaDiNumAvg.Size = new System.Drawing.Size(57, 23);
+            this.qaDiNumAvg.TabIndex = 115;
+            this.qaDiNumAvg.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            this.qaDiNumAvg.Value = new decimal(new int[] {
             1,
             0,
             0,
             0});
             // 
-            // label22
+            // qaDiNumAvgLabel
             // 
-            this.label22.AutoSize = true;
-            this.label22.Location = new System.Drawing.Point(249, 31);
-            this.label22.Name = "label22";
-            this.label22.Size = new System.Drawing.Size(61, 17);
-            this.label22.TabIndex = 114;
-            this.label22.Text = "NumAvg";
+            this.qaDiNumAvgLabel.AutoSize = true;
+            this.qaDiNumAvgLabel.Location = new System.Drawing.Point(249, 31);
+            this.qaDiNumAvgLabel.Name = "qaDiNumAvgLabel";
+            this.qaDiNumAvgLabel.Size = new System.Drawing.Size(61, 17);
+            this.qaDiNumAvgLabel.TabIndex = 114;
+            this.qaDiNumAvgLabel.Text = "NumAvg";
             // 
-            // but7
+            // qaDiIWarningThreshLabel
             // 
-            this.but7.Appearance = System.Windows.Forms.Appearance.Button;
-            this.but7.AutoCheck = false;
-            this.but7.BackColor = System.Drawing.Color.Green;
-            this.but7.Cursor = System.Windows.Forms.Cursors.No;
-            this.but7.Location = new System.Drawing.Point(487, 59);
-            this.but7.Name = "but7";
-            this.but7.Size = new System.Drawing.Size(28, 26);
-            this.but7.TabIndex = 113;
-            this.but7.Text = "7";
-            this.but7.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            this.but7.UseVisualStyleBackColor = false;
+            this.qaDiIWarningThreshLabel.AutoSize = true;
+            this.qaDiIWarningThreshLabel.Location = new System.Drawing.Point(320, 31);
+            this.qaDiIWarningThreshLabel.Name = "qaDiIWarningThreshLabel";
+            this.qaDiIWarningThreshLabel.Size = new System.Drawing.Size(59, 17);
+            this.qaDiIWarningThreshLabel.TabIndex = 105;
+            this.qaDiIWarningThreshLabel.Text = "I_thresh";
             // 
-            // but3
+            // qaDiIWarningThresh
             // 
-            this.but3.Appearance = System.Windows.Forms.Appearance.Button;
-            this.but3.AutoCheck = false;
-            this.but3.BackColor = System.Drawing.Color.Green;
-            this.but3.Cursor = System.Windows.Forms.Cursors.No;
-            this.but3.Location = new System.Drawing.Point(487, 26);
-            this.but3.Name = "but3";
-            this.but3.Size = new System.Drawing.Size(28, 26);
-            this.but3.TabIndex = 112;
-            this.but3.Text = "3";
-            this.but3.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            this.but3.UseVisualStyleBackColor = false;
-            // 
-            // but2
-            // 
-            this.but2.Appearance = System.Windows.Forms.Appearance.Button;
-            this.but2.AutoCheck = false;
-            this.but2.BackColor = System.Drawing.Color.Green;
-            this.but2.Cursor = System.Windows.Forms.Cursors.No;
-            this.but2.Location = new System.Drawing.Point(453, 26);
-            this.but2.Name = "but2";
-            this.but2.Size = new System.Drawing.Size(28, 26);
-            this.but2.TabIndex = 111;
-            this.but2.Text = "2";
-            this.but2.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            this.but2.UseVisualStyleBackColor = false;
-            // 
-            // but1
-            // 
-            this.but1.Appearance = System.Windows.Forms.Appearance.Button;
-            this.but1.AutoCheck = false;
-            this.but1.BackColor = System.Drawing.Color.Green;
-            this.but1.Cursor = System.Windows.Forms.Cursors.No;
-            this.but1.Location = new System.Drawing.Point(419, 26);
-            this.but1.Name = "but1";
-            this.but1.Size = new System.Drawing.Size(28, 26);
-            this.but1.TabIndex = 110;
-            this.but1.Text = "1";
-            this.but1.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            this.but1.UseVisualStyleBackColor = false;
-            // 
-            // but0
-            // 
-            this.but0.Appearance = System.Windows.Forms.Appearance.Button;
-            this.but0.AutoCheck = false;
-            this.but0.BackColor = System.Drawing.Color.Green;
-            this.but0.Cursor = System.Windows.Forms.Cursors.No;
-            this.but0.Location = new System.Drawing.Point(385, 26);
-            this.but0.Name = "but0";
-            this.but0.Size = new System.Drawing.Size(28, 26);
-            this.but0.TabIndex = 109;
-            this.but0.Text = "0";
-            this.but0.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            this.but0.UseVisualStyleBackColor = false;
-            // 
-            // but5
-            // 
-            this.but5.Appearance = System.Windows.Forms.Appearance.Button;
-            this.but5.AutoCheck = false;
-            this.but5.BackColor = System.Drawing.Color.Green;
-            this.but5.Cursor = System.Windows.Forms.Cursors.No;
-            this.but5.Location = new System.Drawing.Point(419, 59);
-            this.but5.Name = "but5";
-            this.but5.Size = new System.Drawing.Size(28, 26);
-            this.but5.TabIndex = 108;
-            this.but5.Text = "5";
-            this.but5.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            this.but5.UseVisualStyleBackColor = false;
-            // 
-            // but4
-            // 
-            this.but4.Appearance = System.Windows.Forms.Appearance.Button;
-            this.but4.AutoCheck = false;
-            this.but4.BackColor = System.Drawing.Color.Green;
-            this.but4.Cursor = System.Windows.Forms.Cursors.No;
-            this.but4.Location = new System.Drawing.Point(385, 59);
-            this.but4.Name = "but4";
-            this.but4.Size = new System.Drawing.Size(28, 26);
-            this.but4.TabIndex = 107;
-            this.but4.Text = "4";
-            this.but4.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            this.but4.UseVisualStyleBackColor = false;
-            // 
-            // but6
-            // 
-            this.but6.Appearance = System.Windows.Forms.Appearance.Button;
-            this.but6.AutoCheck = false;
-            this.but6.BackColor = System.Drawing.Color.Green;
-            this.but6.Cursor = System.Windows.Forms.Cursors.No;
-            this.but6.Location = new System.Drawing.Point(453, 59);
-            this.but6.Name = "but6";
-            this.but6.Size = new System.Drawing.Size(28, 26);
-            this.but6.TabIndex = 106;
-            this.but6.Text = "6";
-            this.but6.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            this.but6.UseVisualStyleBackColor = false;
-            // 
-            // label21
-            // 
-            this.label21.AutoSize = true;
-            this.label21.Location = new System.Drawing.Point(320, 31);
-            this.label21.Name = "label21";
-            this.label21.Size = new System.Drawing.Size(59, 17);
-            this.label21.TabIndex = 105;
-            this.label21.Text = "I_thresh";
-            // 
-            // iWarningThresh
-            // 
-            this.iWarningThresh.Location = new System.Drawing.Point(317, 53);
-            this.iWarningThresh.Name = "iWarningThresh";
-            this.iWarningThresh.Size = new System.Drawing.Size(62, 23);
-            this.iWarningThresh.TabIndex = 104;
-            this.iWarningThresh.Text = "0.1";
-            this.iWarningThresh.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            this.qaDiIWarningThresh.Location = new System.Drawing.Point(317, 53);
+            this.qaDiIWarningThresh.Name = "qaDiIWarningThresh";
+            this.qaDiIWarningThresh.Size = new System.Drawing.Size(62, 23);
+            this.qaDiIWarningThresh.TabIndex = 104;
+            this.qaDiIWarningThresh.Text = "0.1";
+            this.qaDiIWarningThresh.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             // 
             // autoDataProgress
             // 
@@ -3085,15 +2423,15 @@
             this.autoDataProgress.Style = System.Windows.Forms.ProgressBarStyle.Continuous;
             this.autoDataProgress.TabIndex = 103;
             // 
-            // numButton
+            // qaStartButton
             // 
-            this.numButton.Location = new System.Drawing.Point(142, 31);
-            this.numButton.Name = "numButton";
-            this.numButton.Size = new System.Drawing.Size(99, 23);
-            this.numButton.TabIndex = 100;
-            this.numButton.Text = "Auto Data";
-            this.numButton.UseVisualStyleBackColor = true;
-            this.numButton.Click += new System.EventHandler(this.NumButton_Click);
+            this.qaStartButton.Location = new System.Drawing.Point(142, 31);
+            this.qaStartButton.Name = "qaStartButton";
+            this.qaStartButton.Size = new System.Drawing.Size(99, 23);
+            this.qaStartButton.TabIndex = 100;
+            this.qaStartButton.Text = "Auto Data";
+            this.qaStartButton.UseVisualStyleBackColor = true;
+            this.qaStartButton.Click += new System.EventHandler(this.QaStartButton_Click);
             // 
             // numLabel
             // 
@@ -3123,13 +2461,13 @@
             // 
             // qaBias
             // 
-            this.qaBias.BackColor = System.Drawing.Color.Red;
+            this.qaBias.BackColor = System.Drawing.Color.LightGray;
             this.qaBias.Font = new System.Drawing.Font("Consolas", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.qaBias.Location = new System.Drawing.Point(133, 21);
             this.qaBias.Name = "qaBias";
             this.qaBias.Size = new System.Drawing.Size(79, 23);
             this.qaBias.TabIndex = 131;
-            this.qaBias.Text = "0.00";
+            this.qaBias.Text = "57.0";
             this.qaBias.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             this.qaBias.TextChanged += new System.EventHandler(this.QaBias_TextChanged);
             // 
@@ -3267,60 +2605,23 @@
             this.cmbTestBtn.UseVisualStyleBackColor = true;
             this.cmbTestBtn.Click += new System.EventHandler(this.CmbTestBtn_Click);
             // 
-            // comPortStatus
-            // 
-            this.comPortStatus.Location = new System.Drawing.Point(0, 0);
-            this.comPortStatus.Name = "comPortStatus";
-            this.comPortStatus.Size = new System.Drawing.Size(100, 23);
-            this.comPortStatus.TabIndex = 0;
-            // 
-            // comPortListLabel
-            // 
-            this.comPortListLabel.Location = new System.Drawing.Point(0, 0);
-            this.comPortListLabel.Name = "comPortListLabel";
-            this.comPortListLabel.Size = new System.Drawing.Size(100, 23);
-            this.comPortListLabel.TabIndex = 0;
-            // 
-            // comStatus
-            // 
-            this.comStatus.Location = new System.Drawing.Point(0, 0);
-            this.comStatus.Name = "comStatus";
-            this.comStatus.Size = new System.Drawing.Size(100, 23);
-            this.comStatus.TabIndex = 0;
-            // 
-            // getCOMPorts
-            // 
-            this.getCOMPorts.Location = new System.Drawing.Point(0, 0);
-            this.getCOMPorts.Name = "getCOMPorts";
-            this.getCOMPorts.Size = new System.Drawing.Size(75, 23);
-            this.getCOMPorts.TabIndex = 0;
-            // 
-            // comPortList
-            // 
-            this.comPortList.Location = new System.Drawing.Point(0, 0);
-            this.comPortList.Name = "comPortList";
-            this.comPortList.Size = new System.Drawing.Size(121, 21);
-            this.comPortList.TabIndex = 0;
-            // 
-            // comPortDisconnect
-            // 
-            this.comPortDisconnect.Location = new System.Drawing.Point(0, 0);
-            this.comPortDisconnect.Name = "comPortDisconnect";
-            this.comPortDisconnect.Size = new System.Drawing.Size(75, 23);
-            this.comPortDisconnect.TabIndex = 0;
-            // 
-            // comPortConnect
-            // 
-            this.comPortConnect.Location = new System.Drawing.Point(0, 0);
-            this.comPortConnect.Name = "comPortConnect";
-            this.comPortConnect.Size = new System.Drawing.Size(75, 23);
-            this.comPortConnect.TabIndex = 0;
-            // 
             // timer1
             // 
             this.timer1.Enabled = true;
             this.timer1.Interval = 200;
             this.timer1.Tick += new System.EventHandler(this.Timer1_Tick);
+            // 
+            // runLog
+            // 
+            this.runLog.Location = new System.Drawing.Point(3, 459);
+            this.runLog.Name = "runLog";
+            this.runLog.ReadOnly = true;
+            this.runLog.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.ForcedBoth;
+            this.runLog.Size = new System.Drawing.Size(1240, 180);
+            this.runLog.TabIndex = 46;
+            this.runLog.Text = "";
+            this.runLog.WordWrap = false;
+            this.runLog.TextChanged += new System.EventHandler(this.RunLog_TextChanged);
             // 
             // frmMain
             // 
@@ -3350,8 +2651,8 @@
             this.groupBox1.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).EndInit();
             this.tabConsole.ResumeLayout(false);
+            this.tabConsole.PerformLayout();
             this.groupBox3.ResumeLayout(false);
-            this.groupBox3.PerformLayout();
             this.tabFEB1.ResumeLayout(false);
             this.tabFEB1.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.nreads)).EndInit();
@@ -3379,12 +2680,13 @@
             this.tabQA.PerformLayout();
             this.lightCheckGroup.ResumeLayout(false);
             this.lightCheckGroup.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.lightNumChecks)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.lightModuleLayer)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.lightCheckChanSelec)).EndInit();
             this.dicounterQAGroup.ResumeLayout(false);
             this.dicounterQAGroup.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.numAvg)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.qaDiNumAvg)).EndInit();
             this.tabCMBTester.ResumeLayout(false);
-            this.cmbHistoBox.ResumeLayout(false);
             this.cmbTestControl.ResumeLayout(false);
             this.cmbTestControl.PerformLayout();
             this.sipmControl.ResumeLayout(false);
@@ -3439,7 +2741,6 @@
         private System.Windows.Forms.Button dbgFEB2;
         private System.Windows.Forms.Button dbgFEB1;
         private System.Windows.Forms.GroupBox groupBox3;
-        private System.Windows.Forms.Label lblConsole_disp;
         private System.Windows.Forms.TextBox textBox1;
         private System.Windows.Forms.Button btnBiasREAD;
         private System.Windows.Forms.TextBox txtI;
@@ -3535,55 +2836,18 @@
         private System.Windows.Forms.Label qaBiasLbl;
         private System.Windows.Forms.TextBox qaBias;
         private System.Windows.Forms.GroupBox dicounterQAGroup;
-        private System.Windows.Forms.RadioButton but7;
-        private System.Windows.Forms.RadioButton but3;
-        private System.Windows.Forms.RadioButton but2;
-        private System.Windows.Forms.RadioButton but1;
-        private System.Windows.Forms.RadioButton but0;
-        private System.Windows.Forms.RadioButton but5;
-        private System.Windows.Forms.RadioButton but4;
-        private System.Windows.Forms.RadioButton but6;
-        private System.Windows.Forms.Label label21;
-        private System.Windows.Forms.TextBox iWarningThresh;
+        private System.Windows.Forms.RadioButton[] qaDiButtons;
+        private System.Windows.Forms.Label qaDiIWarningThreshLabel;
+        private System.Windows.Forms.TextBox qaDiIWarningThresh;
         private System.Windows.Forms.ProgressBar autoDataProgress;
-        public System.Windows.Forms.Button numButton;
+        private System.Windows.Forms.Button qaStartButton;
         private System.Windows.Forms.Label numLabel;
         private System.Windows.Forms.TextBox numTextBox;
         private System.Windows.Forms.GroupBox lightCheckGroup;
-        private System.Windows.Forms.RadioButton lightBut0;
+        private System.Windows.Forms.GroupBox[] lightCheckGroupFPGAs;
         private System.Windows.Forms.Button lightCheckBtn;
-        private System.Windows.Forms.RadioButton lightBut1;
-        private System.Windows.Forms.RadioButton lightBut2;
-        private System.Windows.Forms.RadioButton lightBut3;
-        private System.Windows.Forms.RadioButton lightBut4;
-        private System.Windows.Forms.RadioButton lightBut30;
-        private System.Windows.Forms.RadioButton lightBut5;
-        private System.Windows.Forms.RadioButton lightBut29;
-        private System.Windows.Forms.RadioButton lightBut6;
-        private System.Windows.Forms.RadioButton lightBut28;
-        private System.Windows.Forms.RadioButton lightBut7;
-        private System.Windows.Forms.RadioButton lightBut27;
-        private System.Windows.Forms.RadioButton lightBut8;
-        private System.Windows.Forms.RadioButton lightBut26;
-        private System.Windows.Forms.RadioButton lightBut9;
-        private System.Windows.Forms.RadioButton lightBut25;
-        private System.Windows.Forms.RadioButton lightBut10;
-        private System.Windows.Forms.RadioButton lightBut24;
-        private System.Windows.Forms.RadioButton lightBut11;
-        private System.Windows.Forms.RadioButton lightBut23;
-        private System.Windows.Forms.RadioButton lightBut12;
-        private System.Windows.Forms.RadioButton lightBut22;
-        private System.Windows.Forms.RadioButton lightBut13;
-        private System.Windows.Forms.RadioButton lightBut21;
-        private System.Windows.Forms.RadioButton lightBut14;
-        private System.Windows.Forms.RadioButton lightBut20;
-        private System.Windows.Forms.RadioButton lightBut15;
-        private System.Windows.Forms.RadioButton lightBut19;
-        private System.Windows.Forms.RadioButton lightBut16;
-        private System.Windows.Forms.RadioButton lightBut18;
-        private System.Windows.Forms.RadioButton lightBut17;
+        private System.Windows.Forms.RadioButton[] lightButtons;
         private System.Windows.Forms.TextBox lightGlobalThresh;
-        private System.Windows.Forms.RadioButton lightBut31;
         private System.Windows.Forms.CheckBox globalThreshChkBox;
         private System.Windows.Forms.Label lightGlobalThreshLbl;
         private System.Windows.Forms.Button lightCheckChanThreshBtn;
@@ -3594,18 +2858,11 @@
         private System.Windows.Forms.Button autoThreshBtn;
         private System.Windows.Forms.ProgressBar lightAutoThreshProgress;
         private System.Windows.Forms.Button lightCheckResetThresh;
-        private System.Windows.Forms.Label j18;
-        private System.Windows.Forms.Label j17;
-        private System.Windows.Forms.Label j16;
-        private System.Windows.Forms.Label j15;
-        private System.Windows.Forms.Label j14;
-        private System.Windows.Forms.Label j13;
-        private System.Windows.Forms.Label j12;
-        private System.Windows.Forms.Label j11;
+        private System.Windows.Forms.Label[] lightCMBlabels;
+        private System.Windows.Forms.Label[] qaFPGALabels;
         private System.Windows.Forms.Label label16;
-        private System.Windows.Forms.TextBox numTimesToCheckTextBox;
-        private System.Windows.Forms.Label label22;
-        private System.Windows.Forms.NumericUpDown numAvg;
+        private System.Windows.Forms.Label qaDiNumAvgLabel;
+        private System.Windows.Forms.NumericUpDown qaDiNumAvg;
         private System.Windows.Forms.CheckBox oneReadout;
         private System.Windows.Forms.Label BDVoltsLabel15;
         private System.Windows.Forms.Label BDVoltsLabel14;
@@ -3626,16 +2883,8 @@
         private System.Windows.Forms.CheckBox scanAllChanBox;
         private System.Windows.Forms.Label label23;
         private System.Windows.Forms.TabPage tabCMBTester;
-        private System.Windows.Forms.ComboBox comPortList;
-        private System.Windows.Forms.Button comPortDisconnect;
-        private System.Windows.Forms.Button comPortConnect;
         private System.Windows.Forms.GroupBox cmbTestControl;
-        private System.Windows.Forms.Button getCOMPorts;
-        private System.Windows.Forms.Label comPortStatus;
-        private System.Windows.Forms.Label comPortListLabel;
-        private System.Windows.Forms.Label comStatus;
         private System.Windows.Forms.Button cmbTestBtn;
-        private System.IO.Ports.SerialPort serialPort1;
         private System.Windows.Forms.GroupBox sipmControl;
         private System.Windows.Forms.TextBox cmbBias;
         private System.Windows.Forms.CheckBox cmbBiasOverride;
@@ -3646,5 +2895,18 @@
         private System.Windows.Forms.TextBox cmbInfoBox;
         private System.Windows.Forms.CheckBox updateFilesChkBox;
         private System.Windows.Forms.GroupBox cmbHistoBox;
+        private System.Windows.Forms.TextBox qaOutputFileName;
+        private System.Windows.Forms.Label qaOutputFileNameLabel;
+        private System.Windows.Forms.TableLayoutPanel lightCheckFPGApanel;
+        private System.Windows.Forms.CheckBox lightWriteToFileBox;
+        private System.Windows.Forms.ComboBox lightModuleSide;
+        private System.Windows.Forms.Label lightModuleLabelLabel;
+        private System.Windows.Forms.TextBox lightModuleLabel;
+        private System.Windows.Forms.Label lightModuleSideLabel;
+        private System.Windows.Forms.Label lightModuleLayerLabel;
+        private System.Windows.Forms.NumericUpDown lightModuleLayer;
+        private System.Windows.Forms.NumericUpDown lightNumChecks;
+        private System.Windows.Forms.RichTextBox console_Disp;
+        private System.Windows.Forms.RichTextBox runLog;
     }
 }

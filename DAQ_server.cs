@@ -147,7 +147,7 @@ namespace TB_mu2e
                 }
                 catch (Exception e)
                 {
-                    if (PP.glbDebug){ Console.WriteLine("oops, connection lost"); }
+                    if (PP.glbDebug){ Console.WriteLine("oops, connection lost: {0}", e); }
                 }
 
                 soc.Close();

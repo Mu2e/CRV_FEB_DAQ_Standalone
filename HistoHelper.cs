@@ -176,10 +176,7 @@ namespace TB_mu2e
         {
             uint fpga = requested_channel / 16;
             for (int i = 0; i < base_controls.Length; i++)
-            {
-                Mu2e_Register.FindAddr(Convert.ToUInt16(base_controls[i] + (fpga*0x400)), ref febClient.arrReg, out histo_controls[i]); //Histogram control registers
-                //histo_controls[i].addr += Convert.ToUInt16(fpga * histo_controls[i].fpga_offset_mult); //Apply the offset to the histo_controls
-            }
+                Mu2e_Register.FindAddrFPGA(base_controls[i], fpga, ref febClient.arrReg, out histo_controls[i]); //Histogram control
         }
 
         private void SetRegisters()

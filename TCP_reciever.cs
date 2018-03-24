@@ -80,7 +80,7 @@ namespace TB_mu2e
             int old_available = 0;
             byte[] rec_buf;
             byte[] mem_buf=new byte[5242879*8];
-            int mem_ind = 0;
+            //int mem_ind = 0;
             while (s.Available > old_available)
             {
                 Thread.Sleep(20);
@@ -101,7 +101,7 @@ namespace TB_mu2e
             //PP.myRun.UpdateStatus("Ended recieving " + buf.LongCount() + " bytes");
             //Thread.Sleep(25);
             //spill word count is the first 4 bytes
-            int ind = 0;
+            //int ind = 0;
             Int64 t = 0;
             t = (Int64)(buf[0] * 256 * 256 * 256 + buf[1] * 256 * 256 + buf[2] * 256 + buf[3]);
             long SpillWordCount = t * 2;

@@ -93,54 +93,109 @@ namespace TB_mu2e
             }
 
         }
-        public void ReadTemp(out double CMB0_temp, out double CMB1_temp, out double CMB2_temp, out double CMB3_temp, int fpga =0)
-        {
-            CMB0_temp = 0;
-            CMB1_temp = 0;
-            CMB2_temp = 0;
-            CMB3_temp = 0;
 
-            SendStr("STAB" );
+        //Read the temperatures from all the CMBs on a given FPGA
+        public double[] ReadTemp(int fpga = 0)
+        {
+            double[] cmb_temps = new double[4];
+
+            ReadStr(out string junk, out int junkL);
+
+            SendStr("cmb");//SendStr("STAB" );
             ReadStr(out string a, out int r);
+            a = a.Substring(0, a.Length - 1); //Eliminate beginning and end '>'
             if (a.Length > 40)
             {
                 char[] sep = new char[3];
-                sep[0] = ' ';
-                sep[1] = '\r';
-                sep[2] = '\n';
+                sep[0] = ' '; sep[1] = '\r'; sep[2] = '\n';
                 string[] tok = a.Split(sep, StringSplitOptions.RemoveEmptyEntries);
                 try
                 {
-                    Int32 temp = Convert.ToInt32(tok[46],16);
-                    CMB0_temp = temp * 0.062;
-                    temp = Convert.ToInt32(tok[47], 16);
-                    CMB1_temp = temp * 0.062;
-                    temp = Convert.ToInt32(tok[48], 16);
-                    CMB2_temp = temp * 0.062;
-                    temp = Convert.ToInt32(tok[49], 16);
-                    CMB3_temp = temp * 0.062;
+                    if (String.Equals(tok[1], "DegC")) //Preproduction FEB 'cmb' format
+                    {
+                        for (int cmb = 0; cmb < 4; cmb++)
+                            cmb_temps[cmb] = Convert.ToDouble(tok[(cmb*3) + (12 * fpga) + 5]); //Starting at index 5, every 3rd string is the cmb temperature
+                    }
+                    else if(String.Equals(tok[1], "Cnts_TEMP_DegC")) //Prototype FEB 'cmb' format
+                    {
+                        for (int cmb = 0; cmb < 4; cmb++)
+                            cmb_temps[cmb] = Convert.ToDouble(tok[(cmb * 4) + (12 * fpga) + 5]); //Starting at index 6, every 4th string is the cmb temperature
+                    }
+                    else { for (int cmb = 0; cmb < 4; cmb++) cmb_temps[cmb] = -1; } //unknown format
                 }
-                catch
+                catch //if any error occurs, just set the temperatures to -1
                 {
-                    CMB0_temp = 0;
-                    CMB1_temp = 0;
-                    CMB2_temp = 0;
-                    CMB3_temp = 0;
+                    for (int cmb = 0; cmb < 4; cmb++) cmb_temps[cmb] = -1;
                 }
             }
+
+            return cmb_temps;
         }
+
+        //Read the temperature from a single CMB on a given FPGA
+        public double ReadTemp(int cmb, int fpga = 0)
+        {
+            double cmb_temp = -1;
+            if (cmb > 3 && cmb < 16) //if the user gives the CMB number (0-16)
+            { fpga = cmb / 4; cmb %= 4; } //set the FPGA and % the cmb number
+            else if (cmb < 0) //if the user enters a negative number, return bad value
+                return cmb_temp;
+            //Else we can assume the user has given a cmb # between 0 and 3, and provided the FPGA number
+
+            SendStr("cmb");//SendStr("STAB" );
+            ReadStr(out string a, out int r);
+            a = a.Substring(1, a.Length - 2); //Eliminate beginning and end '>'
+            if (a.Length > 40)
+            {
+                char[] sep = new char[3];
+                sep[0] = ' '; sep[1] = '\r'; sep[2] = '\n';
+                string[] tok = a.Split(sep, StringSplitOptions.RemoveEmptyEntries);
+                try
+                {
+                    if (String.Equals(tok[1], "DegC")) //Preproduction FEB 'cmb' format
+                    {
+                        cmb_temp = Convert.ToDouble(tok[(cmb * 3) + (12 * fpga) + 5]); //Starting at index 5, every 3rd string is the cmb temperature
+                    }
+                    else if (String.Equals(tok[1], "Cnts_TEMP_DegC")) //Prototype FEB 'cmb' format
+                    {
+                        cmb_temp = Convert.ToDouble(tok[(cmb * 4) + (12 * fpga) + 5]); //Starting at index 5, every 4th string s the cmb temperature
+                    }
+                    else { cmb_temp = -1; } //unknown format
+                }
+                catch //if any error occurs, just set the temperature to -1
+                {
+                    cmb_temp = -1;
+                }
+            }
+
+            return cmb_temp;
+        }
+
 
         public void SetV(double V, int fpga = 0)
         {
             UInt32 counts;
-            double t = V / 5.38 * 256;
-            t = System.Math.Round(t);
-            try { counts = Convert.ToUInt32(t); }
+            try { counts = Convert.ToUInt32(System.Math.Round(V / 5.38 * 256)); }
             catch { counts = 0; }
-            //string a= ????
             SendStr("wr " + Convert.ToString(4 * fpga, 16) + "44 " + Convert.ToString(counts, 16));
             Thread.Sleep(5);
             SendStr("wr " + Convert.ToString(4 * fpga, 16) + "45 " + Convert.ToString(counts, 16));
+            Thread.Sleep((int)(Math.Ceiling(V / 10.0)*1000) + 500); //Wait for the bias to come up
+        }
+
+        public void SetVAll(double V)
+        {
+            UInt32 counts;
+            try { counts = Convert.ToUInt32(System.Math.Round(V / 5.38 * 256)); }
+            catch { counts = 0; }
+
+            for (int fpga = 0; fpga < 4; fpga++)
+            {
+                SendStr("wr " + Convert.ToString(4 * fpga, 16) + "44 " + Convert.ToString(counts, 16));
+                Thread.Sleep(5);
+                SendStr("wr " + Convert.ToString(4 * fpga, 16) + "45 " + Convert.ToString(counts, 16));
+            }
+            Thread.Sleep((int)(Math.Ceiling(V / 10.0) * 1000) + 500); //Wait for the bias to come up
         }
 
         public double ReadV(int fpga = 0)

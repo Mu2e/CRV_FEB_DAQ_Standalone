@@ -38,8 +38,8 @@ namespace TB_mu2e
         public NetworkStream stream;
         public StreamReader SR;
         public StreamWriter SW;
-        private  int max_timeout;
-        private  int timeout;
+        private  int max_timeout = 0;
+        private  int timeout = 0;
 
         // events 
         //public delegate void cOpening();

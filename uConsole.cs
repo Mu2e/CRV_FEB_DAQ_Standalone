@@ -8,8 +8,8 @@ namespace TB_mu2e
 {
     class uConsole
     {
-        public Queue<string> messg_que = new Queue<string>(200);
-        public int max_lines = 12;
+        public Queue<string> messg_que = new Queue<string>(1024);
+        public int max_lines = 128;
         public int current_lines;
 
         public string add_messg(string m)

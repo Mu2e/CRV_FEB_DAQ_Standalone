@@ -155,7 +155,7 @@ namespace TB_mu2e
             {
                 //Exception e = new Exception("you should not be messing with WC trigger!");
 
-                string m = "Did you mean to have the Fake It box checked?";
+                //string m = "Did you mean to have the Fake It box checked?";
                 // Exception e = new Exception(m);
                 // throw e;
 

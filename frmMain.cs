@@ -263,11 +263,6 @@ namespace TB_mu2e
             }
         }
 
-        public void Select_module_Click(object sender, EventArgs e)
-        {
-
-        }
-
         private void TextBox1_KeyPress(object sender, KeyPressEventArgs e)
         {
             if (((Control.ModifierKeys & Keys.Control) == Keys.Control))
@@ -335,14 +330,14 @@ namespace TB_mu2e
                             else
                             { l = console_label.add_messg("timeout!"); }
                         }
-                        lblConsole_disp.Text = l;
+                        console_Disp.Text = l;
                         Application.DoEvents();
                     }
                 }
                 catch
                 {
                     string m = "Exception caught. Do you have a module selected?";
-                    lblConsole_disp.Text = m;
+                    console_Disp.Text = m;
                     Application.DoEvents();
                 }
             }
@@ -429,17 +424,17 @@ namespace TB_mu2e
             if (myName.Contains("FEB1"))
             {
                 Button1_Click((object)btnFEB1, e);
-                lblConsole_disp.Text = console_label.add_messg("---- FEB1 ----\r\n");
+                console_Disp.Text = console_label.add_messg("---- FEB1 ----\r\n");
             }
             if (myName.Contains("FEB2"))
             {
                 Button1_Click((object)btnFEB2, e);
-                lblConsole_disp.Text = console_label.add_messg("---- FEB2 ----\r\n");
+                console_Disp.Text = console_label.add_messg("---- FEB2 ----\r\n");
             }
             if (myName.Contains("WC"))
             {
                 Button1_Click((object)btnWC, e);
-                lblConsole_disp.Text = console_label.add_messg("----  WC  ----\r\n");
+                console_Disp.Text = console_label.add_messg("----  WC  ----\r\n");
             }
             if (myName.Contains("FECC")) { }
         }
@@ -518,7 +513,7 @@ namespace TB_mu2e
 
         private void BtnBiasREAD_Click(object sender, EventArgs e)
         {
-            double[] cmb_temp = new double[5];
+            double[] cmb_temp = new double[4];
             string name = tabControl.SelectedTab.Text;
             if (name.Contains("FEB"))
             {
@@ -564,22 +559,22 @@ namespace TB_mu2e
                         }
                         txtI.Text = (I1 / (double)(nGoodReads)).ToString("0.0000");
 
-                        PP.FEB1.ReadTemp(out cmb_temp[1], out cmb_temp[2], out cmb_temp[3], out cmb_temp[4], (int)udFPGA.Value);
+                        cmb_temp = PP.FEB1.ReadTemp((int)udFPGA.Value);
                         break;
                     case 2:
                         txtV.Text = PP.FEB2.ReadV((int)udFPGA.Value).ToString("0.000");
                         txtI.Text = PP.FEB2.ReadA0((int)udFPGA.Value, (int)udChan.Value).ToString("0.0000");
-                        PP.FEB2.ReadTemp(out cmb_temp[1], out cmb_temp[2], out cmb_temp[3], out cmb_temp[4], (int)udFPGA.Value);
+                        cmb_temp = PP.FEB2.ReadTemp((int)udFPGA.Value);
                         break;
 
                     default:
                         break;
                 }
             }
-            txtCMB_Temp1.Text = cmb_temp[1].ToString("0.0");
-            txtCMB_Temp2.Text = cmb_temp[2].ToString("0.0");
-            txtCMB_Temp3.Text = cmb_temp[3].ToString("0.0");
-            txtCMB_Temp4.Text = cmb_temp[4].ToString("0.0");
+            txtCMB_Temp1.Text = cmb_temp[0].ToString("0.0");
+            txtCMB_Temp2.Text = cmb_temp[1].ToString("0.0");
+            txtCMB_Temp3.Text = cmb_temp[2].ToString("0.0");
+            txtCMB_Temp4.Text = cmb_temp[3].ToString("0.0");
         }
 
         private void BtnBiasWRITE_Click(object sender, EventArgs e)
@@ -916,6 +911,7 @@ namespace TB_mu2e
             zedFEB1.Invalidate(true);
             Application.DoEvents();
         }
+
         private void UpdateDisplay()
         {
             Color[] this_color = new Color[12];
@@ -1407,18 +1403,18 @@ namespace TB_mu2e
                 if (PP.myRun != null) //update log
                 {
                     lblRunName.Text = "Run_" + PP.myRun.num.ToString();
-                    lblRunLog.Text = "";
+                    runLog/*lblRunLog*/.Text = "";
                     string[] all_m = PP.myRun.RunStatus.ToArray<string>();
                     int l = all_m.Length;
                     if (PP.myRun.RunStatus.Count > 13)
                     {
                         for (int i = l - 13; i < l; i++)
-                        { lblRunLog.Text += all_m[i] + "\r\n"; }
+                        { runLog/*lblRunLog*/.Text += all_m[i] + "\r\n"; }
                     }
                     else
                     {
                         for (int i = 0; i < all_m.Length; i++)
-                        { lblRunLog.Text += all_m[i] + "\r\n"; }
+                        { runLog/*lblRunLog*/.Text += all_m[i] + "\r\n"; }
                     }
 
 
@@ -1770,12 +1766,115 @@ namespace TB_mu2e
 
         private void FrmMain_Load(object sender, EventArgs e)
         {
-
+            CreateButtonArrays();
         }
 
-        private void Label10_Click(object sender, EventArgs e)
+        private void CreateButtonArrays()
         {
+            //To-do: put these buttons into a TableLayoutPanel for easy organization as well as adding/subtracting buttons
+            #region DiCounterQAButtons
+            qaDiButtons = new System.Windows.Forms.RadioButton[8]; //Create an array of new buttons
+            for(int btni = 0; btni < qaDiButtons.Length; btni++)
+            {
+                qaDiButtons[btni] = new System.Windows.Forms.RadioButton
+                {
+                    Appearance = System.Windows.Forms.Appearance.Button,
+                    AutoCheck = false,
+                    BackColor = System.Drawing.Color.Green,
+                    Location = new System.Drawing.Point(385 + ((btni % 4) * 30), 25 + ((btni / 4) * 30)),
+                    Name = "qaDiButton" + btni,
+                    Size = new System.Drawing.Size(25, 25),
+                    TabIndex = 109+btni,
+                    Text = btni.ToString(),
+                    TextAlign = System.Drawing.ContentAlignment.MiddleCenter,
+                    UseVisualStyleBackColor = false
+                }; //Create a new button in the array and set some properties
+                qaDiButtons[btni].Click += new System.EventHandler(QaDiButton_Click); //Assign the button a handler for when it is clicked
+                dicounterQAGroup.Controls.Add(qaDiButtons[btni]); //Add the button to the group box
+            }
+            #endregion DiCounterQAButtons
 
+
+            #region LightCheckButtons
+            lightButtons = new System.Windows.Forms.RadioButton[64]; //Create an array of new buttons
+            lightCheckGroupFPGAs = new System.Windows.Forms.GroupBox[4]; //Create an array of new group boxes
+            lightCMBlabels = new System.Windows.Forms.Label[16]; //Create an array of new labels
+            for(int cmb = 0; cmb < 16; cmb++)
+            {
+                lightCMBlabels[cmb] = new System.Windows.Forms.Label
+                {
+                    AutoSize = false,
+                    BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle,
+                    Name = "lightCMB" + cmb,
+                    Size = new System.Drawing.Size(30, 20),
+                    TabIndex = 182+cmb,
+                    Text = cmb.ToString(),
+                    TextAlign = System.Drawing.ContentAlignment.MiddleCenter
+                }; //Create a label for each CMB
+                lightCMBlabels[cmb].Click += new System.EventHandler(LightCMBLabel_Click); //Assign the label a handler for when it is clicked
+            } //Create labels for each CMB
+            qaFPGALabels = new System.Windows.Forms.Label[4]; //Create an array of new labels
+            int fpga = 0; //Define a variable called FPGA for drawing and filling through group boxes
+            for (int btni = 0; btni < lightButtons.Length; btni++)
+            {
+                if (btni > 0 && btni % 16 == 0) //increment fpga #
+                    fpga++;
+                lightButtons[btni] = new System.Windows.Forms.RadioButton
+                {
+                    Appearance = System.Windows.Forms.Appearance.Button,
+                    AutoCheck = false,
+                    BackColor = System.Drawing.Color.Green,
+                    Cursor = System.Windows.Forms.Cursors.Cross,
+                    Font = new System.Drawing.Font("Microsoft Sans Serif", 8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0))),
+                    Name = "lightButton" + btni,
+                    Size = new System.Drawing.Size(60, 30),
+                    TabIndex = 134 + btni,
+                    Text = btni.ToString(),
+                    TextAlign = System.Drawing.ContentAlignment.MiddleCenter,
+                    UseVisualStyleBackColor = false
+                }; //Create a new button and set some properties
+                lightButtons[btni].Click += new System.EventHandler(LightButton_Click); //Assign the button a handler for when it is clicked
+
+                if (lightCheckGroupFPGAs[fpga] == null) //If the group box for that particular FPGA has not been created yet, create it now
+                {
+                    qaFPGALabels[fpga] = new System.Windows.Forms.Label
+                    {
+                        AutoSize = false,
+                        BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle,
+                        Name = "fpga" + fpga + "Label",
+                        Size = new System.Drawing.Size(60, 20),
+                        TabIndex = 240+fpga,
+                        Text = "FPGA " + fpga,
+                        TextAlign = System.Drawing.ContentAlignment.MiddleCenter
+                    }; //Create a label for the FPGA
+                    qaFPGALabels[fpga].Click += new System.EventHandler(LightFPGALabel_Click); //Assign the label a handler for when it is clicked
+
+                    lightCheckGroupFPGAs[fpga] = new System.Windows.Forms.GroupBox
+                    {
+                        Location = new System.Drawing.Point(300 + ((fpga % 2) * 410), 85 + ((fpga / 2) * 200)),
+                        Name = "lightCheckGroup",
+                        Size = new System.Drawing.Size(400, 180),
+                        TabIndex = 130 + fpga,
+                        TabStop = false,
+                        Text = "FPGA " + fpga
+                    }; //Create a new group box and set some properties
+                    var localPanel = new TableLayoutPanel
+                    {
+                        Dock = System.Windows.Forms.DockStyle.Fill,
+                        Size = new System.Drawing.Size(380, 160),
+                        Name = "lightCheckGroupFPGApanel" + fpga
+                    }; //Create a new TableLayoutPanel which will live in the group box and arrange the buttons
+                    lightCheckGroupFPGAs[fpga].Controls.Add(localPanel); //Add the panel to the group box
+                    lightCheckFPGApanel.Controls.Add(lightCheckGroupFPGAs[fpga]); //Add the FPGA group box to the light check group box
+                }
+                TableLayoutPanel fpga_panel = lightCheckGroupFPGAs[fpga].Controls.OfType<TableLayoutPanel>().First() ; //Get the panel from the group box (use First() to get actual panel, since there is only one here)
+                fpga_panel.Controls.Add(lightButtons[btni], btni % 4, (btni%16)/ 4); //Add the button to the panel inside the FPGA's group box
+                if(((btni+1) % 4) == 0)//At the end of filling each row with buttons, add a label
+                    fpga_panel.Controls.Add(lightCMBlabels[btni / 4], 5, (btni%16) / 4);
+                if (((btni+1) % 16) == 0)//At the end of filling the panel with buttons and cmb labels, add the FPGA 
+                    fpga_panel.Controls.Add(qaFPGALabels[fpga], 6, 1);//Add the FPGA label to the layout table
+            }
+            #endregion LightCheckButtons
         }
 
         private void GroupBoxEvDisplay_Enter(object sender, EventArgs e)
@@ -1783,969 +1882,387 @@ namespace TB_mu2e
 
         }
 
-        private void Label15_Click(object sender, EventArgs e)
+        private void QaStartButton_Click(object sender, EventArgs e)
         {
-
-        }
-
-        private void NumLabel_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        private void NumButton_Click(object sender, EventArgs e)
-        {
-            numButton.Enabled = false;  //prevents multiple clicks on the button
-            autoThreshBtn.Enabled = false;
-            lightCheckResetThresh.Enabled = false;
-            lightCheckBtn.Enabled = false;
-            RadioButton[] statusButtons = { but0, but1, but2, but3, but4, but5, but6, but7 }; //holds the 8 buttons
-            string[] chanOuts = new string[8];
-            using (StreamWriter writer = File.AppendText("C:\\data\\ScanningData.txt"))
+            if (PP.FEB1.client != null) //If the FEB is connected, then proceed.
             {
-                string dicountNumber = numTextBox.Text;
-                writer.Write("{0}\t", dicountNumber);
-                DateTime today = DateTime.Now;
-                writer.Write("{0}\t", today.ToString("g"));
+                qaStartButton.Enabled = false;  //prevents multiple clicks of the buttons
+                autoThreshBtn.Enabled = false;
+                lightCheckResetThresh.Enabled = false;
+                lightCheckBtn.Enabled = false;
+                string[] chanOuts = new string[8];
 
-                //string name = tabControl.SelectedTab.Text;
-                //if (name.Contains("QA"))
-                //{
-                switch (_ActiveFEB)
+                //Data are written to the Google Drive, CRV Fabrication Documents folder ScanningData, subfolder DicounterQA
+                //'using' will ensure the writer is closed/destroyed if the scope of the structure is left due to code-completion or a thrown exception
+                using (StreamWriter writer = File.AppendText("C:\\Users\\FEB-Laptop-1\\Google Drive\\CRV Fabrication Documents\\QA_Safety\\QA\\Dicounter Source Testing\\ScanningData_" + qaOutputFileName.Text + ".txt")) //The output file
                 {
-                    case 1:
-                        PP.FEB1.SetV(Convert.ToDouble(qaBias.Text), (int)udFPGA.Value);
-                        txtI.Text = PP.FEB1.ReadA0((int)udFPGA.Value, (int)udChan.Value).ToString("0.0000");
-                        break;
-                    case 2:
-                        PP.FEB2.SetV(Convert.ToDouble(qaBias.Text));
-                        txtI.Text = PP.FEB2.ReadA0((int)udFPGA.Value, (int)udChan.Value).ToString("0.0000");
-                        break;
+                    writer.Write("{0}\t", numTextBox.Text); //Write dicounter number to file
 
-                    default:
-                        break;
+                    //Write temp to file
+                    double[] temp = { 0, 0, 0, 0 };
+                    for (int numTries = 0; numTries < 10; numTries++) //Try and read the temperature 10 times
+                        temp = PP.FEB1.ReadTemp();                    //read the temperatures on FPGA 0
+                    writer.Write("{0}\t", temp[0].ToString("0.00"));  //Write the temperature, in degrees C, as measured by the CMB
+
+                    //Write date to file
+                    writer.Write("{0}\t", DateTime.Now.ToString("MM/dd/yy HH:mm\t")); //Changed to 24 hour time format to match database storage format
+
+                    PP.FEB1.SetV(Convert.ToDouble(qaBias.Text)); //Turn on bias for the first FPGA (since this is the only one used for dicounter QA
+
+                    foreach(var btn in qaDiButtons) { if (!btn.Checked) { btn.BackColor = Color.Green; btn.Update(); } } //Reset all active channel indicators to green
+
+                    foreach (var btn in qaDiButtons)
+                    {
+                        double averageCurrent = 0;
+                        int channel = Convert.ToInt16(btn.Text);
+                        if (!btn.Checked)
+                        {
+                            for (int measI = 0; measI < Convert.ToInt16(qaDiNumAvg.Value); measI++)
+                                averageCurrent += Convert.ToDouble(PP.FEB1.ReadA0(0, channel)); //read the current for the specified channel on FPGA 0
+                            averageCurrent /= Convert.ToDouble(qaDiNumAvg.Value);
+                            if (averageCurrent < Convert.ToDouble(qaDiIWarningThresh.Text)) //if the current was less than warning thresh && we still have current, update the color of the lamp
+                                qaDiButtons[channel].BackColor = Color.Red;
+                            if (averageCurrent < 0.025) //if there was no current then
+                                qaDiButtons[channel].BackColor = Color.Blue; //set indicator color to blue: "cold-no-current"
+                            qaDiButtons[channel].Update();
+                        }
+
+                        chanOuts[channel] = averageCurrent.ToString("0.0000");
+                        Console.WriteLine("Channel {0}: {1}", channel, chanOuts[channel]);
+                        writer.Write("{0}\t", chanOuts[channel]); //write out the current for the channel
+                        autoDataProgress.Increment(1);
+                    }
+
+                    writer.WriteLine(); //write a 'return' to file
+
+                    PP.FEB1.SetV(0.0); //Turn off the bias
+                    autoDataProgress.Value = 0; //Set the progress bar back to 0
+                    autoDataProgress.Update();
                 }
 
-                //initially set to green
-                for (int i = 0; i < 8; i++)
-                {
-                    statusButtons[i].BackColor = Color.Green;
-                    statusButtons[i].Update();
-                }
-                int lastChan = 8; //by default set lastChan = 8 (number of channels to read when doing counter QA)
-                if (oneReadout.Checked)
-                    lastChan = 4; //If single readout is checked, then only read the first 4 channels
-                else
-                    lastChan = 8;
-
-                for (int i = 0; i < 8; i++)
-                {
-                    double average = 0;
-                    for (int measurementNumber = 0; measurementNumber < Convert.ToInt32(numAvg.Value) && i < lastChan; measurementNumber++)
-                        average += Convert.ToDouble(PP.FEB1.ReadA0((int)udFPGA.Value, i));
-                    average /= Convert.ToDouble(numAvg.Value);
-                    //Console.WriteLine("" + average);
-                    if (average < Convert.ToDouble(iWarningThresh.Text)) //if the current was less than warning thresh && we still have current, update the color of the lamp
-                        statusButtons[i].BackColor = Color.Red;
-                    if (average < 0.025) //if there was no current then
-                        statusButtons[i].BackColor = Color.Blue; //set lamp color to blue "cold-no-current"
-                    //statusButtons[i].Text = "" + Math.Round(average,2);
-                    statusButtons[i].Update();
-
-                    chanOuts[i] = average.ToString("0.0000");
-                    //Console.WriteLine("Channel {0}: {1}", i, chanOuts[i]);
-                    writer.Write("{0}\t", chanOuts[i]);
-                    autoDataProgress.Increment(1);
-                }
-                double[] cmb_temp = new double[4];
-                PP.FEB1.ReadTemp(out cmb_temp[0], out cmb_temp[1], out cmb_temp[2], out cmb_temp[3], (int)udFPGA.Value);
-                writer.Write("{0} C", cmb_temp[0].ToString("0.000"));
-                writer.WriteLine();
-
-                switch (_ActiveFEB)
-                {
-                    case 1:
-                        PP.FEB1.SetV(0.0, (int)udFPGA.Value);
-                        txtI.Text = PP.FEB1.ReadA0((int)udFPGA.Value, (int)udChan.Value).ToString("0.0000");
-                        break;
-                    case 2:
-                        PP.FEB2.SetV(0.0);
-                        txtI.Text = PP.FEB2.ReadA0((int)udFPGA.Value, (int)udChan.Value).ToString("0.0000");
-                        break;
-
-                    default:
-                        break;
-                }
-                autoDataProgress.Increment(-7);
-
-                //}
-
-
+                qaStartButton.Enabled = true;
+                autoThreshBtn.Enabled = true;
+                lightCheckResetThresh.Enabled = true;
+                lightCheckBtn.Enabled = true;
             }
-            numButton.Enabled = true;
-            autoThreshBtn.Enabled = true;
-            lightCheckResetThresh.Enabled = true;
-            lightCheckBtn.Enabled = true;
         }
-
 
         private void AutoThreshBtn_Click(object sender, EventArgs e)
         {
-            autoThreshBtn.Enabled = false;  //prevents multiple clicks on the button
-            numButton.Enabled = false;
-            lightCheckResetThresh.Enabled = false;
-            lightCheckBtn.Enabled = false;
-            RadioButton[] statusButtons = { lightBut0, lightBut1, lightBut2, lightBut3,
-                                            lightBut4, lightBut5, lightBut6, lightBut7,
-                                            lightBut8, lightBut9, lightBut10, lightBut11,
-                                            lightBut12, lightBut13, lightBut14, lightBut15,
-                                            lightBut16, lightBut17, lightBut18, lightBut19,
-                                            lightBut20, lightBut21, lightBut22, lightBut23,
-                                            lightBut24, lightBut25, lightBut26, lightBut27,
-                                            lightBut28, lightBut29, lightBut30, lightBut31 }; //holds the 32 indicators
-            switch (_ActiveFEB)
+            if (PP.FEB1.client != null) //If the FEB is connected, then proceed
             {
-                case 1:
-                    PP.FEB1.SetV(Convert.ToDouble(qaBias.Text), (int)udFPGA.Value);
-                    txtI.Text = PP.FEB1.ReadA0((int)udFPGA.Value, (int)udChan.Value).ToString("0.0000");
-                    break;
-                case 2:
-                    PP.FEB2.SetV(Convert.ToDouble(qaBias.Text));
-                    txtI.Text = PP.FEB2.ReadA0((int)udFPGA.Value, (int)udChan.Value).ToString("0.0000");
-                    break;
+                autoThreshBtn.Enabled = false;  //prevents multiple clicks of the buttons
+                qaStartButton.Enabled = false;
+                lightCheckResetThresh.Enabled = false;
+                lightCheckBtn.Enabled = false;
 
-                default:
-                    break;
-            }
+                PP.FEB1.SetVAll(Convert.ToDouble(qaBias.Text)); //Turn on the bias for ALL FPGAs
 
-            //initially set to green
-            for (int i = 0; i < 31; i++)
-            {
-                if (!statusButtons[i].Checked)
+                foreach (var btn in lightButtons) 
                 {
-                    statusButtons[i].BackColor = Color.Green;
-                    statusButtons[i].Update();
-                }
-            }
+                    if (!btn.Checked)
+                    {
+                        btn.BackColor = Color.Green;
+                        btn.Update();
+                    }
+                } //Reset all active channel indicators to green
 
-            for (int i = 0; i < 31; i++)
-            {
-                if (!statusButtons[i].Checked)
+                foreach (var btn in lightButtons)
                 {
-                    double average = PP.FEB1.ReadA0((int)udFPGA.Value, i);
-                    Console.WriteLine("" + Math.Round(average, 2));
+                    if (!btn.Checked)
+                    {
+                        int channel = Convert.ToInt16(btn.Text);
+                        double average = PP.FEB1.ReadA0(channel / 16, channel % 16); //read the current for the specified channel on the correct FPGA
 
-                    if (average < 0.025) //If no current update the color of the lamp
-                    {
-                        statusButtons[i].BackColor = Color.Blue; //set lamp color to blue "cold-no-current"
-                        statusButtons[i].Text = "" + Math.Round(average, 1);
-                        statusButtons[i].Update();
+                        if (average < 0.025) //If no current update the color of the lamp
+                        {
+                            btn.BackColor = Color.Blue; //set lamp color to blue "cold-no-current"
+                            btn.Update();
+                        }
+                        else
+                        {
+                            PP.lightCheckChanThreshs[channel] = average * 1.10; //set the threshold to 10% higher than dark-current
+                        }
                     }
-                    else
-                    {
-                        PP.lightCheckChanThreshs[i] = average * 1.10; //set the threshold to 10% higher than dark-current
-                    }
+                    lightAutoThreshProgress.Increment(1);
                 }
-                lightAutoThreshProgress.Increment(1);
+
+                PP.FEB1.SetVAll(0.0);//Turn off the bias
+                lightAutoThreshProgress.Value = 0;
+                lightAutoThreshProgress.Update();
+
+                lightCheckChanThresh.Text = PP.lightCheckChanThreshs[Convert.ToUInt16(lightCheckChanSelec.Value)].ToString("0.0000"); //update the current channel to display the new thresh
+                
+                autoThreshBtn.Enabled = true;
+                qaStartButton.Enabled = true;
+                lightCheckResetThresh.Enabled = true;
+                lightCheckBtn.Enabled = true;
             }
-
-            switch (_ActiveFEB)
-            {
-                case 1:
-                    PP.FEB1.SetV(0.0, (int)udFPGA.Value);
-                    txtI.Text = PP.FEB1.ReadA0((int)udFPGA.Value, (int)udChan.Value).ToString("0.0000");
-                    break;
-                case 2:
-                    PP.FEB2.SetV(0.0);
-                    txtI.Text = PP.FEB2.ReadA0((int)udFPGA.Value, (int)udChan.Value).ToString("0.0000");
-                    break;
-
-                default:
-                    break;
-            }
-            lightAutoThreshProgress.Increment(-32);
-
-            uint selection = Convert.ToUInt16(lightCheckChanSelec.Value);
-            lightCheckChanThresh.Text = PP.lightCheckChanThreshs[selection].ToString("0.0000"); //update the current channel to new thresh
-
-
-            autoThreshBtn.Enabled = true;
-            numButton.Enabled = true;
-            lightCheckResetThresh.Enabled = true;
-            lightCheckBtn.Enabled = true;
         }
 
         private void LightCheckResetThresh_Click(object sender, EventArgs e)
         {
-            for (int i = 0; i < 32; i++)
+            for (int i = 0; i < PP.lightCheckChanThreshs.Length; i++)
                 PP.lightCheckChanThreshs[i] = 0.25;
             lightGlobalThresh.Text = "0.25";
         }
 
         private void LightCheckChanSelec_ValueChanged(object sender, EventArgs e)
         {
-            uint selection = Convert.ToUInt16(lightCheckChanSelec.Value);
-            lightCheckChanThresh.Text = PP.lightCheckChanThreshs[selection].ToString("0.0000");
+            lightCheckChanThresh.Text = PP.lightCheckChanThreshs[Convert.ToUInt16(lightCheckChanSelec.Value)].ToString("0.0000");
         }
 
         private void LightCheckChanThreshBtn_Click(object sender, EventArgs e)
         {
-            uint selection = Convert.ToUInt16(lightCheckChanSelec.Value);
-            PP.lightCheckChanThreshs[selection] = Convert.ToDouble(lightCheckChanThresh.Text);
+            PP.lightCheckChanThreshs[Convert.ToUInt16(lightCheckChanSelec.Value)] = Convert.ToDouble(lightCheckChanThresh.Text);
         }
 
         private void LightCheckBtn_Click(object sender, EventArgs e)
         {
-            lightCheckBtn.Enabled = false;  //prevents multiple clicks on the button
-            autoThreshBtn.Enabled = false;
-            numButton.Enabled = false;
-            lightCheckResetThresh.Enabled = false;
-            RadioButton[] statusButtons = { lightBut0, lightBut1, lightBut2, lightBut3,
-                                            lightBut4, lightBut5, lightBut6, lightBut7,
-                                            lightBut8, lightBut9, lightBut10, lightBut11,
-                                            lightBut12, lightBut13, lightBut14, lightBut15,
-                                            lightBut16, lightBut17, lightBut18, lightBut19,
-                                            lightBut20, lightBut21, lightBut22, lightBut23,
-                                            lightBut24, lightBut25, lightBut26, lightBut27,
-                                            lightBut28, lightBut29, lightBut30, lightBut31 }; //holds the 32 indicators
-            switch (_ActiveFEB)
+            if (PP.FEB1.client != null)
             {
-                case 1:
-                    PP.FEB1.SetV(Convert.ToDouble(qaBias.Text), (int)udFPGA.Value);
-                    txtI.Text = PP.FEB1.ReadA0((int)udFPGA.Value, (int)udChan.Value).ToString("0.0000");
-                    break;
-                case 2:
-                    PP.FEB2.SetV(Convert.ToDouble(qaBias.Text));
-                    txtI.Text = PP.FEB2.ReadA0((int)udFPGA.Value, (int)udChan.Value).ToString("0.0000");
-                    break;
+                lightCheckBtn.Enabled = false;  //prevents multiple clicks on the button
+                autoThreshBtn.Enabled = false;
+                qaStartButton.Enabled = false;
+                lightCheckResetThresh.Enabled = false;
 
-                default:
-                    break;
-            }
-
-            //initially set to green
-            for (int i = 0; i < 31; i++)
-            {
-                if (!statusButtons[i].Checked)
+                //Writes the file to the CRV Fabrication Documents, ScanningData folder on the Google Drive, subfolder ModuleLightCheck
+                //'using' will ensure the writer is closed/destroyed if the scope of the structure is left due to code-completion or a thrown exception
+                using (StreamWriter writer = File.AppendText("C:\\Users\\FEB-Laptop-1\\Google Drive\\CRV Fabrication Documents\\QA_Safety\\QA\\Module Light Leak Testing\\LightCheck.txt")) //Path for file output of lightcheck
                 {
-                    statusButtons[i].BackColor = Color.Green;
-                    statusButtons[i].Text = "" + i;
-                    statusButtons[i].Update();
-                }
-            }
-            int numChecked = 0;
-            foreach (RadioButton r in statusButtons)
-            {
-                if (!r.Checked) numChecked++;
-            }
-            int numAverages = numChecked;
-            //double[] averages = new double[numAverages];
-
-            //for (int i = 0; i < numAverages; i++)
-            //{
-            //    averages[i] = 0;
-            //}
-            int numTimesToCheck = Convert.ToInt32(numTimesToCheckTextBox.Text);
-            for (int j = 0; j < numTimesToCheck; j++)
-            {
-
-                double sum = 0;
-                for (int i = 0; i < 32; i++)
-                {
-                    if (!statusButtons[i].Checked)
+                    if (lightWriteToFileBox.Checked)
                     {
-                        double average = PP.FEB1.ReadA0((int)udFPGA.Value, i);
-                        //averages[i] = average;
-                        if (average > 0)
+                        writer.Write("{0}\t", lightModuleLabel.Text); //write out the module name
+                        writer.Write("{0}\t", lightModuleSide.Text); //write out the module side
+                        writer.Write("{0}\t", lightModuleLayer.Value.ToString()); //write out the module layer
+                        writer.Write("{0}", DateTime.Now.ToString("g")); // write out the timestamp
+                    }
+
+                    PP.FEB1.SetVAll(Convert.ToDouble(qaBias.Text)); //Turn on the bias
+
+                    //initially set to green
+                    for(int btn = 0; btn < lightButtons.Length; btn++)
+                    {
+                        if (!lightButtons[btn].Checked)
                         {
-                            sum += average / numAverages;
+                            lightButtons[btn].BackColor = Color.Green;
+                            lightButtons[btn].Text = btn.ToString();
+                            lightButtons[btn].Update();
                         }
-                        Console.WriteLine("" + average);
-                        if (!globalThreshChkBox.Checked) // if the global thresh box is not checked, then use individual channels thresh
+
+                    }
+                    int numChecked = 0;
+                    foreach (RadioButton r in lightButtons)
+                    {
+                        if (!r.Checked) numChecked++;
+                    }
+                    int numAverages = numChecked;
+                    //double[] averages = new double[numAverages];
+
+                    //for (int i = 0; i < numAverages; i++)
+                    //{
+                    //    averages[i] = 0;
+                    //}
+                    int numTimesToCheck = 1;
+                    if (!lightWriteToFileBox.Checked)
+                        numTimesToCheck = (int)lightNumChecks.Value;
+                    for (int j = 0; j < numTimesToCheck; j++)
+                    {
+                        double total_avg_I = 0;
+                        for (int chan = 0; chan < lightButtons.Length; chan++)
                         {
-                            if (average > PP.lightCheckChanThreshs[i]) //If the current is above the thresh, light leak!
+                            if (!lightButtons[chan].Checked)
                             {
-                                statusButtons[i].BackColor = Color.Red; //flag the button
+                                double average = PP.FEB1.ReadA0(chan / 16, chan % 16);
+                                //averages[i] = average;
+                                if (average > 0)
+                                    total_avg_I += average / numAverages;
+
+                                if (!globalThreshChkBox.Checked) // if the global thresh box is not checked, then use individual channels thresh
+                                {
+                                    if (average > PP.lightCheckChanThreshs[chan]) //If the current is above the thresh, light leak!
+                                        lightButtons[chan].BackColor = Color.Red; //flag the channel
+                                    else if (average < 0.025) //if it died or bias is lost, set "cold-no-current"
+                                        lightButtons[chan].BackColor = Color.Blue;
+
+                                    lightButtons[chan].Text = "" + Math.Round(average, 2);
+                                    lightButtons[chan].Update();
+                                    if (j == 0 && lightWriteToFileBox.Checked && lightWriteToFileBox.Enabled)
+                                    {
+                                        writer.WriteLine("");
+                                        writer.Write("\t{0}\t", chan.ToString());
+                                        writer.Write("{0}\t", ((double)PP.lightCheckChanThreshs[chan] / 1.1).ToString("0.0000"));
+                                        writer.Write("{0}", average.ToString("0.0000"));
+                                    }
+                                }
+                                else
+                                {
+                                    if (average > Convert.ToDouble(lightGlobalThresh.Text)) //If the current is above the thresh, light leak!
+                                        lightButtons[chan].BackColor = Color.Red; //flag the channel
+                                    else if (average < 0.025) //if it died or bias is lost, set "cold-no-current"
+                                        lightButtons[chan].BackColor = Color.Blue;
+
+                                    lightButtons[chan].Text = Math.Round(average, 2).ToString(); //Update each channel with the current reading
+                                    lightButtons[chan].Update();
+
+                                    if (j == 0 && lightWriteToFileBox.Checked && lightWriteToFileBox.Enabled)
+                                    {
+                                        writer.WriteLine("");
+                                        writer.Write("\t{0}\t", chan.ToString());
+                                        writer.Write("{0}\t", lightGlobalThresh.Text);
+                                        writer.Write("{0}", average.ToString("0.0000"));
+                                    }
+                                }
                             }
-                            else if (average < 0.025)
+                            else
                             {
-                                statusButtons[i].BackColor = Color.Blue; //flag the button
+                                //averages[i] = 0;
                             }
-
-                            statusButtons[i].Text = "" + Math.Round(average, 2);
-                            statusButtons[i].Update();
-
                         }
-                        else
+                        //foreach (double d in averages)
+                        //{
+                        //    sum += d / (double)numAverages;
+                        //}
+                        Console.WriteLine("Sum: " + total_avg_I);
+                        if (total_avg_I >= 0.1)
                         {
-                            if (average > Convert.ToDouble(lightGlobalThresh.Text)) //If the current is above the thresh, light leak!
+                            int signal = 0;
+                            if (total_avg_I / .1 < 1)
                             {
-                                statusButtons[i].BackColor = Color.Red; //flag the button
+                                signal = 1;
                             }
-                            else if (average < 0.025)
+                            else if (total_avg_I / .1 > 20)
                             {
-                                statusButtons[i].BackColor = Color.Blue; //flag the button
+                                signal = 20;
                             }
+                            else
+                            {
+                                signal = (int)(total_avg_I / .1);
+                            }
+                            Console.WriteLine("Signal: " + signal);
+                            //System.Windows.Media.MediaPlayer[] players = new System.Windows.Media.MediaPlayer[signal];
+                            for (int m = 0; m < signal; m++)
+                            {
+                                new System.Threading.Thread(() =>
+                                {
+                                    var c = new System.Windows.Media.MediaPlayer();
+                                    c.Open(new System.Uri(@"C:\Users\FEB-Laptop-1\Desktop\beep-07.wav"));
+                                    c.Play();
+                                }).Start();
+                                //players[m] = new System.Windows.Media.MediaPlayer();
+                                //players[m].Open(new System.Uri(@"C:\Users\FEB-Laptop-1\Desktop\chimes.wav"));
+                                //players[m].Play();
+                                System.Threading.Thread.Sleep(100);
+                                //                        System.Media.SystemSounds.Beep.Play();
 
-                            statusButtons[i].Text = "" + Math.Round(average, 2);
-                            statusButtons[i].Update();
-
+                            }
                         }
+                        lightAutoThreshProgress.Increment(1);
                     }
-                    else
+
+                    switch (_ActiveFEB)
                     {
-                        //averages[i] = 0;
+                        case 1:
+                            //PP.FEB1.SetV(0.0, (int)udFPGA.Value);
+                            PP.FEB1.SetV(0.0, 0);
+                            PP.FEB1.SetV(0.0, 1);
+                            PP.FEB1.SetV(0.0, 2);
+                            PP.FEB1.SetV(0.0, 3);
+
+                            txtI.Text = PP.FEB1.ReadA0((int)udFPGA.Value, (int)udChan.Value).ToString("0.0000");
+                            break;
+                        case 2:
+                            PP.FEB2.SetV(0.0);
+                            txtI.Text = PP.FEB2.ReadA0((int)udFPGA.Value, (int)udChan.Value).ToString("0.0000");
+                            break;
+
+                        default:
+                            break;
                     }
+                    if (lightWriteToFileBox.Checked)
+                        writer.WriteLine();
                 }
-                //foreach (double d in averages)
-                //{
-                //    sum += d / (double)numAverages;
-                //}
-                Console.WriteLine("Sum: " + sum);
-                if (sum >= 0.1)
-                {
-                    int signal = 0;
-                    if (sum / .1 < 1)
-                    {
-                        signal = 1;
-                    } else if (sum / .1 > 20)
-                    {
-                        signal = 20;
-                    } else
-                    {
-                        signal = (int)(sum / .1);
-                    }
-                    Console.WriteLine("Signal: " + signal);
-                    //System.Windows.Media.MediaPlayer[] players = new System.Windows.Media.MediaPlayer[signal];
-                    for (int m = 0; m < signal; m++)
-                    {
-                        new System.Threading.Thread(() =>
-                        {
-                            var c = new System.Windows.Media.MediaPlayer();
-                            c.Open(new System.Uri(@"C:\Users\FEB-Laptop-1\Desktop\beep-07.wav"));
-                            c.Play();
-                        }).Start();
-                        //players[m] = new System.Windows.Media.MediaPlayer();
-                        //players[m].Open(new System.Uri(@"C:\Users\FEB-Laptop-1\Desktop\chimes.wav"));
-                        //players[m].Play();
-                        System.Threading.Thread.Sleep(100);
-                        //                        System.Media.SystemSounds.Beep.Play();
-
-                    }
-                }
-                lightAutoThreshProgress.Increment(1);
+                lightAutoThreshProgress.Increment(-64);
+                lightCheckBtn.Enabled = true;
+                autoThreshBtn.Enabled = true;
+                qaStartButton.Enabled = true;
+                lightCheckResetThresh.Enabled = true;
             }
-
-            switch (_ActiveFEB)
-            {
-                case 1:
-                    PP.FEB1.SetV(0.0, (int)udFPGA.Value);
-                    txtI.Text = PP.FEB1.ReadA0((int)udFPGA.Value, (int)udChan.Value).ToString("0.0000");
-                    break;
-                case 2:
-                    PP.FEB2.SetV(0.0);
-                    txtI.Text = PP.FEB2.ReadA0((int)udFPGA.Value, (int)udChan.Value).ToString("0.0000");
-                    break;
-
-                default:
-                    break;
-            }
-            lightAutoThreshProgress.Increment(-32);
-            lightCheckBtn.Enabled = true;
-            autoThreshBtn.Enabled = true;
-            numButton.Enabled = true;
-            lightCheckResetThresh.Enabled = true;
         }
 
         private void QaBias_TextChanged(object sender, EventArgs e)
         {
-            qaBias.BackColor = Color.White;
+            qaBias.BackColor = Color.Orange;
+            bool parsed = double.TryParse(qaBias.Text, out var isNumber);
+            //Check for invalid input
+            if (string.IsNullOrWhiteSpace(qaBias.Text))
+                qaBias.BackColor = Color.Red;
+            else if (!parsed || isNumber < 0 || isNumber > 80)
+            { qaBias.Text = "57.0"; qaBias.BackColor = Color.LightGray; }
+
         }
 
-        private void LightBut0_Click(object sender, EventArgs e)
+        private void QaDiButton_Click(object sender, EventArgs e)
         {
-            if (!lightBut0.Checked)
+            RadioButton btn = (RadioButton)sender;
+            if (!btn.Checked)
             {
-                lightBut0.BackColor = Color.DimGray;
-                lightBut0.Update();
-                lightBut0.Checked = true;
+                btn.BackColor = Color.DimGray;
+                btn.Update();
+                btn.Checked = true;
             }
             else
             {
-                lightBut0.BackColor = Color.Green;
-                lightBut0.Update();
-                lightBut0.Checked = false;
+                btn.BackColor = Color.Green;
+                btn.Update();
+                btn.Checked = false;
             }
         }
 
-        private void LightBut1_Click(object sender, EventArgs e)
+        private void LightButton_Click(object sender, EventArgs e)
         {
-            if (!lightBut1.Checked)
+            RadioButton btn = (RadioButton) sender;
+            if (!btn.Checked)
             {
-                lightBut1.BackColor = Color.DimGray;
-                lightBut1.Update();
-                lightBut1.Checked = true;
+                btn.BackColor = Color.DimGray;
+                btn.Update();
+                btn.Checked = true;
             }
             else
             {
-                lightBut1.BackColor = Color.Green;
-                lightBut1.Update();
-                lightBut1.Checked = false;
+                btn.BackColor = Color.Green;
+                btn.Update();
+                btn.Checked = false;
             }
         }
 
-        private void LightBut2_Click(object sender, EventArgs e)
+        private void LightCMBLabel_Click(object sender, EventArgs e)
         {
-            if (!lightBut2.Checked)
+            System.Windows.Forms.Label lbl = (System.Windows.Forms.Label)sender; //Get the label that was clicked
+            int cmb = Convert.ToInt16(lbl.Text); //Convert to CMB number index starting at 0
+            for(int btn = (cmb*4); btn < (cmb*4)+4; btn++) //Set loop bounds and 'click' all of the buttons
             {
-                lightBut2.BackColor = Color.DimGray;
-                lightBut2.Update();
-                lightBut2.Checked = true;
-            }
-            else
-            {
-                lightBut2.BackColor = Color.Green;
-                lightBut2.Update();
-                lightBut2.Checked = false;
+                sender = lightButtons[btn];
+                LightButton_Click(sender, e);
             }
         }
 
-        private void LightBut3_Click(object sender, EventArgs e)
+        private void LightFPGALabel_Click(object sender, EventArgs e)
         {
-            if (!lightBut3.Checked)
+            System.Windows.Forms.Label lbl = (System.Windows.Forms.Label)sender;
+            int fpga_num = Convert.ToInt16(lbl.Text.Substring(lbl.Text.Length-1, 1));
+            for(int btni = fpga_num*16; btni < (fpga_num*16)+16; btni++)
             {
-                lightBut3.BackColor = Color.DimGray;
-                lightBut3.Update();
-                lightBut3.Checked = true;
-            }
-            else
-            {
-                lightBut3.BackColor = Color.Green;
-                lightBut3.Update();
-                lightBut3.Checked = false;
+                sender = lightButtons[btni];
+                LightButton_Click(sender, e);
             }
         }
-
-        private void LightBut4_Click(object sender, EventArgs e)
-        {
-            if (!lightBut4.Checked)
-            {
-                lightBut4.BackColor = Color.DimGray;
-                lightBut4.Update();
-                lightBut4.Checked = true;
-            }
-            else
-            {
-                lightBut4.BackColor = Color.Green;
-                lightBut4.Update();
-                lightBut4.Checked = false;
-            }
-        }
-
-        private void LightBut5_Click(object sender, EventArgs e)
-        {
-            if (!lightBut5.Checked)
-            {
-                lightBut5.BackColor = Color.DimGray;
-                lightBut5.Update();
-                lightBut5.Checked = true;
-            }
-            else
-            {
-                lightBut5.BackColor = Color.Green;
-                lightBut5.Update();
-                lightBut5.Checked = false;
-            }
-        }
-
-        private void LightBut6_Click(object sender, EventArgs e)
-        {
-            if (!lightBut6.Checked)
-            {
-                lightBut6.BackColor = Color.DimGray;
-                lightBut6.Update();
-                lightBut6.Checked = true;
-            }
-            else
-            {
-                lightBut6.BackColor = Color.Green;
-                lightBut6.Update();
-                lightBut6.Checked = false;
-            }
-        }
-
-        private void LightBut7_Click(object sender, EventArgs e)
-        {
-            if (!lightBut7.Checked)
-            {
-                lightBut7.BackColor = Color.DimGray;
-                lightBut7.Update();
-                lightBut7.Checked = true;
-            }
-            else
-            {
-                lightBut7.BackColor = Color.Green;
-                lightBut7.Update();
-                lightBut7.Checked = false;
-            }
-        }
-
-        private void LightBut8_Click(object sender, EventArgs e)
-        {
-            if (!lightBut8.Checked)
-            {
-                lightBut8.BackColor = Color.DimGray;
-                lightBut8.Update();
-                lightBut8.Checked = true;
-            }
-            else
-            {
-                lightBut8.BackColor = Color.Green;
-                lightBut8.Update();
-                lightBut8.Checked = false;
-            }
-        }
-
-        private void LightBut9_Click(object sender, EventArgs e)
-        {
-            if (!lightBut9.Checked)
-            {
-                lightBut9.BackColor = Color.DimGray;
-                lightBut9.Update();
-                lightBut9.Checked = true;
-            }
-            else
-            {
-                lightBut9.BackColor = Color.Green;
-                lightBut9.Update();
-                lightBut9.Checked = false;
-            }
-        }
-
-        private void LightBut10_Click(object sender, EventArgs e)
-        {
-            if (!lightBut10.Checked)
-            {
-                lightBut10.BackColor = Color.DimGray;
-                lightBut10.Update();
-                lightBut10.Checked = true;
-            }
-            else
-            {
-                lightBut10.BackColor = Color.Green;
-                lightBut10.Update();
-                lightBut10.Checked = false;
-            }
-        }
-
-        private void LightBut11_Click(object sender, EventArgs e)
-        {
-            if (!lightBut11.Checked)
-            {
-                lightBut11.BackColor = Color.DimGray;
-                lightBut11.Update();
-                lightBut11.Checked = true;
-            }
-            else
-            {
-                lightBut11.BackColor = Color.Green;
-                lightBut11.Update();
-                lightBut11.Checked = false;
-            }
-        }
-
-        private void LightBut12_Click(object sender, EventArgs e)
-        {
-            if (!lightBut12.Checked)
-            {
-                lightBut12.BackColor = Color.DimGray;
-                lightBut12.Update();
-                lightBut12.Checked = true;
-            }
-            else
-            {
-                lightBut12.BackColor = Color.Green;
-                lightBut12.Update();
-                lightBut12.Checked = false;
-            }
-        }
-
-        private void LightBut13_Click(object sender, EventArgs e)
-        {
-            if (!lightBut13.Checked)
-            {
-                lightBut13.BackColor = Color.DimGray;
-                lightBut13.Update();
-                lightBut13.Checked = true;
-            }
-            else
-            {
-                lightBut13.BackColor = Color.Green;
-                lightBut13.Update();
-                lightBut13.Checked = false;
-            }
-        }
-
-        private void LightBut14_Click(object sender, EventArgs e)
-        {
-            if (!lightBut14.Checked)
-            {
-                lightBut14.BackColor = Color.DimGray;
-                lightBut14.Update();
-                lightBut14.Checked = true;
-            }
-            else
-            {
-                lightBut14.BackColor = Color.Green;
-                lightBut14.Update();
-                lightBut14.Checked = false;
-            }
-        }
-
-        private void LightBut15_Click(object sender, EventArgs e)
-        {
-            if (!lightBut15.Checked)
-            {
-                lightBut15.BackColor = Color.DimGray;
-                lightBut15.Update();
-                lightBut15.Checked = true;
-            }
-            else
-            {
-                lightBut15.BackColor = Color.Green;
-                lightBut15.Update();
-                lightBut15.Checked = false;
-            }
-        }
-
-        private void LightBut16_Click(object sender, EventArgs e)
-        {
-            if (!lightBut16.Checked)
-            {
-                lightBut16.BackColor = Color.DimGray;
-                lightBut16.Update();
-                lightBut16.Checked = true;
-            }
-            else
-            {
-                lightBut16.BackColor = Color.Green;
-                lightBut16.Update();
-                lightBut16.Checked = false;
-            }
-        }
-
-        private void LightBut17_Click(object sender, EventArgs e)
-        {
-            if (!lightBut17.Checked)
-            {
-                lightBut17.BackColor = Color.DimGray;
-                lightBut17.Update();
-                lightBut17.Checked = true;
-            }
-            else
-            {
-                lightBut17.BackColor = Color.Green;
-                lightBut17.Update();
-                lightBut17.Checked = false;
-            }
-        }
-
-        private void LightBut18_Click(object sender, EventArgs e)
-        {
-            if (!lightBut18.Checked)
-            {
-                lightBut18.BackColor = Color.DimGray;
-                lightBut18.Update();
-                lightBut18.Checked = true;
-            }
-            else
-            {
-                lightBut18.BackColor = Color.Green;
-                lightBut18.Update();
-                lightBut18.Checked = false;
-            }
-        }
-
-        private void LightBut19_Click(object sender, EventArgs e)
-        {
-            if (!lightBut19.Checked)
-            {
-                lightBut19.BackColor = Color.DimGray;
-                lightBut19.Update();
-                lightBut19.Checked = true;
-            }
-            else
-            {
-                lightBut19.BackColor = Color.Green;
-                lightBut19.Update();
-                lightBut19.Checked = false;
-            }
-        }
-
-        private void LightBut20_Click(object sender, EventArgs e)
-        {
-            if (!lightBut20.Checked)
-            {
-                lightBut20.BackColor = Color.DimGray;
-                lightBut20.Update();
-                lightBut20.Checked = true;
-            }
-            else
-            {
-                lightBut20.BackColor = Color.Green;
-                lightBut20.Update();
-                lightBut20.Checked = false;
-            }
-        }
-
-        private void LightBut21_Click(object sender, EventArgs e)
-        {
-            if (!lightBut21.Checked)
-            {
-                lightBut21.BackColor = Color.DimGray;
-                lightBut21.Update();
-                lightBut21.Checked = true;
-            }
-            else
-            {
-                lightBut21.BackColor = Color.Green;
-                lightBut21.Update();
-                lightBut21.Checked = false;
-            }
-        }
-
-        private void LightBut22_Click(object sender, EventArgs e)
-        {
-            if (!lightBut22.Checked)
-            {
-                lightBut22.BackColor = Color.DimGray;
-                lightBut22.Update();
-                lightBut22.Checked = true;
-            }
-            else
-            {
-                lightBut22.BackColor = Color.Green;
-                lightBut22.Update();
-                lightBut22.Checked = false;
-            }
-        }
-
-        private void LightBut23_Click(object sender, EventArgs e)
-        {
-            if (!lightBut23.Checked)
-            {
-                lightBut23.BackColor = Color.DimGray;
-                lightBut23.Update();
-                lightBut23.Checked = true;
-            }
-            else
-            {
-                lightBut23.BackColor = Color.Green;
-                lightBut23.Update();
-                lightBut23.Checked = false;
-            }
-        }
-
-        private void LightBut24_Click(object sender, EventArgs e)
-        {
-            if (!lightBut24.Checked)
-            {
-                lightBut24.BackColor = Color.DimGray;
-                lightBut24.Update();
-                lightBut24.Checked = true;
-            }
-            else
-            {
-                lightBut24.BackColor = Color.Green;
-                lightBut24.Update();
-                lightBut24.Checked = false;
-            }
-        }
-
-        private void LightBut25_Click(object sender, EventArgs e)
-        {
-            if (!lightBut25.Checked)
-            {
-                lightBut25.BackColor = Color.DimGray;
-                lightBut25.Update();
-                lightBut25.Checked = true;
-            }
-            else
-            {
-                lightBut25.BackColor = Color.Green;
-                lightBut25.Update();
-                lightBut25.Checked = false;
-            }
-        }
-
-        private void LightBut26_Click(object sender, EventArgs e)
-        {
-            if (!lightBut26.Checked)
-            {
-                lightBut26.BackColor = Color.DimGray;
-                lightBut26.Update();
-                lightBut26.Checked = true;
-            }
-            else
-            {
-                lightBut26.BackColor = Color.Green;
-                lightBut26.Update();
-                lightBut26.Checked = false;
-            }
-        }
-
-        private void LightBut27_Click(object sender, EventArgs e)
-        {
-            if (!lightBut27.Checked)
-            {
-                lightBut27.BackColor = Color.DimGray;
-                lightBut27.Update();
-                lightBut27.Checked = true;
-            }
-            else
-            {
-                lightBut27.BackColor = Color.Green;
-                lightBut27.Update();
-                lightBut27.Checked = false;
-            }
-        }
-
-        private void LightBut28_Click(object sender, EventArgs e)
-        {
-            if (!lightBut28.Checked)
-            {
-                lightBut28.BackColor = Color.DimGray;
-                lightBut28.Update();
-                lightBut28.Checked = true;
-            }
-            else
-            {
-                lightBut28.BackColor = Color.Green;
-                lightBut28.Update();
-                lightBut28.Checked = false;
-            }
-        }
-
-        private void LightBut29_Click(object sender, EventArgs e)
-        {
-            if (!lightBut29.Checked)
-            {
-                lightBut29.BackColor = Color.DimGray;
-                lightBut29.Update();
-                lightBut29.Checked = true;
-            }
-            else
-            {
-                lightBut29.BackColor = Color.Green;
-                lightBut29.Update();
-                lightBut29.Checked = false;
-            }
-        }
-
-        private void LightBut30_Click(object sender, EventArgs e)
-        {
-            if (!lightBut30.Checked)
-            {
-                lightBut30.BackColor = Color.DimGray;
-                lightBut30.Update();
-                lightBut30.Checked = true;
-            }
-            else
-            {
-                lightBut30.BackColor = Color.Green;
-                lightBut30.Update();
-                lightBut30.Checked = false;
-            }
-        }
-
-        private void LightBut31_Click(object sender, EventArgs e)
-        {
-            if (!lightBut31.Checked)
-            {
-                lightBut31.BackColor = Color.DimGray;
-                lightBut31.Update();
-                lightBut31.Checked = true;
-            }
-            else
-            {
-                lightBut31.BackColor = Color.Green;
-                lightBut31.Update();
-                lightBut31.Checked = false;
-            }
-        }
-
-        private void J11_Click(object sender, EventArgs e)
-        {
-            LightBut0_Click(sender, e);
-            LightBut1_Click(sender, e);
-            LightBut2_Click(sender, e);
-            LightBut3_Click(sender, e);
-        }
-
-        private void J12_Click(object sender, EventArgs e)
-        {
-            LightBut4_Click(sender, e);
-            LightBut5_Click(sender, e);
-            LightBut6_Click(sender, e);
-            LightBut7_Click(sender, e);
-        }
-
-        private void J13_Click(object sender, EventArgs e)
-        {
-            LightBut8_Click(sender, e);
-            LightBut9_Click(sender, e);
-            LightBut10_Click(sender, e);
-            LightBut11_Click(sender, e);
-        }
-
-        private void J14_Click(object sender, EventArgs e)
-        {
-            LightBut12_Click(sender, e);
-            LightBut13_Click(sender, e);
-            LightBut14_Click(sender, e);
-            LightBut15_Click(sender, e);
-        }
-
-        private void J15_Click(object sender, EventArgs e)
-        {
-            LightBut16_Click(sender, e);
-            LightBut17_Click(sender, e);
-            LightBut18_Click(sender, e);
-            LightBut19_Click(sender, e);
-        }
-
-        private void J16_Click(object sender, EventArgs e)
-        {
-            LightBut20_Click(sender, e);
-            LightBut21_Click(sender, e);
-            LightBut22_Click(sender, e);
-            LightBut23_Click(sender, e);
-        }
-
-        private void J17_Click(object sender, EventArgs e)
-        {
-            LightBut24_Click(sender, e);
-            LightBut25_Click(sender, e);
-            LightBut26_Click(sender, e);
-            LightBut27_Click(sender, e);
-        }
-
-        private void J18_Click(object sender, EventArgs e)
-        {
-            LightBut28_Click(sender, e);
-            LightBut29_Click(sender, e);
-            LightBut30_Click(sender, e);
-            LightBut31_Click(sender, e);
-        }
-
-
 
         private void CmbTestBtn_Click(object sender, EventArgs e)
         {
             //Check that an FEB client exists, otherwise, don't bother setting up the pulser or trying to get data
             if (PP.FEB1.client != null)
             {
-
                 //These registers are required for setting up the FEB to record triggered events and the flashing of the LED.
                 //The FEB is responsible for controlling the pulser via the FEB's GPO port into the pulser's external clock port
                 Mu2e_Register.FindAddr(0x300, ref PP.FEB1.arrReg, out Mu2e_Register flashGateControlReg); //Flash gate control register
@@ -2797,11 +2314,10 @@ namespace TB_mu2e
                 #endregion ReadFileAvgs
 
                 #region Pedestal/Calibration
-                for (uint fpga = 0; fpga < 4; fpga++) //Turn on bias for SiPMs
-                    PP.FEB1.SetV(Convert.ToDouble(cmbBias.Text), (int)fpga);
+
                 #region BiasWait
                 cmbInfoBox.Text = "Waiting for bias";
-                for (int tick = 0; tick < 7; tick++) { cmbInfoBox.Text += "."; cmbInfoBox.Update(); System.Threading.Thread.Sleep(1000); }
+                PP.FEB1.SetVAll(Convert.ToDouble(cmbBias.Text));
                 #endregion BiasWait
 
                 //Code that was here can be found in the following file: C:\FLASH\..\Redacted.txt
@@ -2823,25 +2339,25 @@ namespace TB_mu2e
                         uint[] channels = { channel, Convert.ToUInt32(histos[1].GetTitle()) }; //Lazily grab the other channel's label from the histogram title...
                         System.Console.WriteLine("Histo Chans: " + channels[0] + ", " + channels[1]);
 
-                        for (int chanI = 0; chanI < 2; chanI++)//Loop over each of the two histograms
+                        for (int hist = 0; hist < 2; hist++)//Loop over each of the two histograms
                         {
-                            peHistos[channels[chanI]] = histos[chanI];
-                            peakFinders[chanI] = new ROOTNET.NTSpectrum(3); //Only try and compute the gain from pedestal, 1st, and possibly 2nd PE
-                            int peaksFound = peakFinders[chanI].Search(peHistos[channels[chanI]], 1.5, "nobackground", 0.00001); //Don't try and estimate background, and set the threshold to only include pedestal, 1st, and 2nd PE
-                            if (peaksFound < 2) { System.Console.WriteLine("Cannot find 1+ PE for Chan {0}", channels[chanI]); continue; } //Need this beacuse we need to know the gain, which is impossible if we can't see first PE
-                            var peakPositions = peakFinders[chanI].GetPositionX();
+                            peHistos[channels[hist]] = histos[hist];
+                            peakFinders[hist] = new ROOTNET.NTSpectrum(3); //Only try and compute the gain from pedestal, 1st, and possibly 2nd PE
+                            int peaksFound = peakFinders[hist].Search(peHistos[channels[hist]], 1.5, "nobackground", 0.00001); //Don't try and estimate background, and set the threshold to only include pedestal, 1st, and 2nd PE
+                            if (peaksFound < 2) { System.Console.WriteLine("Cannot find 1+ PE for Chan {0}", channels[hist]); continue; } //Need this beacuse we need to know the gain, which is impossible if we can't see first PE
+                            var peakPositions = peakFinders[hist].GetPositionX();
                             peakFits = new ROOTNET.NTF1[peaksFound];
                             for (uint peak = 0; peak < peaksFound; peak++)
                             {
                                 float x_loc = peakPositions[(int)peak];
-                                peakFits[peak] = new ROOTNET.NTF1("Ch" + channels[chanI].ToString() + "peak" + peak.ToString(), "gaus", x_loc - 2.5, x_loc + 2.5);
+                                peakFits[peak] = new ROOTNET.NTF1("Ch" + channels[hist].ToString() + "peak" + peak.ToString(), "gaus", x_loc - 2.5, x_loc + 2.5);
                                 peakFits[peak].SetLineColor(Convert.ToInt16(peak + 2));
-                                peHistos[channels[chanI]].Fit(peakFits[peak], "R+");// R option forces the function to fit only over its specified range, + option tells it to add fit to histogram list without deleting previous fits
+                                peHistos[channels[hist]].Fit(peakFits[peak], "R+");// R option forces the function to fit only over its specified range, + option tells it to add fit to histogram list without deleting previous fits
                             }
-                            pedestals[channels[chanI]] = peakFits[0].GetParameter(1);
-                            gains[channels[chanI]] = peakFits[1].GetParameter(1) - pedestals[channels[chanI]];
+                            pedestals[channels[hist]] = peakFits[0].GetParameter(1);
+                            gains[channels[hist]] = peakFits[1].GetParameter(1) - pedestals[channels[hist]];
                             if (peakFits.Length > 2)
-                                gains[channels[chanI]] = (gains[channels[chanI]] + peakFits[2].GetParameter(1) - peakFits[1].GetParameter(1)) / 2.0;
+                                gains[channels[hist]] = (gains[channels[hist]] + peakFits[2].GetParameter(1) - peakFits[1].GetParameter(1)) / 2.0;
 
                         }
                     }
@@ -2867,7 +2383,7 @@ namespace TB_mu2e
 
                 passed_calibration = false; //find a new home for this guy
 
-                //return; //FULL STOP, DONT DO ANYTHING MORE, SHIT BELOW IS ABSOLUTELY CRAY CRAY
+                //return;
                 #endregion Pedestal/Calibration
                 
 
@@ -2892,14 +2408,14 @@ namespace TB_mu2e
                     //[X] Need to set the flash gate control register to flash gate and not CMB LEDs (set 0x300 to 2)
                     //[X] Need to set the trigControlReg to set the GPO select
                     //[X] Need to set the test pulser frequency
-                    //[?] Need to set the delay between internal pulser and external LED (hit-pipeline delay if it affects the raw SiPM data for histogramming)
+                    //[?] Need to set the delay between internal pulser and external LED (hit-pipeline delay if it affects the raw SiPM data for histogramming, or adjust on pulser)
                     //[X] Get histograms
                     //[ ] Fit data
                     //[ ] Report evaluation
 
                     Mu2e_Register.WriteReg(0x2, ref flashGateControlReg, ref PP.FEB1.client); //Set the CMB Pulse routing to the Flash Gate (to LED flasher will create interference on CMB)
                     Mu2e_Register.WriteReg(0x100, ref trigControlReg, ref PP.FEB1.client); //Enable the on-board test pulser, output of this signal will be delivered to external pulser to flash LED
-                    Mu2e_Register.WriteReg(0x1F07AC, ref testPulseFreqReg, ref PP.FEB1.client); //Set the on-board test pulser's frequency to ~140kHz
+                    Mu2e_Register.WriteReg(0x5E5E5E, ref testPulseFreqReg, ref PP.FEB1.client); //Set the on-board test pulser's frequency to ~230kHz
                     Mu2e_Register.WriteReg(0x1, ref hitPipelineDelayReg, ref PP.FEB1.client); //Set the hit pipeline delay to minimum value (12.56ns)
 
                     //ROOTNET.NTSpectrum[] peakFinders = new ROOTNET.NTSpectrum[2];
@@ -2917,25 +2433,25 @@ namespace TB_mu2e
                             uint[] channels = { channel, Convert.ToUInt32(histos[1].GetTitle()) }; //Lazily grab the other channel's label from the histogram title...
                             System.Console.WriteLine("Histo Chans: " + channels[0] + ", " + channels[1]);
 
-                            for (int chanI = 0; chanI < 2; chanI++)//Loop over each of the two histograms
+                            for (int hist = 0; hist < 2; hist++) //Loop over each of the two histograms
                             {
-                                ledHistos[channels[chanI]] = histos[chanI];
-                                peakFinders[chanI] = new ROOTNET.NTSpectrum(10); //Maybe try and get all the PEs
-                                int peaksFound = peakFinders[chanI].Search(ledHistos[channels[chanI]], 1.5, "nobackground", 0.001); //Don't try and estimate background, and set the threshold to only include pedestal, 1st, and 2nd PE
-                                //if (peaksFound < 2) { System.Console.WriteLine("Cannot find 1+ PE for Chan {0}", channels[chanI]); continue; } //Need this beacuse we need to know the gain, which is impossible if we can't see first PE
-                                //var peakPositions = peakFinders[chanI].GetPositionX();
+                                ledHistos[channels[hist]] = histos[hist];
+                                peakFinders[hist] = new ROOTNET.NTSpectrum(10); //Maybe try and get all the PEs
+                                int peaksFound = peakFinders[hist].Search(ledHistos[channels[hist]], 1.5, "nobackground", 0.001); //Don't try and estimate background, and set the threshold to only include pedestal, 1st, and 2nd PE
+                                //if (peaksFound < 2) { System.Console.WriteLine("Cannot find 1+ PE for Chan {0}", channels[hist]); continue; } //Need this beacuse we need to know the gain, which is impossible if we can't see first PE
+                                //var peakPositions = peakFinders[hist].GetPositionX();
                                 //peakFits = new ROOTNET.NTF1[peaksFound];
                                 //for (uint peak = 0; peak < peaksFound; peak++)
                                 //{
                                 //    float x_loc = peakPositions[(int)peak];
-                                //    peakFits[peak] = new ROOTNET.NTF1("Ch" + channels[chanI].ToString() + "peak" + peak.ToString(), "gaus", x_loc - 2.5, x_loc + 2.5);
+                                //    peakFits[peak] = new ROOTNET.NTF1("Ch" + channels[hist].ToString() + "peak" + peak.ToString(), "gaus", x_loc - 2.5, x_loc + 2.5);
                                 //    peakFits[peak].SetLineColor(Convert.ToInt16(peak + 2));
-                                //    ledHistos[channels[chanI]].Fit(peakFits[peak], "R+");// R option forces the function to fit only over its specified range, + option tells it to add fit to histogram list without deleting previous fits
+                                //    ledHistos[channels[hist]].Fit(peakFits[peak], "R+");// R option forces the function to fit only over its specified range, + option tells it to add fit to histogram list without deleting previous fits
                                 //}
-                                //pedestals[channels[chanI]] = peakFits[0].GetParameter(1);
-                                //gains[channels[chanI]] = peakFits[1].GetParameter(1) - pedestals[channels[chanI]];
+                                //pedestals[channels[hist]] = peakFits[0].GetParameter(1);
+                                //gains[channels[hist]] = peakFits[1].GetParameter(1) - pedestals[channels[hist]];
                                 //if (peakFits.Length > 2)
-                                //gains[channels[chanI]] = (gains[channels[chanI]] + peakFits[2].GetParameter(1) - peakFits[1].GetParameter(1)) / 2.0;
+                                //gains[channels[hist]] = (gains[channels[hist]] + peakFits[2].GetParameter(1) - peakFits[1].GetParameter(1)) / 2.0;
                             }
                         }
                     }
@@ -2966,7 +2482,7 @@ namespace TB_mu2e
 
                 cmbInfoBox.Text = ""; cmbInfoBox.Update();
 
-                return;
+                return; //FULL STOP, DONT DO ANYTHING MORE, SHIT BELOW IS ABSOLUTELY CRAY CRAY
 
                 #region Move this
                 febSocket.Send(sendRDB);
@@ -3098,9 +2614,17 @@ namespace TB_mu2e
             bool parsed = double.TryParse(cmbBias.Text, out var isNumber);
             //Check for invalid input
             if (string.IsNullOrWhiteSpace(cmbBias.Text))
-                cmbBias.BackColor = Color.Red; 
+            {
+                cmbBias.BackColor = Color.Red;
+                cmbTestBtn.Enabled = false;
+            }
             else if (!parsed || isNumber < 0 || isNumber > 80)
+            {
                 cmbBias.Text = "57.0";
+                cmbTestBtn.Enabled = true;
+            }
+            else
+                cmbTestBtn.Enabled = true;
         }
 
         private void RequestNumTrigs_TextChanged(object sender, EventArgs e)
@@ -3114,15 +2638,97 @@ namespace TB_mu2e
                 requestNumTrigs.Text = "100";
         }
 
-    }
+        private void OneReadout_CheckedChanged(object sender, EventArgs e)
+        {
+            if (oneReadout.Checked == true)
+            {
+                foreach (var btn in qaDiButtons.Take(4).ToArray()) //If any of the first 4 buttons have been checked, uncheck them
+                    if (btn.Checked)
+                        QaDiButton_Click(btn, e);
 
+                foreach (var btn in qaDiButtons.Skip(4).ToArray()) //Check the remaining buttons, if not checked already
+                    if (!btn.Checked) //if it isn't checked, then check it
+                        QaDiButton_Click(btn, e);
+            }
+            else
+            {
+                foreach (var btn in qaDiButtons) //If any button is checked, uncheck it
+                    if (btn.Checked)
+                        QaDiButton_Click(btn, e);
+            }
+        }
+
+        private void LightModuleLabel_TextChanged(object sender, EventArgs e)
+        {
+            lightModuleLabel.BackColor = Color.White;
+            if (string.IsNullOrWhiteSpace(lightModuleSide.Text))
+                lightModuleSide.SelectedIndex = 0;
+            if (!string.IsNullOrWhiteSpace(lightModuleLabel.Text))
+            {
+                lightWriteToFileBox.Enabled = true;
+                lightModuleSide.Enabled = true;
+                lightModuleLayer.Enabled = true;
+            }
+            else
+            {
+                lightWriteToFileBox.Checked = false;
+                lightWriteToFileBox.Enabled = false;
+                lightModuleLabel.BackColor = Color.Yellow;
+                lightModuleSide.Enabled = false;
+                lightModuleLayer.Enabled = false;
+            }
+            lightModuleLabel.Update();
+        }
+
+        private void LightWriteToFileBox_CheckedChanged(object sender, EventArgs e)
+        {
+            if (lightWriteToFileBox.Checked)
+            {
+                lightNumChecks.Value = 1;
+                lightNumChecks.Enabled = false;
+            }
+            else
+                lightNumChecks.Enabled = true;
+        }
+
+        private void LightGlobalThresh_TextChanged(object sender, EventArgs e)
+        {
+            lightGlobalThresh.BackColor = Color.White;
+            bool parsed = double.TryParse(lightGlobalThresh.Text, out var isNumber);
+            //Check for invalid input
+            if (string.IsNullOrWhiteSpace(lightGlobalThresh.Text))
+            {
+                lightGlobalThresh.BackColor = Color.Red;
+                globalThreshChkBox.Enabled = false;
+            }
+            else if (!parsed || isNumber < 0)
+            {
+                lightGlobalThresh.Text = "0.25";
+                globalThreshChkBox.Enabled = true;
+            }
+            else
+                globalThreshChkBox.Enabled = true;
+        }
+
+        private void Console_Disp_TextChanged(object sender, EventArgs e)
+        {
+            //Autoscroll to the end of the text box
+            console_Disp.SelectionStart = console_Disp.Text.Length;
+            console_Disp.ScrollToCaret();
+        }
+
+        private void RunLog_TextChanged(object sender, EventArgs e)
+        {
+            //Autoscroll to the end of the text box
+            runLog.SelectionStart = console_Disp.Text.Length;
+            runLog.ScrollToCaret();
+        }
+    }
 
 
     public class ConnectAttemptEventArgs : EventArgs
     {
         public int ConnectAttempt { get; set; }
     }
-
-
 
 }
