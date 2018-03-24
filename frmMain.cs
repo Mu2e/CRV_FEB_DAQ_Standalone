@@ -2196,10 +2196,26 @@ namespace TB_mu2e
             bool parsed = double.TryParse(qaBias.Text, out var isNumber);
             //Check for invalid input
             if (string.IsNullOrWhiteSpace(qaBias.Text))
+            {
                 qaBias.BackColor = Color.Red;
+                qaStartButton.Enabled = false;
+                lightCheckBtn.Enabled = false;
+                autoThreshBtn.Enabled = false;
+            }
             else if (!parsed || isNumber < 0 || isNumber > 80)
-            { qaBias.Text = "57.0"; qaBias.BackColor = Color.LightGray; }
-
+            {
+                qaBias.Text = "57.0";
+                qaBias.BackColor = Color.LightGray;
+                qaStartButton.Enabled = true;
+                lightCheckBtn.Enabled = true;
+                autoThreshBtn.Enabled = true;
+            }
+            else
+            {
+                qaStartButton.Enabled = true;
+                lightCheckBtn.Enabled = true;
+                autoThreshBtn.Enabled = true;
+            }
         }
 
         private void QaDiButton_Click(object sender, EventArgs e)
@@ -2722,6 +2738,25 @@ namespace TB_mu2e
             //Autoscroll to the end of the text box
             runLog.SelectionStart = console_Disp.Text.Length;
             runLog.ScrollToCaret();
+        }
+
+        private void qaDiIWarningThresh_TextChanged(object sender, EventArgs e)
+        {
+            qaDiIWarningThresh.BackColor = Color.White;
+            bool parsed = double.TryParse(qaDiIWarningThresh.Text, out var isNumber);
+            //Check for invalid input
+            if (string.IsNullOrWhiteSpace(qaDiIWarningThresh.Text))
+            {
+                qaDiIWarningThresh.BackColor = Color.Red;
+                qaStartButton.Enabled = false;
+            }
+            else if (!parsed || isNumber < 0)
+            {
+                qaDiIWarningThresh.Text = "0.1";
+                qaStartButton.Enabled = true;
+            }
+            else
+                qaStartButton.Enabled = true;
         }
     }
 

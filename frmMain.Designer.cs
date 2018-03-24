@@ -38,6 +38,7 @@
             this.lblMessage = new System.Windows.Forms.ToolStripStatusLabel();
             this.tabControl = new System.Windows.Forms.TabControl();
             this.tabRUN = new System.Windows.Forms.TabPage();
+            this.runLog = new System.Windows.Forms.RichTextBox();
             this.label14 = new System.Windows.Forms.Label();
             this.label13 = new System.Windows.Forms.Label();
             this.label12 = new System.Windows.Forms.Label();
@@ -234,7 +235,6 @@
             this.cmbBiasOverride = new System.Windows.Forms.CheckBox();
             this.cmbTestBtn = new System.Windows.Forms.Button();
             this.timer1 = new System.Windows.Forms.Timer(this.components);
-            this.runLog = new System.Windows.Forms.RichTextBox();
             this.statusStrip1.SuspendLayout();
             this.tabControl.SuspendLayout();
             this.tabRUN.SuspendLayout();
@@ -356,6 +356,18 @@
             this.tabRUN.TabIndex = 0;
             this.tabRUN.Text = "RUN";
             this.tabRUN.UseVisualStyleBackColor = true;
+            // 
+            // runLog
+            // 
+            this.runLog.Location = new System.Drawing.Point(3, 459);
+            this.runLog.Name = "runLog";
+            this.runLog.ReadOnly = true;
+            this.runLog.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.ForcedBoth;
+            this.runLog.Size = new System.Drawing.Size(1240, 180);
+            this.runLog.TabIndex = 46;
+            this.runLog.Text = "";
+            this.runLog.WordWrap = false;
+            this.runLog.TextChanged += new System.EventHandler(this.RunLog_TextChanged);
             // 
             // label14
             // 
@@ -2412,6 +2424,7 @@
             this.qaDiIWarningThresh.TabIndex = 104;
             this.qaDiIWarningThresh.Text = "0.1";
             this.qaDiIWarningThresh.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            this.qaDiIWarningThresh.TextChanged += new System.EventHandler(this.qaDiIWarningThresh_TextChanged);
             // 
             // autoDataProgress
             // 
@@ -2610,18 +2623,6 @@
             this.timer1.Enabled = true;
             this.timer1.Interval = 200;
             this.timer1.Tick += new System.EventHandler(this.Timer1_Tick);
-            // 
-            // runLog
-            // 
-            this.runLog.Location = new System.Drawing.Point(3, 459);
-            this.runLog.Name = "runLog";
-            this.runLog.ReadOnly = true;
-            this.runLog.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.ForcedBoth;
-            this.runLog.Size = new System.Drawing.Size(1240, 180);
-            this.runLog.TabIndex = 46;
-            this.runLog.Text = "";
-            this.runLog.WordWrap = false;
-            this.runLog.TextChanged += new System.EventHandler(this.RunLog_TextChanged);
             // 
             // frmMain
             // 
