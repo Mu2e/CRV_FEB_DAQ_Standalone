@@ -95,7 +95,7 @@ namespace TB_mu2e
         }
 
         //Read the temperatures from all the CMBs on a given FPGA
-        public double[] ReadTemp(int fpga = 0)
+        public double[] ReadTempFPGA(int fpga = 0)
         {
             double[] cmb_temps = new double[4];
 
@@ -103,31 +103,22 @@ namespace TB_mu2e
 
             SendStr("cmb");//SendStr("STAB" );
             ReadStr(out string a, out int r);
-            a = a.Substring(0, a.Length - 1); //Eliminate beginning and end '>'
-            if (a.Length > 40)
+            if (a.Length > 400) //If it got 'all' the info
             {
-                char[] sep = new char[3];
-                sep[0] = ' '; sep[1] = '\r'; sep[2] = '\n';
-                string[] tok = a.Split(sep, StringSplitOptions.RemoveEmptyEntries);
-                try
+                string[] tok = a.Split(new string[] { " ", Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
+                if (String.Equals(tok[1], "DegC")) //Preproduction FEB 'cmb' format
                 {
-                    if (String.Equals(tok[1], "DegC")) //Preproduction FEB 'cmb' format
-                    {
-                        for (int cmb = 0; cmb < 4; cmb++)
-                            cmb_temps[cmb] = Convert.ToDouble(tok[(cmb*3) + (12 * fpga) + 5]); //Starting at index 5, every 3rd string is the cmb temperature
-                    }
-                    else if(String.Equals(tok[1], "Cnts_TEMP_DegC")) //Prototype FEB 'cmb' format
-                    {
-                        for (int cmb = 0; cmb < 4; cmb++)
-                            cmb_temps[cmb] = Convert.ToDouble(tok[(cmb * 4) + (12 * fpga) + 5]); //Starting at index 6, every 4th string is the cmb temperature
-                    }
-                    else { for (int cmb = 0; cmb < 4; cmb++) cmb_temps[cmb] = -1; } //unknown format
+                    for (int cmb = 0; cmb < 4; cmb++)
+                        cmb_temps[cmb] = Convert.ToDouble(tok[(cmb * 3) + (12 * fpga) + 5]); //Starting at index 5, every 3rd string is the cmb temperature
                 }
-                catch //if any error occurs, just set the temperatures to -1
+                else if (String.Equals(tok[1], "Cnts_TEMP_DegC")) //Prototype FEB 'cmb' format
                 {
-                    for (int cmb = 0; cmb < 4; cmb++) cmb_temps[cmb] = -1;
+                    for (int cmb = 0; cmb < 4; cmb++)
+                        cmb_temps[cmb] = Convert.ToDouble(tok[(cmb * 4) + (12 * fpga) + 5]); //Starting at index 6, every 4th string is the cmb temperature
                 }
+                else { for (int cmb = 0; cmb < 4; cmb++) cmb_temps[cmb] = -1; } //unknown format
             }
+            else { for (int cmb = 0; cmb < 4; cmb++) cmb_temps[cmb] = -1; } //Didn't receive the info
 
             return cmb_temps;
         }
@@ -144,12 +135,9 @@ namespace TB_mu2e
 
             SendStr("cmb");//SendStr("STAB" );
             ReadStr(out string a, out int r);
-            a = a.Substring(1, a.Length - 2); //Eliminate beginning and end '>'
-            if (a.Length > 40)
+            if (a.Length > 400)//If it got 'all' the info
             {
-                char[] sep = new char[3];
-                sep[0] = ' '; sep[1] = '\r'; sep[2] = '\n';
-                string[] tok = a.Split(sep, StringSplitOptions.RemoveEmptyEntries);
+                string[] tok = a.Split(new string[] { " ", Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
                 try
                 {
                     if (String.Equals(tok[1], "DegC")) //Preproduction FEB 'cmb' format
@@ -166,11 +154,10 @@ namespace TB_mu2e
                 {
                     cmb_temp = -1;
                 }
-            }
+            } //else didn't get the info so cmb_temp is left at -1
 
             return cmb_temp;
         }
-
 
         public void SetV(double V, int fpga = 0)
         {
@@ -218,6 +205,8 @@ namespace TB_mu2e
 
         public double ReadA0(int fpga = 0, int ch = 0)
         {
+            SendStr("mux " + fpga); //Set the mux correctly
+            Thread.Sleep(20);
             if (ch == 0)
             { SendStr("wr " + Convert.ToString(4 * fpga, 16) + "20 10"); }
             else
@@ -304,8 +293,6 @@ namespace TB_mu2e
             while ((SR.ReadLine() != "trig") && (timeout < max_timeout)) { System.Threading.Thread.Sleep(1); timeout++; }
             if (timeout < max_timeout) { return true; } else { return false; }
         }
-
-
 
         public bool CheckStatus(out uint spill_state, out uint spill_num, out uint trig_num)
         {
@@ -443,6 +430,7 @@ namespace TB_mu2e
                     Thread.Sleep(10);
                     int ret_len = TNETSocket.Receive(rec_buf);
                     t = PP.GetString(rec_buf, ret_len);
+                    t = t.Trim(new char[] { '>' }); //remove >
                 }
             }
             ret_time = this_t;
@@ -560,4 +548,16 @@ namespace TB_mu2e
         //}
 
     }
+
+    struct CMB
+    {
+        public int num;
+        public string rom_id;
+        public double temp;
+        public ROOTNET.NTH1I darkCurrentHisto;
+        public ROOTNET.NTH1I ledHisto;
+        public ROOTNET.NTH1I flasherHisto;
+        public ROOTNET.NTH1I gateHisto;
+        public bool flagged;        
+    };
 }

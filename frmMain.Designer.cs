@@ -47,7 +47,6 @@
             this.lblMaxADC2 = new System.Windows.Forms.Label();
             this.lblMaxADC1 = new System.Windows.Forms.Label();
             this.lblMaxADC0 = new System.Windows.Forms.Label();
-            this.lblRunLog = new System.Windows.Forms.Label();
             this.lblEventCount = new System.Windows.Forms.Label();
             this.groupBoxEvDisplay = new System.Windows.Forms.GroupBox();
             this.chkLast = new System.Windows.Forms.CheckBox();
@@ -222,7 +221,8 @@
             this.qaBiasLbl = new System.Windows.Forms.Label();
             this.qaBias = new System.Windows.Forms.TextBox();
             this.tabCMBTester = new System.Windows.Forms.TabPage();
-            this.cmbHistoBox = new System.Windows.Forms.GroupBox();
+            this.cmbDataGroup = new System.Windows.Forms.GroupBox();
+            this.cmbDataTable = new System.Windows.Forms.TableLayoutPanel();
             this.cmbTestControl = new System.Windows.Forms.GroupBox();
             this.updateFilesChkBox = new System.Windows.Forms.CheckBox();
             this.cmbInfoBox = new System.Windows.Forms.TextBox();
@@ -268,6 +268,7 @@
             this.dicounterQAGroup.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.qaDiNumAvg)).BeginInit();
             this.tabCMBTester.SuspendLayout();
+            this.cmbDataGroup.SuspendLayout();
             this.cmbTestControl.SuspendLayout();
             this.sipmControl.SuspendLayout();
             this.SuspendLayout();
@@ -344,7 +345,6 @@
             this.tabRUN.Controls.Add(this.lblMaxADC2);
             this.tabRUN.Controls.Add(this.lblMaxADC1);
             this.tabRUN.Controls.Add(this.lblMaxADC0);
-            this.tabRUN.Controls.Add(this.lblRunLog);
             this.tabRUN.Controls.Add(this.lblEventCount);
             this.tabRUN.Controls.Add(this.groupBoxEvDisplay);
             this.tabRUN.Controls.Add(this.groupBox1);
@@ -359,11 +359,11 @@
             // 
             // runLog
             // 
-            this.runLog.Location = new System.Drawing.Point(3, 459);
+            this.runLog.Location = new System.Drawing.Point(7, 460);
             this.runLog.Name = "runLog";
             this.runLog.ReadOnly = true;
             this.runLog.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.ForcedBoth;
-            this.runLog.Size = new System.Drawing.Size(1240, 180);
+            this.runLog.Size = new System.Drawing.Size(1240, 202);
             this.runLog.TabIndex = 46;
             this.runLog.Text = "";
             this.runLog.WordWrap = false;
@@ -440,18 +440,6 @@
             this.lblMaxADC0.Size = new System.Drawing.Size(54, 17);
             this.lblMaxADC0.TabIndex = 36;
             this.lblMaxADC0.Text = "label14";
-            // 
-            // lblRunLog
-            // 
-            this.lblRunLog.AutoSize = true;
-            this.lblRunLog.BackColor = System.Drawing.SystemColors.Info;
-            this.lblRunLog.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.150944F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblRunLog.Location = new System.Drawing.Point(3, 459);
-            this.lblRunLog.MinimumSize = new System.Drawing.Size(1240, 180);
-            this.lblRunLog.Name = "lblRunLog";
-            this.lblRunLog.Size = new System.Drawing.Size(1240, 180);
-            this.lblRunLog.TabIndex = 3;
-            this.lblRunLog.Text = "run log text goes here\r\n1\r\n2\r\n3\r\n4\r\n5\r\n6\r\n7\r\n8\r\n9\r\n10\r\n11\r\n12";
             // 
             // lblEventCount
             // 
@@ -1561,6 +1549,7 @@
             this.udFPGA.Size = new System.Drawing.Size(46, 23);
             this.udFPGA.TabIndex = 13;
             this.udFPGA.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+            this.udFPGA.ValueChanged += new System.EventHandler(this.UdFPGA_ValueChanged);
             // 
             // btnRegMON
             // 
@@ -2424,7 +2413,7 @@
             this.qaDiIWarningThresh.TabIndex = 104;
             this.qaDiIWarningThresh.Text = "0.1";
             this.qaDiIWarningThresh.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
-            this.qaDiIWarningThresh.TextChanged += new System.EventHandler(this.qaDiIWarningThresh_TextChanged);
+            this.qaDiIWarningThresh.TextChanged += new System.EventHandler(this.QaDiIWarningThresh_TextChanged);
             // 
             // autoDataProgress
             // 
@@ -2486,7 +2475,7 @@
             // 
             // tabCMBTester
             // 
-            this.tabCMBTester.Controls.Add(this.cmbHistoBox);
+            this.tabCMBTester.Controls.Add(this.cmbDataGroup);
             this.tabCMBTester.Controls.Add(this.cmbTestControl);
             this.tabCMBTester.Location = new System.Drawing.Point(4, 29);
             this.tabCMBTester.Name = "tabCMBTester";
@@ -2496,14 +2485,45 @@
             this.tabCMBTester.Text = "CMB Tester";
             this.tabCMBTester.UseVisualStyleBackColor = true;
             // 
-            // cmbHistoBox
+            // cmbDataGroup
             // 
-            this.cmbHistoBox.Location = new System.Drawing.Point(517, 23);
-            this.cmbHistoBox.Name = "cmbHistoBox";
-            this.cmbHistoBox.Size = new System.Drawing.Size(710, 419);
-            this.cmbHistoBox.TabIndex = 1;
-            this.cmbHistoBox.TabStop = false;
-            this.cmbHistoBox.Text = "CMB Histos";
+            this.cmbDataGroup.Controls.Add(this.cmbDataTable);
+            this.cmbDataGroup.Location = new System.Drawing.Point(16, 219);
+            this.cmbDataGroup.Name = "cmbDataGroup";
+            this.cmbDataGroup.Size = new System.Drawing.Size(246, 410);
+            this.cmbDataGroup.TabIndex = 1;
+            this.cmbDataGroup.TabStop = false;
+            this.cmbDataGroup.Text = "CMB Info";
+            // 
+            // cmbDataTable
+            // 
+            this.cmbDataTable.ColumnCount = 3;
+            this.cmbDataTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 33.33333F));
+            this.cmbDataTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 33.33334F));
+            this.cmbDataTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 33.33334F));
+            this.cmbDataTable.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.cmbDataTable.Location = new System.Drawing.Point(3, 19);
+            this.cmbDataTable.Margin = new System.Windows.Forms.Padding(0);
+            this.cmbDataTable.Name = "cmbDataTable";
+            this.cmbDataTable.RowCount = 16;
+            this.cmbDataTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 6.25F));
+            this.cmbDataTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 6.25F));
+            this.cmbDataTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 6.25F));
+            this.cmbDataTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 6.25F));
+            this.cmbDataTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 6.25F));
+            this.cmbDataTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 6.25F));
+            this.cmbDataTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 6.25F));
+            this.cmbDataTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 6.25F));
+            this.cmbDataTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 6.25F));
+            this.cmbDataTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 6.25F));
+            this.cmbDataTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 6.25F));
+            this.cmbDataTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 6.25F));
+            this.cmbDataTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 6.25F));
+            this.cmbDataTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 6.25F));
+            this.cmbDataTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 6.25F));
+            this.cmbDataTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 6.25F));
+            this.cmbDataTable.Size = new System.Drawing.Size(240, 388);
+            this.cmbDataTable.TabIndex = 0;
             // 
             // cmbTestControl
             // 
@@ -2688,6 +2708,7 @@
             this.dicounterQAGroup.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.qaDiNumAvg)).EndInit();
             this.tabCMBTester.ResumeLayout(false);
+            this.cmbDataGroup.ResumeLayout(false);
             this.cmbTestControl.ResumeLayout(false);
             this.cmbTestControl.PerformLayout();
             this.sipmControl.ResumeLayout(false);
@@ -2773,7 +2794,6 @@
         private System.Windows.Forms.Button btnStopRun;
         private System.Windows.Forms.Button btnStartRun;
         private System.Windows.Forms.Button btnPrepare;
-        private System.Windows.Forms.Label lblRunLog;
         private System.Windows.Forms.Label lblRunName;
         private System.Windows.Forms.Label lblSpillTime;
         private System.Windows.Forms.Label lblWCTrigNum;
@@ -2895,7 +2915,7 @@
         private System.Windows.Forms.Label requestNumTrigsLabel;
         private System.Windows.Forms.TextBox cmbInfoBox;
         private System.Windows.Forms.CheckBox updateFilesChkBox;
-        private System.Windows.Forms.GroupBox cmbHistoBox;
+        private System.Windows.Forms.GroupBox cmbDataGroup;
         private System.Windows.Forms.TextBox qaOutputFileName;
         private System.Windows.Forms.Label qaOutputFileNameLabel;
         private System.Windows.Forms.TableLayoutPanel lightCheckFPGApanel;
@@ -2909,5 +2929,7 @@
         private System.Windows.Forms.NumericUpDown lightNumChecks;
         private System.Windows.Forms.RichTextBox console_Disp;
         private System.Windows.Forms.RichTextBox runLog;
+        private System.Windows.Forms.TableLayoutPanel cmbDataTable;
+        private System.Windows.Forms.Label[][] cmbInfoLabels;
     }
 }

@@ -67,13 +67,23 @@ namespace TB_mu2e
             ROOTNET.NTH1I[] histo = new ROOTNET.NTH1I[2];
             for (uint i = 0; i < 2; i++)
             {
-                histo[i] = new ROOTNET.NTH1I("Ch" + channels[i, 3].ToString(), channels[i, 3].ToString(), 512, 0, binning*512);
-                for (uint binIndex = 0; binIndex < histogramBinContents[i].Length; binIndex++)
+                try
                 {
-                    histo[i].SetBinContent((int)binIndex, histogramBinContents[i][binIndex]);
+                    histo[i] = new ROOTNET.NTH1I("Ch" + channels[i, 3].ToString(), channels[i, 3].ToString(), 512, 0, binning * 512);
+                    for (uint binIndex = 0; binIndex < histogramBinContents[i].Length; binIndex++)
+                    {
+                        histo[i].SetBinContent((int)binIndex, histogramBinContents[i][binIndex]);
+                    }
+                    histo[i].GetXaxis().SetTitle("ADC");
+                    histo[i].GetYaxis().SetTitle("N");
                 }
-                histo[i].GetXaxis().SetTitle("ADC");
-                histo[i].GetYaxis().SetTitle("N");
+                catch(NullReferenceException)
+                {
+                    //leave it as an empty histogram
+                    histo[i].GetXaxis().SetTitle("ADC");
+                    histo[i].GetYaxis().SetTitle("N");
+
+                }
             }
             
             //Return the histograms
@@ -91,6 +101,9 @@ namespace TB_mu2e
                 int lret, old_available = 0;
                 do
                 {
+                    if (febSocket.Available > 0)
+                        febSocket.Receive(new byte[febSocket.Available], febSocket.Available, System.Net.Sockets.SocketFlags.None); //Receive any junk it was previously trying to send
+                    ResetReadAddresses(); //Set the read-pointer addresses back to 0
                     febSocket.Send(PP.GetBytes("rdbr " + addresses[packNum, 0].ToString("X") + " 400\r\n")); //This is a request command for the FEB to perform 1024 reads at the specified address, and send that data in binary 
                     System.Threading.Thread.Sleep(100); //Pause for a moment to allow the data to show up in the send buffer
                     while (febSocket.Available > old_available) //Wait until the FEB has all the data to send
@@ -101,7 +114,7 @@ namespace TB_mu2e
                     packs[packNum] = new byte[febSocket.Available];
                     lret = febSocket.Receive(packs[packNum], packs[packNum].Length, System.Net.Sockets.SocketFlags.None);
                     System.Console.WriteLine("Read: {0} / {1} bytes", lret, old_available);
-                } while (lret != old_available || old_available < 2048); //2048 is the minimum byte length for an incoming histogram; each one is actually >=2049 due to the '>' sent by the board
+                } while (lret != old_available || old_available < 2048 || old_available > 2060); //2048 is the minimum byte length for an incoming histogram; each one is actually >=2049 due to the '>' sent by the board, also need to check if >2048 because sometimes the borad likes to send both histograms in one packet
             }
 
             return packs;
@@ -165,7 +178,7 @@ namespace TB_mu2e
 
         public ushort GetAccumulation_interval() { return accumulation_interval; }
 
-        public void SetAccumulation_interval(ushort value)
+        public void SetAccumulation_Interval(ushort value)
         {
             accumulation_interval = value;
             Mu2e_Register.WriteReg(accumulation_interval, ref histo_controls[1], ref febClient.client); //if we update the accumulation interval in the class, we need to update the register on the FEB
@@ -182,6 +195,12 @@ namespace TB_mu2e
         private void SetRegisters()
         { 
             Mu2e_Register.WriteReg(accumulation_interval, ref histo_controls[1], ref febClient.client); //Set the accumulation interval
+            Mu2e_Register.WriteReg(0x0, ref histo_controls[2], ref febClient.client); //Set the read pointers back to 0
+            Mu2e_Register.WriteReg(0x0, ref histo_controls[3], ref febClient.client); //Set the read pointers back to 0
+        }
+
+        private void ResetReadAddresses()
+        {
             Mu2e_Register.WriteReg(0x0, ref histo_controls[2], ref febClient.client); //Set the read pointers back to 0
             Mu2e_Register.WriteReg(0x0, ref histo_controls[3], ref febClient.client); //Set the read pointers back to 0
         }

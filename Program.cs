@@ -127,15 +127,15 @@ namespace TB_mu2e
                     RunParams = words;
                     sr2.Close();
                 }
-
+                sr.Close();
             }
-            catch
+            catch(Exception e)
             {
+                System.Console.Write("Caught Exception {0} in Program.cs!", e);
                 last_num = 1;
             }
             num = last_num + 1;
             run_name = "Run_" + num.ToString("0000");
-            sr.Close();
             try
             {
                 StreamWriter sw = File.AppendText("c:\\data\\run_list2.txt");
@@ -145,9 +145,17 @@ namespace TB_mu2e
             }
             catch (Exception e)
             {
-                StreamWriter sw1 = File.CreateText("c:\\data\\run_list2.txt");
-                sw1.WriteLine(num.ToString() + " starting at: " + DateTime.Now);
-                sw1.Close();
+                System.Console.Write("Caught Exception {0} in Program.cs!", e);
+                try
+                {
+                    StreamWriter sw1 = File.CreateText("c:\\data\\run_list2.txt");
+                    sw1.WriteLine(num.ToString() + " starting at: " + DateTime.Now);
+                    sw1.Close();
+                }
+                catch(Exception f)
+                {
+                    System.Console.Write("Caught Exception {0} in Program.cs!", f);
+                }
             }
         }
 
@@ -192,17 +200,36 @@ namespace TB_mu2e
                     sw1.Close();
                     sw1 = null;
                 }
-                catch { }
+                catch(Exception e)
+                {
+                    System.Console.Write("Caught Exception {0} in Program.cs!", e);
+                }
             }
 
             if (!File.Exists("c:\\data\\run_param.txt"))
             {
-                File.CreateText("c:\\data\\run_param.txt");
+                try
+                {
+                    File.CreateText("c:\\data\\run_param.txt");
+                }
+                catch (Exception e)
+                {
+                    System.Console.Write("Caught Exception {0} in Program.cs!", e);
+                }
+
             }
-            StreamWriter sw2 = File.AppendText("c:\\data\\run_param.txt");
-            sw2.WriteLine(this.num.ToString() + " " + rn.textEbeam.Text + " " + rn.textIbeam.Text + " " + rn.BIASVtextBox.Text + " " + rn.GainTextBox.Text + " " + rn.comboPID.Text + " " + rn.textAngle.Text + " " + rn.textXpos.Text + " " + rn.textZpos.Text + " " + rn.textPressure.Text);
-            sw2.Close();
-            sw2 = null;
+
+            try
+            {
+                StreamWriter sw2 = File.AppendText("c:\\data\\run_param.txt");
+                sw2.WriteLine(this.num.ToString() + " " + rn.textEbeam.Text + " " + rn.textIbeam.Text + " " + rn.BIASVtextBox.Text + " " + rn.GainTextBox.Text + " " + rn.comboPID.Text + " " + rn.textAngle.Text + " " + rn.textXpos.Text + " " + rn.textZpos.Text + " " + rn.textPressure.Text);
+                sw2.Close();
+                sw2 = null;
+            }
+            catch(Exception e)
+            {
+                System.Console.Write("Caught Exception {0} in Program.cs!", e);
+            }
 
             TCP_reciever.SaveEnabled = true;
             ACTIVE = true;

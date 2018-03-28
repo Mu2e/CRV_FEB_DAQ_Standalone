@@ -14,24 +14,21 @@ namespace TB_mu2e
 
         public string add_messg(string m)
         {
-            current_lines = messg_que.Count + 1;
-            while (m.Contains("\r\n"))
-            {
-                string q = m.Substring(0, m.IndexOf("\r\n") + 2);
-                messg_que.Enqueue(q);
-                if (messg_que.Count > max_lines) { messg_que.Dequeue(); }
-                m = m.Substring(m.IndexOf("\r\n") + 2);
-            }
+            string[] messages;
             string new_m = "";
-            while (messg_que.Count > max_lines)
-            { messg_que.Dequeue(); }
 
-            foreach (string t in messg_que)
-            {
-                new_m += t;
-            }
+            messages = m.Split(new string[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
+            
+            foreach (string msg in messages) //Add the lines from the message to the queue
+                messg_que.Enqueue(msg);
+            messg_que.Enqueue("-------------"); //Add a spacer to indicate a single set of console messages (grouping of lines)
 
-            return new_m;
+            while (messg_que.Count > max_lines) //Remove any lines which fall outside of the queue
+                messg_que.Dequeue();
+
+            new_m = string.Join("\r\n", messg_que); //Make each line a line again
+
+            return new_m; //return the concatination
         }
     }
 }

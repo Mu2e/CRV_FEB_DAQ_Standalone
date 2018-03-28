@@ -24,7 +24,7 @@ namespace TB_mu2e
 
         private string msg1Conn = "";
         private string msg2Conn = "";
-        private uConsole console_label;
+        private uConsole console;
         private List<Button> sel_list;
 
         private static int num_reg = 15;
@@ -44,9 +44,10 @@ namespace TB_mu2e
         private const int num_chans = 16;
         private System.Windows.Forms.Label[] BDVoltLabels = new System.Windows.Forms.Label[num_chans];
 
-        public void AddConsoleMessage(string mess)
+        public void AddConsoleMessage(string msg)
         {
-            console_label.add_messg(mess);
+            console_Disp.Text = console.add_messg(msg);
+            Application.DoEvents();
         }
 
         public frmMain()
@@ -63,7 +64,7 @@ namespace TB_mu2e
             btnWC.Click += new System.EventHandler(this.Button1_Click);
             btnWC.Tag = PP.WC; btnWC.Text = PP.WC.host_name_prop;
 
-            console_label = new uConsole();
+            console = new uConsole();
 
 
             spill_trig_num = new int[3];
@@ -287,19 +288,21 @@ namespace TB_mu2e
         {
             string l = "";
             bool this_is_a_write = false;
-            string tt = "";
+            string sent_string = "";
 
             if (textBox1.Text.Contains("\n"))
             {
                 try
                 {
                     if (textBox1.Text.Contains("$")) //this is a comment
-                    { }
+                    {
+                        AddConsoleMessage(textBox1.Text);
+                        textBox1.Text = "";
+                    }
                     else
                     {
                         byte[] buf = PP.GetBytes(textBox1.Text);
-                        tt = textBox1.Text;
-                        //textBox1.Text = textBox1.Text.Substring(0, textBox1.Text.Length - 2);
+                        sent_string = textBox1.Text;
                         if (textBox1.Text.ToLower().Contains("wr")) { this_is_a_write = true; }
                         textBox1.Text = "";
                         while (PP.active_Socket.Available > 0)
@@ -308,37 +311,40 @@ namespace TB_mu2e
                             PP.active_Socket.Receive(rbuf);
                         }
                         PP.active_Socket.Send(buf);
-                        System.Threading.Thread.Sleep(1);
-                        int max_timeout = 50; int timeout = 0;
-                        if (this_is_a_write) { max_timeout = 3; }
-                        while ((PP.active_Socket.Available == 0) && (timeout < max_timeout))
+                        System.Threading.Thread.Sleep(250);
+                        if (!this_is_a_write)
                         {
-                            timeout++; System.Threading.Thread.Sleep(2);
+                            if (sent_string.ToLower().Contains("a0 "))
+                            {
+                                int delay = Convert.ToInt16(sent_string.Split().Skip(1).First().ToString());
+                                System.Threading.Thread.Sleep(delay * 100);
+                            }
+                            byte[] rec_buf = new byte[PP.active_Socket.Available];
+                            int ret_len = PP.active_Socket.Receive(rec_buf, rec_buf.Length, System.Net.Sockets.SocketFlags.None);
+                            string t = string.Join("", PP.GetString(rec_buf, ret_len).Split('>'));
+                            t = sent_string + t;
+                            AddConsoleMessage(t);
                         }
-                        if (timeout < max_timeout)
+                        else if (this_is_a_write)
                         {
+                            l = sent_string;
+                            string read_string = string.Join(" ", sent_string.Split().Skip(1).Take(1));
+                            //read_string = read_string.Substring(read_string.ToLower().IndexOf("wr") + 2, read_string.Length - read_string.ToLower().IndexOf("wr") + 2);
+                            read_string = "rd " + read_string + "\r\n";
+                            buf = PP.GetBytes(read_string);
+                            PP.active_Socket.Send(buf);
+                            System.Threading.Thread.Sleep(250);
                             byte[] rec_buf = new byte[PP.active_Socket.Available];
                             int ret_len = PP.active_Socket.Receive(rec_buf);
-                            string t = PP.GetString(rec_buf, ret_len);
-                            t = tt.Substring(0, tt.Length - 2) + ": " + t;
-                            l = console_label.add_messg(t);
+                            string t = string.Join("", PP.GetString(rec_buf, ret_len).Split('>'));
+                            t = sent_string + t;
+                            AddConsoleMessage(t);
                         }
-                        else
-                        {
-                            if (this_is_a_write)
-                            { l = console_label.add_messg(tt); }//there is no response to a write
-                            else
-                            { l = console_label.add_messg("timeout!"); }
-                        }
-                        console_Disp.Text = l;
-                        Application.DoEvents();
                     }
                 }
-                catch
+                catch(Exception dispExcep)
                 {
-                    string m = "Exception caught. Do you have a module selected?";
-                    console_Disp.Text = m;
-                    Application.DoEvents();
+                    AddConsoleMessage(dispExcep.ToString());
                 }
             }
         }
@@ -424,17 +430,17 @@ namespace TB_mu2e
             if (myName.Contains("FEB1"))
             {
                 Button1_Click((object)btnFEB1, e);
-                console_Disp.Text = console_label.add_messg("---- FEB1 ----\r\n");
+                console_Disp.Text = console.add_messg("---- FEB1 ----\r\n");
             }
             if (myName.Contains("FEB2"))
             {
                 Button1_Click((object)btnFEB2, e);
-                console_Disp.Text = console_label.add_messg("---- FEB2 ----\r\n");
+                console_Disp.Text = console.add_messg("---- FEB2 ----\r\n");
             }
             if (myName.Contains("WC"))
             {
                 Button1_Click((object)btnWC, e);
-                console_Disp.Text = console_label.add_messg("----  WC  ----\r\n");
+                console_Disp.Text = console.add_messg("----  WC  ----\r\n");
             }
             if (myName.Contains("FECC")) { }
         }
@@ -559,12 +565,12 @@ namespace TB_mu2e
                         }
                         txtI.Text = (I1 / (double)(nGoodReads)).ToString("0.0000");
 
-                        cmb_temp = PP.FEB1.ReadTemp((int)udFPGA.Value);
+                        cmb_temp = PP.FEB1.ReadTempFPGA((int)udFPGA.Value);
                         break;
                     case 2:
                         txtV.Text = PP.FEB2.ReadV((int)udFPGA.Value).ToString("0.000");
                         txtI.Text = PP.FEB2.ReadA0((int)udFPGA.Value, (int)udChan.Value).ToString("0.0000");
-                        cmb_temp = PP.FEB2.ReadTemp((int)udFPGA.Value);
+                        cmb_temp = PP.FEB2.ReadTempFPGA((int)udFPGA.Value);
                         break;
 
                     default:
@@ -1295,9 +1301,15 @@ namespace TB_mu2e
                     Mu2e_Register.WriteReg(v, ref mux_reg, ref myFEB.client);
                 }
             }
-            BtnCHANGE_Click(null, null);
+            BtnRegREAD_Click(null, null);
+            BtnBiasREAD_Click(null, null);
         }
 
+        private void UdFPGA_ValueChanged(object sender, EventArgs e)
+        {
+            BtnRegREAD_Click(null, null);
+        }
+        
         private void Timer1_Tick(object sender, EventArgs e)
         {
             bool in_spill;
@@ -1901,7 +1913,7 @@ namespace TB_mu2e
                     //Write temp to file
                     double[] temp = { 0, 0, 0, 0 };
                     for (int numTries = 0; numTries < 10; numTries++) //Try and read the temperature 10 times
-                        temp = PP.FEB1.ReadTemp();                    //read the temperatures on FPGA 0
+                        temp = PP.FEB1.ReadTempFPGA();                    //read the temperatures on FPGA 0
                     writer.Write("{0}\t", temp[0].ToString("0.00"));  //Write the temperature, in degrees C, as measured by the CMB
 
                     //Write date to file
@@ -2164,10 +2176,7 @@ namespace TB_mu2e
                     {
                         case 1:
                             //PP.FEB1.SetV(0.0, (int)udFPGA.Value);
-                            PP.FEB1.SetV(0.0, 0);
-                            PP.FEB1.SetV(0.0, 1);
-                            PP.FEB1.SetV(0.0, 2);
-                            PP.FEB1.SetV(0.0, 3);
+                            PP.FEB1.SetVAll(0.0);
 
                             txtI.Text = PP.FEB1.ReadA0((int)udFPGA.Value, (int)udChan.Value).ToString("0.0000");
                             break;
@@ -2279,9 +2288,10 @@ namespace TB_mu2e
             //Check that an FEB client exists, otherwise, don't bother setting up the pulser or trying to get data
             if (PP.FEB1.client != null)
             {
+                cmbInfoBox.Text = "";
+                cmbInfoBox.Update();
                 //These registers are required for setting up the FEB to record triggered events and the flashing of the LED.
                 //The FEB is responsible for controlling the pulser via the FEB's GPO port into the pulser's external clock port
-                Mu2e_Register.FindAddr(0x300, ref PP.FEB1.arrReg, out Mu2e_Register flashGateControlReg); //Flash gate control register
                 Mu2e_Register.FindAddr(0x303, ref PP.FEB1.arrReg, out Mu2e_Register trigControlReg); //Trigger control register
                 Mu2e_Register.FindAddr(0x304, ref PP.FEB1.arrReg, out Mu2e_Register hitPipelineDelayReg); //Hit Pipeline Delay register
                 Mu2e_Register.FindAddr(0x305, ref PP.FEB1.arrReg, out Mu2e_Register sampleLengthReg); //Sample length for each event/trigger
@@ -2291,13 +2301,14 @@ namespace TB_mu2e
                 Mu2e_Register.WriteReg(0x0, ref testPulseFreqReg, ref PP.FEB1.client); //Set test pulser frequency to zero, this allows external triggering from LEMO
                 Mu2e_Register.WriteReg(0xA, ref interSpillDurReg, ref PP.FEB1.client); //Set the interspill duration for 10 seconds
 
+                Mu2e_Register[] flashGateControlReg = Mu2e_Register.FindAllAddr(0x300, ref PP.FEB1.arrReg); //Flash Gate Control registers
                 Mu2e_Register[] controlStatusReg = Mu2e_Register.FindAllAddr(0x00, ref PP.FEB1.arrReg);
                 Mu2e_Register.WriteAllReg(0x20, ref controlStatusReg, ref PP.FEB1.client); //issue a general reset for each FPGA
                 Mu2e_Register[][] gainControlReg = Mu2e_Register.FindAllAddrRange(0x46, 0x47, ref PP.FEB1.arrReg);
-                Mu2e_Register.WriteAllRegRange(0x250, ref gainControlReg, ref PP.FEB1.client); //Set the gain for all AFE chips on all FPGAs to the same value
+                Mu2e_Register.WriteAllRegRange(0x300, ref gainControlReg, ref PP.FEB1.client); //Set the gain of all AFE chips on all FPGAs to the same value
 
                 System.Net.Sockets.Socket febSocket = PP.FEB1.TNETSocket_prop; //Declare and define FEB socket variable
-                febSocket.ReceiveTimeout = 500; //Set timeout on FEB socket to 500
+                febSocket.ReceiveTimeout = 500; //Set timeout on FEB socket to 500ms
                 byte[] sendRDB = Encoding.ASCII.GetBytes("rdb\r\n"); //PP.GetBytes("rdb\r\n"); //Lazy way for converting RDB command into packet to send to FEB
                 if (febSocket.Available > 0) //Pick up and discard whatever the board may currently be trying to send until we are ready for "fresh data"
                 {
@@ -2305,20 +2316,124 @@ namespace TB_mu2e
                     febSocket.Receive(junk);
                 }
 
+                #region Read CMB Temps and IDs
+                CMB[] cmbs = new CMB[16]; //make a list of CMBs
+                if (cmbInfoLabels == null) //If this is the first time the labels will be displayed, create an array of labels
+                    cmbInfoLabels = new System.Windows.Forms.Label[16][];
+                PP.FEB1.SendStr("cmb"); //Ask the FEB about the CMBs
+                System.Threading.Thread.Sleep(100); //Wait for the FEB to get the message and respond
+                PP.FEB1.ReadStr(out string cmbMsg, out int r);
+                if (cmbMsg.Length > 400)//If it got 'all' the info
+                {
+                    try
+                    {
+                        string[] tok = cmbMsg.Split(new string[] { " ", Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
+
+                        if (String.Equals(tok[1], "DegC")) //Preproduction FEB 'cmb' format
+                        {
+                            for (int cmb = 0; cmb < 16; cmb++)
+                            {
+                                cmbs[cmb].num = cmb;
+                                cmbs[cmb].temp = Convert.ToDouble(tok[(cmb * 3) + 5]); //Starting at index 5, every 3rd string is the cmb temperature
+                                cmbs[cmb].rom_id = tok[(cmb * 3) + 6]; //Starting at index 6, every 3rd string is the cmb ROM_ID
+                                if (cmbs[cmb].temp == 0 || cmbs[cmb].rom_id == "0")
+                                    cmbs[cmb].flagged = true;
+                                else
+                                    cmbs[cmb].flagged = false;
+                            }
+                        }
+                        else if (String.Equals(tok[1], "Cnts_TEMP_DegC")) //Prototype FEB 'cmb' format
+                        {
+                            for (int cmb = 0; cmb < 16; cmb++)
+                            {
+                                cmbs[cmb].num = cmb;
+                                cmbs[cmb].temp = Convert.ToDouble(tok[(cmb * 4) + 5]); //Starting at index 5, every 4th string is the cmb temperature
+                                cmbs[cmb].rom_id = tok[(cmb * 4) + 6]; //Starting at index 6, every 4th string is the cmb ROM_ID
+                                if (cmbs[cmb].temp == 0 || cmbs[cmb].rom_id == "0")
+                                    cmbs[cmb].flagged = true;
+                                else
+                                    cmbs[cmb].flagged = false;
+                            }
+                        }
+                        else
+                        {
+                            for (int cmb = 0; cmb < 16; cmb++)
+                                cmbs[cmb].flagged = true;
+                        } //unknown format
+                    }
+                    catch //Catch errors
+                    {
+                        for (int cmb = 0; cmb < 16; cmb++)
+                            cmbs[cmb].flagged = true;
+                    }
+                }
+
+                foreach (CMB cmb in cmbs)
+                {
+                    if (cmbInfoLabels[cmb.num] == null) //If this is the first time the labels will be displayed, make new labels
+                    {
+                        cmbInfoLabels[cmb.num] = new System.Windows.Forms.Label[3];
+                        cmbInfoLabels[cmb.num][0] = new System.Windows.Forms.Label
+                        {
+                            Name = "cmbnum" + cmb.num,
+                            Text = (cmb.num + 1).ToString(),
+                            Margin = new System.Windows.Forms.Padding(0, 3, 0, 3),
+                            TextAlign = System.Drawing.ContentAlignment.MiddleCenter,
+                            Dock = System.Windows.Forms.DockStyle.Fill
+                        };
+                        cmbInfoLabels[cmb.num][1] = new System.Windows.Forms.Label
+                        {
+                            Name = "cmbtemp" + cmb.num,
+                            Text = cmb.temp.ToString(),
+                            Margin = new System.Windows.Forms.Padding(0, 3, 0, 3),
+                            TextAlign = System.Drawing.ContentAlignment.MiddleCenter,
+                            Dock = System.Windows.Forms.DockStyle.Fill
+                        };
+                        cmbInfoLabels[cmb.num][2] = new System.Windows.Forms.Label
+                        {
+                            Name = "cmbromid" + cmb.num,
+                            Text = cmb.rom_id,
+                            Margin = new System.Windows.Forms.Padding(0, 3, 0, 3),
+                            TextAlign = System.Drawing.ContentAlignment.MiddleCenter,
+                            Dock = System.Windows.Forms.DockStyle.Fill
+                        };
+                        for (int i = 0; i < 3; i++)
+                            cmbDataTable.Controls.Add(cmbInfoLabels[cmb.num][i], i, cmb.num); //Put the info into the table
+
+                    }
+                    else //Just update the labels
+                    {
+                        cmbInfoLabels[cmb.num][0].Text = (cmb.num + 1).ToString();
+                        cmbInfoLabels[cmb.num][1].Text = cmb.temp.ToString();
+                        cmbInfoLabels[cmb.num][2].Text = cmb.rom_id;
+                    }
+
+                    for (int i = 0; i < 3; i++)
+                    {
+                        if (cmb.flagged)
+                            cmbInfoLabels[cmb.num][i].BackColor = Color.MistyRose; //Flag the CMB if the temp or ROM_ID couldn't be read
+                        else
+                            cmbInfoLabels[cmb.num][i].BackColor = SystemColors.Control;
+
+                        cmbInfoLabels[cmb.num][i].Update();
+                    }
+                }
+
+                #endregion Read CMB Temps and IDs
+
                 //Open up the file used to store/read channel responses
                 //Stores in single line per channel format, channel# AverageADCresponse
                 #region ReadFileAvgs
                 if (updateFilesChkBox.Checked)
                 {
-                    String cmbAvgFileName = "C:\\data\\cmb_tester_data\\cmb_channel_averages.dat";
-                    String[] channelAvgString = new String[64];
-                    double[] channelAvgVal = new double[64];
+                    String cmbAvgFileName = "D:\\data\\cmb_tester_data\\cmb_channel_averages.root";
+                    ROOTNET.NTH1I[] channelAvgHist = new ROOTNET.NTH1I[64];
                     if (File.Exists(cmbAvgFileName))
                     {
-                        channelAvgString = File.ReadAllLines(cmbAvgFileName); //read all the lines from the file and store each line as a different entry in the channelAvgString array
+                        ROOTNET.NTFile cmbAvgsFile = new ROOTNET.NTFile(cmbAvgFileName);
                         for (int channel = 0; channel < 64; channel++)
                         {
-                            channelAvgVal[channel] = Convert.ToDouble(channelAvgString[channel].Substring(2)); //convert the average recorded value for each channel into a usable number
+                            channelAvgHist[channel] = (ROOTNET.NTH1I)cmbAvgsFile.FindObject("Chan" + channel.ToString()); //convert the average recorded value for each channel into a usable number
                         }
                     }
                     else //If the channel averages file does not exist, then print out an error
@@ -2332,24 +2447,23 @@ namespace TB_mu2e
                 #region Pedestal/Calibration
 
                 #region BiasWait
-                cmbInfoBox.Text = "Waiting for bias";
+                cmbInfoBox.Text = "Waiting for bias"; cmbInfoBox.Update();
                 PP.FEB1.SetVAll(Convert.ToDouble(cmbBias.Text));
                 #endregion BiasWait
 
-                //Code that was here can be found in the following file: C:\FLASH\..\Redacted.txt
                 bool passed_calibration = false;
                 double[] pedestals = new double[64]; //pedestal for each channel
                 double[] gains = new double[64]; //gain for each channel (adc/pe)      
 
                 ROOTNET.NTH1I[] peHistos = new ROOTNET.NTH1I[64]; //Histograms used to determine gains
                 ROOTNET.NTSpectrum[] peakFinders = new ROOTNET.NTSpectrum[2];
-                HistoHelper hist_helper = new HistoHelper(ref PP.FEB1, 0xFFE);//0x400);
+                HistoHelper hist_helper = new HistoHelper(ref PP.FEB1, 0x400);//0xFFE);
                 ROOTNET.NTH1I[] histos = new ROOTNET.NTH1I[2];
                 ROOTNET.NTF1[] peakFits;
                 cmbInfoBox.Text = "Calibrating"; cmbInfoBox.Update();
-                for (uint channel = 0; channel < 4; channel++)
+                for (uint channel = 0; channel < 16; channel++)
                 {
-                    if (peHistos[channel] == null) //skip the channels that have already been histogrammed (due to the two channel histograms return from the FEB)
+                    if (peHistos[channel] == null && !(cmbs[channel / 4].flagged)) //skip the channels that have already been histogrammed (due to the two channel histograms return from the FEB), and skip any channels on flagged cmbs
                     {
                         histos = hist_helper.GetHistogram(channel, 1);
                         uint[] channels = { channel, Convert.ToUInt32(histos[1].GetTitle()) }; //Lazily grab the other channel's label from the histogram title...
@@ -2357,6 +2471,8 @@ namespace TB_mu2e
 
                         for (int hist = 0; hist < 2; hist++)//Loop over each of the two histograms
                         {
+                            if (cmbs[channels[hist] / 4].flagged) //Skip if one of the two received channels was flagged
+                                continue;
                             peHistos[channels[hist]] = histos[hist];
                             peakFinders[hist] = new ROOTNET.NTSpectrum(3); //Only try and compute the gain from pedestal, 1st, and possibly 2nd PE
                             int peaksFound = peakFinders[hist].Search(peHistos[channels[hist]], 1.5, "nobackground", 0.00001); //Don't try and estimate background, and set the threshold to only include pedestal, 1st, and 2nd PE
@@ -2372,23 +2488,20 @@ namespace TB_mu2e
                             }
                             pedestals[channels[hist]] = peakFits[0].GetParameter(1);
                             gains[channels[hist]] = peakFits[1].GetParameter(1) - pedestals[channels[hist]];
-                            if (peakFits.Length > 2)
+                            if (peakFits.Length > 2) //if it can find the second PE, improve the estimation of the gain
                                 gains[channels[hist]] = (gains[channels[hist]] + peakFits[2].GetParameter(1) - peakFits[1].GetParameter(1)) / 2.0;
-
                         }
                     }
                 }
 
-                peHistos[0].Draw();
-                
                 var histo_file = ROOTNET.NTFile.Open("D:/Calibrations.root", "RECREATE");
                 if (histo_file == null)
                 {
                     histo_file = ROOTNET.NTFile.Open("D:/Calib_BACKUP_" + System.DateTime.Now.ToFileTime().ToString() + ".root", "RECREATE");
                     System.Console.WriteLine("Cannot open/modify D:/Calibrations.root. A backup has been created.");
                 }
-                
-                histo_file.Write();
+
+                //histo_file.Write();
                 foreach (var histo in peHistos)
                     if (histo != null)
                     {
@@ -2397,11 +2510,11 @@ namespace TB_mu2e
                     }
                 histo_file.Close();
 
-                passed_calibration = false; //find a new home for this guy
+                passed_calibration = true; //find a new home for this guy
 
                 //return;
                 #endregion Pedestal/Calibration
-                
+
 
                 #region LED Response Evaluation
                 uint spill_status = 0;
@@ -2429,7 +2542,7 @@ namespace TB_mu2e
                     //[ ] Fit data
                     //[ ] Report evaluation
 
-                    Mu2e_Register.WriteReg(0x2, ref flashGateControlReg, ref PP.FEB1.client); //Set the CMB Pulse routing to the Flash Gate (to LED flasher will create interference on CMB)
+                    Mu2e_Register.WriteAllReg(0x2, ref flashGateControlReg, ref PP.FEB1.client); //Set the CMB Pulse routing to the Flash Gate (to LED flasher will create interference on CMB)
                     Mu2e_Register.WriteReg(0x100, ref trigControlReg, ref PP.FEB1.client); //Enable the on-board test pulser, output of this signal will be delivered to external pulser to flash LED
                     Mu2e_Register.WriteReg(0x5E5E5E, ref testPulseFreqReg, ref PP.FEB1.client); //Set the on-board test pulser's frequency to ~230kHz
                     Mu2e_Register.WriteReg(0x1, ref hitPipelineDelayReg, ref PP.FEB1.client); //Set the hit pipeline delay to minimum value (12.56ns)
@@ -2444,7 +2557,7 @@ namespace TB_mu2e
                     {
                         if (ledHistos[channel] == null) //skip the channels that have already been histogrammed (due to the two channel histograms return from the FEB)
                         {
-                            hist_helper.SetAccumulation_interval(0xFFE); //Set a long accumulation interval
+                            hist_helper.SetAccumulation_Interval(0xFFE); //Set a long accumulation interval
                             histos = hist_helper.GetHistogram(channel, 1);
                             uint[] channels = { channel, Convert.ToUInt32(histos[1].GetTitle()) }; //Lazily grab the other channel's label from the histogram title...
                             System.Console.WriteLine("Histo Chans: " + channels[0] + ", " + channels[1]);
@@ -2452,8 +2565,8 @@ namespace TB_mu2e
                             for (int hist = 0; hist < 2; hist++) //Loop over each of the two histograms
                             {
                                 ledHistos[channels[hist]] = histos[hist];
-                                peakFinders[hist] = new ROOTNET.NTSpectrum(10); //Maybe try and get all the PEs
-                                int peaksFound = peakFinders[hist].Search(ledHistos[channels[hist]], 1.5, "nobackground", 0.001); //Don't try and estimate background, and set the threshold to only include pedestal, 1st, and 2nd PE
+                                //peakFinders[hist] = new ROOTNET.NTSpectrum(10); //Maybe try and get all the PEs
+                                //int peaksFound = peakFinders[hist].Search(ledHistos[channels[hist]], 1.5, "nobackground", 0.001); //Don't try and estimate background, and set the threshold to only include pedestal, 1st, and 2nd PE
                                 //if (peaksFound < 2) { System.Console.WriteLine("Cannot find 1+ PE for Chan {0}", channels[hist]); continue; } //Need this beacuse we need to know the gain, which is impossible if we can't see first PE
                                 //var peakPositions = peakFinders[hist].GetPositionX();
                                 //peakFits = new ROOTNET.NTF1[peaksFound];
@@ -2611,6 +2724,11 @@ namespace TB_mu2e
                     PP.FEB1.SetV(0.0, (int)fpga);
 
             }
+            else
+            {
+                cmbInfoBox.Text = "Connect to FEB";
+                cmbInfoBox.Update();
+            }
         }
 
         private void CmbBiasOverride_CheckedChanged(object sender, EventArgs e)
@@ -2736,11 +2854,11 @@ namespace TB_mu2e
         private void RunLog_TextChanged(object sender, EventArgs e)
         {
             //Autoscroll to the end of the text box
-            runLog.SelectionStart = console_Disp.Text.Length;
+            runLog.SelectionStart = runLog.Text.Length;
             runLog.ScrollToCaret();
         }
 
-        private void qaDiIWarningThresh_TextChanged(object sender, EventArgs e)
+        private void QaDiIWarningThresh_TextChanged(object sender, EventArgs e)
         {
             qaDiIWarningThresh.BackColor = Color.White;
             bool parsed = double.TryParse(qaDiIWarningThresh.Text, out var isNumber);
@@ -2758,6 +2876,7 @@ namespace TB_mu2e
             else
                 qaStartButton.Enabled = true;
         }
+
     }
 
 
