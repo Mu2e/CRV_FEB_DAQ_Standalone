@@ -344,7 +344,7 @@
       <DependentUpon>RunName.cs</DependentUpon>
     </Compile>
     <Compile Include="SpillData.cs" />
-    <Compile Include="TCP_reciever.cs" />
+    <Compile Include="TCP_receiver.cs" />
     <Compile Include="uConsole.cs" />
     <Compile Include="frmMain.cs">
       <SubType>Form</SubType>

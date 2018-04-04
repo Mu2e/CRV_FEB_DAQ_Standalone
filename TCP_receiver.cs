@@ -9,7 +9,7 @@ using System.IO;
 
 namespace TB_mu2e
 {
-    static class TCP_reciever
+    static class TCP_receiver
     {
         private static StreamWriter sw;
         public static DateTime time_start;

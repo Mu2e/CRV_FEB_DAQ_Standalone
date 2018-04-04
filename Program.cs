@@ -232,7 +232,7 @@ namespace TB_mu2e
                 System.Console.Write("Caught Exception {0} in Program.cs!", e);
             }
 
-            TCP_reciever.SaveEnabled = true;
+            TCP_receiver.SaveEnabled = true;
             ACTIVE = true;
         }
 
@@ -249,7 +249,7 @@ namespace TB_mu2e
                 sw1 = null;
             }
             catch { }
-            TCP_reciever.SaveEnabled = false;
+            TCP_receiver.SaveEnabled = false;
             ACTIVE = false;
 
         }
@@ -262,15 +262,15 @@ namespace TB_mu2e
                 {
                     if ((PP.FEB1.client != null) || (PP.FEB2.client != null))
                     {
-                        TCP_reciever.SaveEnabled = true;
+                        TCP_receiver.SaveEnabled = true;
                         num_bytes = 0;
                         if (PP.FEB1.client != null)
-                        { TCP_reciever.ReadFeb("FEB1", PP.FEB1.TNETSocket_prop, out num_bytes); }
+                        { TCP_receiver.ReadFeb("FEB1", PP.FEB1.TNETSocket_prop, out num_bytes); }
                         this_bytes_written[0] = num_bytes;
                         total_bytes_written[0] += num_bytes;
                         Application.DoEvents();
                         if (PP.FEB2.client != null)
-                        { TCP_reciever.ReadFeb("FEB2", PP.FEB2.TNETSocket_prop, out num_bytes); }
+                        { TCP_receiver.ReadFeb("FEB2", PP.FEB2.TNETSocket_prop, out num_bytes); }
                         Application.DoEvents();
                         //                        TCP_reciever.ReadFeb("WC", PP.WC.TNETSocket_prop, out num_bytes);
                         spill_complete = true;
