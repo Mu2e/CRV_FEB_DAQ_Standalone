@@ -21,6 +21,7 @@ namespace TB_mu2e
         public static bool AllDone;
         public static string source_name;
 
+        //To save data in binary
         private static void Save(byte[] buf)
         {
             sw = PP.myRun.sw;
@@ -51,6 +52,57 @@ namespace TB_mu2e
                 //close after 30 min
             }
             catch { Console.WriteLine("bad break"); }
+        }
+
+        //To save data in human-readable format
+        private static void Save(SpillData spill)
+        {
+            sw = PP.myRun.sw;
+            try
+            {
+                if (sw == null)
+                    return;
+
+                int i = 0;
+                NewSpill = true;
+
+                sw.WriteLine("--Begin of spill (ascii)");
+                sw.WriteLine("--** Source = " + source_name);
+                sw.WriteLine("--SpillHeader");
+                sw.Write(spill.SpillWordCount + " "); //Word counts in spill
+                sw.Write(spill.SpillTrigCount + " "); //Number of triggers in spill
+                sw.Write(spill.SpillCounter + " "); //Spill number
+                sw.Write(spill.ExpectNumCh + " "); //Channel mask
+                sw.Write(spill.BoardID + " "); //Board ID
+                sw.Write(spill.SpillStatus); //Spill status
+                sw.WriteLine("--End SpillHeader");
+                sw.WriteLine("--Events");
+                foreach (Mu2e_Event spillEvent in spill.SpillEvents)
+                {
+                    sw.WriteLine("--EventHeader");
+                    sw.Write(spillEvent.EventWordCount + " "); //Word count in event
+                    sw.Write(spillEvent.EventTimeStamp + " "); //Timestamp for event
+                    sw.Write(spillEvent.TrigCounter + " "); //Trigger number for event
+                    sw.Write(spillEvent.NumSamples + " "); //Number of ADC samples per event
+                    sw.Write(spillEvent.TrigType + " "); //Type of trigger
+                    sw.Write(spillEvent.EventStatus); //Event status
+                    sw.WriteLine("--End EventHeader");
+
+                    foreach(Mu2e_Ch chan in spillEvent.ChanData)
+                    {
+                        sw.Write(chan.num_ch + " "); //Write the channel number
+                        foreach(int adc in chan.data)
+                            sw.Write(adc + " "); //Write the ADC data
+                        sw.Write("\r\n");
+                    }
+                    
+                }
+                sw.WriteLine("--End Events");
+            }
+            catch(Exception e)
+            {
+                Console.WriteLine("Exception thrown in TCP_receiver::Save(SpillData spill) : " + e);
+            }
         }
 
         public static void ReadFeb(string BoardName, Socket s, out long l) //out List<byte> buf,
@@ -130,7 +182,8 @@ namespace TB_mu2e
                 {
                     if (PP.myRun.sw != null)
                     {
-                        if (SaveEnabled) {Save(buf); }
+                        if (SaveEnabled && !PP.myRun.SaveAscii) { Save(buf); } //If it should NOT save in a human readable format
+                        else if(SaveEnabled && PP.myRun.SaveAscii) { Save(new_spill); } //If it should save in a human readable format
                     }
                 }
             }

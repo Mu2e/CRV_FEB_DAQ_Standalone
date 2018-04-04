@@ -1149,11 +1149,7 @@ namespace TB_mu2e
                 chars[i] = (char)rec_buf[i];
             }
             string t = new string(chars);
-            char[] sep = new char[3];
-            sep[0] = ' ';
-            sep[1] = '\r';
-            sep[2] = '\n';
-            string[] tok = t.Split(sep, StringSplitOptions.RemoveEmptyEntries);
+            string[] tok = t.Split(new string[] { " ", Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
             try { v = Convert.ToUInt32(tok[0],16); }
             catch { v = 0; }
             //catch { adc = -1; }

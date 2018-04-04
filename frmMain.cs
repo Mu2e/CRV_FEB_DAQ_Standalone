@@ -1557,6 +1557,10 @@ namespace TB_mu2e
         {
             if (PP.myRun != null)
             {
+                if (saveAsciiBox.Checked)
+                    PP.myRun.SaveAscii = true;
+                else
+                    PP.myRun.SaveAscii = false;
                 PP.myRun.ActivateRun(); PP.myRun.UpdateStatus("Run STARTING");
                 PP.myRun.OneSpill = false;
             }
@@ -2301,7 +2305,10 @@ namespace TB_mu2e
                 Mu2e_Register.WriteReg(0x0, ref testPulseFreqReg, ref PP.FEB1.client); //Set test pulser frequency to zero, this allows external triggering from LEMO
                 Mu2e_Register.WriteReg(0xA, ref interSpillDurReg, ref PP.FEB1.client); //Set the interspill duration for 10 seconds
 
+                Mu2e_Register[] muxReg = Mu2e_Register.FindAllAddr(0x20, ref PP.FEB1.arrReg);//Get the mux register so it can be set to 0 so as to not interfere with histogramming
+                Mu2e_Register.WriteAllReg(0x0, ref muxReg, ref PP.FEB1.client); //Set all the mux to 0 so as to not interfere with histogramming
                 Mu2e_Register[] flashGateControlReg = Mu2e_Register.FindAllAddr(0x300, ref PP.FEB1.arrReg); //Flash Gate Control registers
+                Mu2e_Register.WriteAllReg(0x2, ref flashGateControlReg, ref PP.FEB1.client); //Set the CMB Pulse routing to the Flash Gate (to LED flasher will create interference on CMB)
                 Mu2e_Register[] controlStatusReg = Mu2e_Register.FindAllAddr(0x00, ref PP.FEB1.arrReg);
                 Mu2e_Register.WriteAllReg(0x20, ref controlStatusReg, ref PP.FEB1.client); //issue a general reset for each FPGA
                 Mu2e_Register[][] gainControlReg = Mu2e_Register.FindAllAddrRange(0x46, 0x47, ref PP.FEB1.arrReg);
@@ -2444,7 +2451,7 @@ namespace TB_mu2e
                 }
                 #endregion ReadFileAvgs
 
-                #region Pedestal/Calibration
+                #region LED Response Evaluation and Gain/Pedestal Computation
 
                 #region BiasWait
                 cmbInfoBox.Text = "Waiting for bias"; cmbInfoBox.Update();
@@ -2455,17 +2462,24 @@ namespace TB_mu2e
                 double[] pedestals = new double[64]; //pedestal for each channel
                 double[] gains = new double[64]; //gain for each channel (adc/pe)      
 
-                ROOTNET.NTH1I[] peHistos = new ROOTNET.NTH1I[64]; //Histograms used to determine gains
-                ROOTNET.NTSpectrum[] peakFinders = new ROOTNET.NTSpectrum[2];
-                HistoHelper hist_helper = new HistoHelper(ref PP.FEB1, 0x400);//0xFFE);
-                ROOTNET.NTH1I[] histos = new ROOTNET.NTH1I[2];
-                ROOTNET.NTF1[] peakFits;
-                cmbInfoBox.Text = "Calibrating"; cmbInfoBox.Update();
-                for (uint channel = 0; channel < 16; channel++)
+                ROOTNET.NTH1I[] peHistos = new ROOTNET.NTH1I[64]; //Histograms used to determine response to LED and gains
+                ROOTNET.NTGraph[] peCalibs = new ROOTNET.NTGraph[64]; //2D Plots used to compute gains/pedestal
+                ROOTNET.NTSpectrum peakFinder = new ROOTNET.NTSpectrum(20, 2); //Peak finder, set it to find a maximum of 10 peaks (pedestal + 9 peaks)
+                HistoHelper hist_helper = new HistoHelper(ref PP.FEB1, 0xFFE);//0x400); //Tune later
+                ROOTNET.NTH1I[] histos = new ROOTNET.NTH1I[2]; //temporary spot to store the incoming histograms from the histohelper
+                ROOTNET.NTF1 gainFit = new ROOTNET.NTF1("gainfit", "pol1"); //linear fit for computing the gain
+                ROOTNET.NTF1 bulkRespFit = new ROOTNET.NTF1("respfit", "gaus"); //Gaussian fit for bulk of LED Response
+                cmbInfoBox.Text = "LED/Calibrating"; cmbInfoBox.Update();
+
+                Mu2e_Register.WriteReg(0x100, ref trigControlReg, ref PP.FEB1.client); //Enable the on-board test pulser, output of this signal will be delivered to external pulser to flash LED
+                Mu2e_Register.WriteReg(0x505E5E/*0x5E5E5E*/, ref testPulseFreqReg, ref PP.FEB1.client); //Set the on-board test pulser's frequency to ~230kHz
+                Mu2e_Register.WriteReg(0x1, ref hitPipelineDelayReg, ref PP.FEB1.client); //Set the hit pipeline delay to minimum value (12.56ns)
+
+                for (uint channel = 0; channel < 4; channel++)
                 {
                     if (peHistos[channel] == null && !(cmbs[channel / 4].flagged)) //skip the channels that have already been histogrammed (due to the two channel histograms return from the FEB), and skip any channels on flagged cmbs
                     {
-                        histos = hist_helper.GetHistogram(channel, 1);
+                        histos = hist_helper.GetHistogram(channel, 2);
                         uint[] channels = { channel, Convert.ToUInt32(histos[1].GetTitle()) }; //Lazily grab the other channel's label from the histogram title...
                         System.Console.WriteLine("Histo Chans: " + channels[0] + ", " + channels[1]);
 
@@ -2474,31 +2488,63 @@ namespace TB_mu2e
                             if (cmbs[channels[hist] / 4].flagged) //Skip if one of the two received channels was flagged
                                 continue;
                             peHistos[channels[hist]] = histos[hist];
-                            peakFinders[hist] = new ROOTNET.NTSpectrum(3); //Only try and compute the gain from pedestal, 1st, and possibly 2nd PE
-                            int peaksFound = peakFinders[hist].Search(peHistos[channels[hist]], 1.5, "nobackground", 0.00001); //Don't try and estimate background, and set the threshold to only include pedestal, 1st, and 2nd PE
+                            peCalibs[channels[hist]] = new ROOTNET.NTGraph();
+                            int peaksFound = peakFinder.Search(peHistos[channels[hist]], 1.5, "nobackground", 0.00001); //Don't try and estimate background, and set the threshold to only include pedestal, 1st, and 2nd PE
                             if (peaksFound < 2) { System.Console.WriteLine("Cannot find 1+ PE for Chan {0}", channels[hist]); continue; } //Need this beacuse we need to know the gain, which is impossible if we can't see first PE
-                            var peakPositions = peakFinders[hist].GetPositionX();
-                            peakFits = new ROOTNET.NTF1[peaksFound];
-                            for (uint peak = 0; peak < peaksFound; peak++)
+                            List<float> peakPositions = peakFinder.GetPositionX().as_array(peaksFound).ToList();
+                            for(int p = 1; p < peakPositions.Count; p++)
+                                if (peakPositions[p] < peakPositions[0])//if there are any peaks less than pedestal, remove them
+                                    peakPositions.RemoveAt(p);
+                            peakPositions.Sort(); //Should sort in ascending order by default
+                            List<int> fittingRanges = new List<int>();
+                            if (peakPositions.Count < 2)
+                                continue;
+                            float gain_estimate_thresh = (peakPositions[1] - peakPositions[0])*2; //Set threshold at ~2pe difference
+                            fittingRanges.Add(0);
+                            for (int p = 1; p < peakPositions.Count; p++)
                             {
-                                float x_loc = peakPositions[(int)peak];
-                                peakFits[peak] = new ROOTNET.NTF1("Ch" + channels[hist].ToString() + "peak" + peak.ToString(), "gaus", x_loc - 2.5, x_loc + 2.5);
-                                peakFits[peak].SetLineColor(Convert.ToInt16(peak + 2));
-                                peHistos[channels[hist]].Fit(peakFits[peak], "R+");// R option forces the function to fit only over its specified range, + option tells it to add fit to histogram list without deleting previous fits
+                                if (peakPositions[p] - peakPositions[p - 1] > gain_estimate_thresh)
+                                {
+                                    fittingRanges.Add(p - 1);
+                                    fittingRanges.Add(p);
+                                }                                    
                             }
-                            pedestals[channels[hist]] = peakFits[0].GetParameter(1);
-                            gains[channels[hist]] = peakFits[1].GetParameter(1) - pedestals[channels[hist]];
-                            if (peakFits.Length > 2) //if it can find the second PE, improve the estimation of the gain
-                                gains[channels[hist]] = (gains[channels[hist]] + peakFits[2].GetParameter(1) - peakFits[1].GetParameter(1)) / 2.0;
+                            fittingRanges.Add(peakPositions.Count-1);
+                            for (int peak = 0; peak < peakPositions.Count; peak++) //This is under the assumption that peak 0 = pedestal, peak 1 = 1st PE, ...
+                                    peCalibs[channels[hist]].SetPoint(peak, peak, peakPositions[peak]);
+                            for (int fitRange = 0; fitRange < fittingRanges.Count; fitRange += 2)
+                            {
+                                peCalibs[channels[hist]].Fit(gainFit, "CRQ+", "", fittingRanges[fitRange], fittingRanges[fitRange+1]); //Fit quietly please
+                                gains[channels[hist]] += gainFit.GetParameter(1); //get the slope of the line, which is the gain
+                            }
+                            gains[channels[hist]] /= (fittingRanges.Count / 2); //Average the gain fits
+                            //peCalibs[channels[hist]].Fit(gainFit, "CRQ+", "", );
+                            peCalibs[channels[hist]].SetTitle(channels[hist].ToString()); //Set some info
+                            peCalibs[channels[hist]].SetName(channels[hist].ToString());
+                            peCalibs[channels[hist]].GetXaxis().SetTitle("PE");
+                            peCalibs[channels[hist]].GetYaxis().SetTitle("ADC");
+                            peHistos[channels[hist]].Fit(bulkRespFit, "CRQ+", "", gains[channels[hist]] * 7.5, 512); //Fit from 7.5 PE (in ADC) up to max of histogram (will need to adjust later)
+                            //peakFits = new ROOTNET.NTF1[peaksFound];
+                            //for (uint peak = 0; peak < peaksFound; peak++)
+                            //{
+                            //    float x_loc = peakPositions[(int)peak];
+                            //    peakFits[peak] = new ROOTNET.NTF1("Ch" + channels[hist].ToString() + "peak" + peak.ToString(), "gaus", x_loc - 2.5, x_loc + 2.5);
+                            //    peakFits[peak].SetLineColor(Convert.ToInt16(peak + 2));
+                            //    peHistos[channels[hist]].Fit(peakFits[peak], "R+");// R option forces the function to fit only over its specified range, + option tells it to add fit to histogram list without deleting previous fits
+                            //}
+                            //pedestals[channels[hist]] = peakFits[0].GetParameter(1);
+                            //gains[channels[hist]] = peakFits[1].GetParameter(1) - pedestals[channels[hist]];
+                            //if (peakFits.Length > 2) //if it can find the second PE, improve the estimation of the gain
+                            //    gains[channels[hist]] = (gains[channels[hist]] + peakFits[2].GetParameter(1) - peakFits[1].GetParameter(1)) / 2.0;
                         }
                     }
                 }
 
-                var histo_file = ROOTNET.NTFile.Open("D:/Calibrations.root", "RECREATE");
+                var histo_file = ROOTNET.NTFile.Open("D:/Response_Calibrations.root", "RECREATE");
                 if (histo_file == null)
                 {
-                    histo_file = ROOTNET.NTFile.Open("D:/Calib_BACKUP_" + System.DateTime.Now.ToFileTime().ToString() + ".root", "RECREATE");
-                    System.Console.WriteLine("Cannot open/modify D:/Calibrations.root. A backup has been created.");
+                    histo_file = ROOTNET.NTFile.Open("D:/Resp_Calib_BACKUP_" + System.DateTime.Now.ToFileTime().ToString() + ".root", "RECREATE");
+                    System.Console.WriteLine("Cannot open/modify D:/Response_Calibrations.root. A backup has been created.");
                 }
 
                 //histo_file.Write();
@@ -2508,12 +2554,19 @@ namespace TB_mu2e
                         histo.Write();
                         histo.Delete();
                     }
+                foreach(var plot in peCalibs)
+                    if(plot != null)
+                    {
+                        plot.Write();
+                        plot.Delete();
+                    }
+
                 histo_file.Close();
 
-                passed_calibration = true; //find a new home for this guy
+                passed_calibration = false; //find a new home for this guy
 
                 //return;
-                #endregion Pedestal/Calibration
+                #endregion LED Response Evaluation and Gain/Pedestal Computation
 
 
                 #region LED Response Evaluation

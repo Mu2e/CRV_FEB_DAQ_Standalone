@@ -58,7 +58,7 @@ namespace TB_mu2e
 
             //Start the histogramming and wait for it to finish (very quick)
             Mu2e_Register.WriteReg(histCntrl_Dark_Base, ref histo_controls[0], ref febClient.client);
-            System.Threading.Thread.Sleep(accumulation_interval + 50); //small bit of time buffer added to the interval
+            System.Threading.Thread.Sleep(accumulation_interval + 250); //small bit of time buffer added to the interval
             
             //Get and unpack the data
             UInt32[][] histogramBinContents = ParseData(ReceiveData(channel));
@@ -101,6 +101,7 @@ namespace TB_mu2e
                 int lret, old_available = 0;
                 do
                 {
+                    old_available = 0;
                     if (febSocket.Available > 0)
                         febSocket.Receive(new byte[febSocket.Available], febSocket.Available, System.Net.Sockets.SocketFlags.None); //Receive any junk it was previously trying to send
                     ResetReadAddresses(); //Set the read-pointer addresses back to 0

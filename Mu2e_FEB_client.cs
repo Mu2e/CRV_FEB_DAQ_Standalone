@@ -224,11 +224,7 @@ namespace TB_mu2e
             SendStr("A0 2");
             Thread.Sleep(250);
             ReadStr(out t, out dt, 100);
-            char[] sep = new char[3];
-            sep[0] = ' ';
-            sep[1] = '\r';
-            sep[2] = '\n';
-            string[] tok = t.Split(sep, StringSplitOptions.RemoveEmptyEntries);
+            string[] tok = t.Split(new string[] { " ", Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
             double adc;
             try { adc = Convert.ToDouble(tok[2]); }
             catch { adc = -1; }

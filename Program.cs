@@ -59,6 +59,7 @@ namespace TB_mu2e
 
         public LinkedList<SpillData> Spills;
 
+        public bool SaveAscii { get; internal set; }
 
         public Run()
         {

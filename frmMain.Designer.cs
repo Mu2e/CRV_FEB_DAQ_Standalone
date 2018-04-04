@@ -235,6 +235,7 @@
             this.cmbBiasOverride = new System.Windows.Forms.CheckBox();
             this.cmbTestBtn = new System.Windows.Forms.Button();
             this.timer1 = new System.Windows.Forms.Timer(this.components);
+            this.saveAsciiBox = new System.Windows.Forms.CheckBox();
             this.statusStrip1.SuspendLayout();
             this.tabControl.SuspendLayout();
             this.tabRUN.SuspendLayout();
@@ -579,6 +580,7 @@
             // 
             // groupBox1
             // 
+            this.groupBox1.Controls.Add(this.saveAsciiBox);
             this.groupBox1.Controls.Add(this.btnTimerFix);
             this.groupBox1.Controls.Add(this.label5);
             this.groupBox1.Controls.Add(this.numericUpDown1);
@@ -2644,6 +2646,16 @@
             this.timer1.Interval = 200;
             this.timer1.Tick += new System.EventHandler(this.Timer1_Tick);
             // 
+            // saveAsciiBox
+            // 
+            this.saveAsciiBox.AutoSize = true;
+            this.saveAsciiBox.Location = new System.Drawing.Point(365, 123);
+            this.saveAsciiBox.Name = "saveAsciiBox";
+            this.saveAsciiBox.Size = new System.Drawing.Size(226, 21);
+            this.saveAsciiBox.TabIndex = 36;
+            this.saveAsciiBox.Text = "Save data as human-readable?";
+            this.saveAsciiBox.UseVisualStyleBackColor = true;
+            // 
             // frmMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 17F);
@@ -2931,5 +2943,6 @@
         private System.Windows.Forms.RichTextBox runLog;
         private System.Windows.Forms.TableLayoutPanel cmbDataTable;
         private System.Windows.Forms.Label[][] cmbInfoLabels;
+        private System.Windows.Forms.CheckBox saveAsciiBox;
     }
 }
