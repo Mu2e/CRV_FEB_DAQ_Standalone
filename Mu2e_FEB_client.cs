@@ -550,10 +550,17 @@ namespace TB_mu2e
         public int num;
         public string rom_id;
         public double temp;
-        public ROOTNET.NTH1I darkCurrentHisto;
-        public ROOTNET.NTH1I ledHisto;
-        public ROOTNET.NTH1I flasherHisto;
-        public ROOTNET.NTH1I gateHisto;
-        public bool flagged;        
+        public ROOTNET.NTH1I[] ledHisto;
+        public ROOTNET.NTH1I[] flasherHisto;
+        public ROOTNET.NTH1I[] gateHisto;
+        public bool flagged;  
+        public enum Failure { NoFail=0, TempRom, SiPMResp, Flashgate, LED, TailCancellation};
+        public int failureType;
+
+        public string FailType()
+        {
+            string[] failures = { "GOOD", "TEMP/ROM", "SiPMRESP", "FLASHGATE", "LED", "TAILCAN" };
+            return failures[failureType];
+        }
     };
 }

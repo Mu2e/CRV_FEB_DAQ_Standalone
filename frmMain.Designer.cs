@@ -58,6 +58,7 @@
             this.ud_VertMin = new System.Windows.Forms.NumericUpDown();
             this.ud_VertMax = new System.Windows.Forms.NumericUpDown();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.saveAsciiBox = new System.Windows.Forms.CheckBox();
             this.btnTimerFix = new System.Windows.Forms.Button();
             this.label5 = new System.Windows.Forms.Label();
             this.numericUpDown1 = new System.Windows.Forms.NumericUpDown();
@@ -235,7 +236,6 @@
             this.cmbBiasOverride = new System.Windows.Forms.CheckBox();
             this.cmbTestBtn = new System.Windows.Forms.Button();
             this.timer1 = new System.Windows.Forms.Timer(this.components);
-            this.saveAsciiBox = new System.Windows.Forms.CheckBox();
             this.statusStrip1.SuspendLayout();
             this.tabControl.SuspendLayout();
             this.tabRUN.SuspendLayout();
@@ -622,6 +622,16 @@
             this.groupBox1.TabIndex = 2;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "RUN CONTROL";
+            // 
+            // saveAsciiBox
+            // 
+            this.saveAsciiBox.AutoSize = true;
+            this.saveAsciiBox.Location = new System.Drawing.Point(365, 123);
+            this.saveAsciiBox.Name = "saveAsciiBox";
+            this.saveAsciiBox.Size = new System.Drawing.Size(226, 21);
+            this.saveAsciiBox.TabIndex = 36;
+            this.saveAsciiBox.Text = "Save data as human-readable?";
+            this.saveAsciiBox.UseVisualStyleBackColor = true;
             // 
             // btnTimerFix
             // 
@@ -2492,17 +2502,26 @@
             this.cmbDataGroup.Controls.Add(this.cmbDataTable);
             this.cmbDataGroup.Location = new System.Drawing.Point(16, 219);
             this.cmbDataGroup.Name = "cmbDataGroup";
-            this.cmbDataGroup.Size = new System.Drawing.Size(246, 410);
+            this.cmbDataGroup.Size = new System.Drawing.Size(1223, 410);
             this.cmbDataGroup.TabIndex = 1;
             this.cmbDataGroup.TabStop = false;
             this.cmbDataGroup.Text = "CMB Info";
             // 
             // cmbDataTable
             // 
-            this.cmbDataTable.ColumnCount = 3;
-            this.cmbDataTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 33.33333F));
-            this.cmbDataTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 33.33334F));
-            this.cmbDataTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 33.33334F));
+            this.cmbDataTable.ColumnCount = 12;
+            this.cmbDataTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 8.333333F));
+            this.cmbDataTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 8.333333F));
+            this.cmbDataTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 8.333333F));
+            this.cmbDataTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 8.333333F));
+            this.cmbDataTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 8.333333F));
+            this.cmbDataTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 8.333333F));
+            this.cmbDataTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 8.333333F));
+            this.cmbDataTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 8.333333F));
+            this.cmbDataTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 8.333333F));
+            this.cmbDataTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 8.333333F));
+            this.cmbDataTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 8.333333F));
+            this.cmbDataTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 8.333333F));
             this.cmbDataTable.Dock = System.Windows.Forms.DockStyle.Fill;
             this.cmbDataTable.Location = new System.Drawing.Point(3, 19);
             this.cmbDataTable.Margin = new System.Windows.Forms.Padding(0);
@@ -2524,7 +2543,7 @@
             this.cmbDataTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 6.25F));
             this.cmbDataTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 6.25F));
             this.cmbDataTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 6.25F));
-            this.cmbDataTable.Size = new System.Drawing.Size(240, 388);
+            this.cmbDataTable.Size = new System.Drawing.Size(1217, 388);
             this.cmbDataTable.TabIndex = 0;
             // 
             // cmbTestControl
@@ -2645,16 +2664,6 @@
             this.timer1.Enabled = true;
             this.timer1.Interval = 200;
             this.timer1.Tick += new System.EventHandler(this.Timer1_Tick);
-            // 
-            // saveAsciiBox
-            // 
-            this.saveAsciiBox.AutoSize = true;
-            this.saveAsciiBox.Location = new System.Drawing.Point(365, 123);
-            this.saveAsciiBox.Name = "saveAsciiBox";
-            this.saveAsciiBox.Size = new System.Drawing.Size(226, 21);
-            this.saveAsciiBox.TabIndex = 36;
-            this.saveAsciiBox.Text = "Save data as human-readable?";
-            this.saveAsciiBox.UseVisualStyleBackColor = true;
             // 
             // frmMain
             // 

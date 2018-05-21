@@ -342,7 +342,7 @@ namespace TB_mu2e
                         }
                     }
                 }
-                catch(Exception dispExcep)
+                catch (Exception dispExcep)
                 {
                     AddConsoleMessage(dispExcep.ToString());
                 }
@@ -1309,7 +1309,7 @@ namespace TB_mu2e
         {
             BtnRegREAD_Click(null, null);
         }
-        
+
         private void Timer1_Tick(object sender, EventArgs e)
         {
             bool in_spill;
@@ -1790,7 +1790,7 @@ namespace TB_mu2e
             //To-do: put these buttons into a TableLayoutPanel for easy organization as well as adding/subtracting buttons
             #region DiCounterQAButtons
             qaDiButtons = new System.Windows.Forms.RadioButton[8]; //Create an array of new buttons
-            for(int btni = 0; btni < qaDiButtons.Length; btni++)
+            for (int btni = 0; btni < qaDiButtons.Length; btni++)
             {
                 qaDiButtons[btni] = new System.Windows.Forms.RadioButton
                 {
@@ -1800,7 +1800,7 @@ namespace TB_mu2e
                     Location = new System.Drawing.Point(385 + ((btni % 4) * 30), 25 + ((btni / 4) * 30)),
                     Name = "qaDiButton" + btni,
                     Size = new System.Drawing.Size(25, 25),
-                    TabIndex = 109+btni,
+                    TabIndex = 109 + btni,
                     Text = btni.ToString(),
                     TextAlign = System.Drawing.ContentAlignment.MiddleCenter,
                     UseVisualStyleBackColor = false
@@ -1815,7 +1815,7 @@ namespace TB_mu2e
             lightButtons = new System.Windows.Forms.RadioButton[64]; //Create an array of new buttons
             lightCheckGroupFPGAs = new System.Windows.Forms.GroupBox[4]; //Create an array of new group boxes
             lightCMBlabels = new System.Windows.Forms.Label[16]; //Create an array of new labels
-            for(int cmb = 0; cmb < 16; cmb++)
+            for (int cmb = 0; cmb < 16; cmb++)
             {
                 lightCMBlabels[cmb] = new System.Windows.Forms.Label
                 {
@@ -1823,7 +1823,7 @@ namespace TB_mu2e
                     BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle,
                     Name = "lightCMB" + cmb,
                     Size = new System.Drawing.Size(30, 20),
-                    TabIndex = 182+cmb,
+                    TabIndex = 182 + cmb,
                     Text = cmb.ToString(),
                     TextAlign = System.Drawing.ContentAlignment.MiddleCenter
                 }; //Create a label for each CMB
@@ -1859,7 +1859,7 @@ namespace TB_mu2e
                         BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle,
                         Name = "fpga" + fpga + "Label",
                         Size = new System.Drawing.Size(60, 20),
-                        TabIndex = 240+fpga,
+                        TabIndex = 240 + fpga,
                         Text = "FPGA " + fpga,
                         TextAlign = System.Drawing.ContentAlignment.MiddleCenter
                     }; //Create a label for the FPGA
@@ -1883,11 +1883,11 @@ namespace TB_mu2e
                     lightCheckGroupFPGAs[fpga].Controls.Add(localPanel); //Add the panel to the group box
                     lightCheckFPGApanel.Controls.Add(lightCheckGroupFPGAs[fpga]); //Add the FPGA group box to the light check group box
                 }
-                TableLayoutPanel fpga_panel = lightCheckGroupFPGAs[fpga].Controls.OfType<TableLayoutPanel>().First() ; //Get the panel from the group box (use First() to get actual panel, since there is only one here)
-                fpga_panel.Controls.Add(lightButtons[btni], btni % 4, (btni%16)/ 4); //Add the button to the panel inside the FPGA's group box
-                if(((btni+1) % 4) == 0)//At the end of filling each row with buttons, add a label
-                    fpga_panel.Controls.Add(lightCMBlabels[btni / 4], 5, (btni%16) / 4);
-                if (((btni+1) % 16) == 0)//At the end of filling the panel with buttons and cmb labels, add the FPGA 
+                TableLayoutPanel fpga_panel = lightCheckGroupFPGAs[fpga].Controls.OfType<TableLayoutPanel>().First(); //Get the panel from the group box (use First() to get actual panel, since there is only one here)
+                fpga_panel.Controls.Add(lightButtons[btni], btni % 4, (btni % 16) / 4); //Add the button to the panel inside the FPGA's group box
+                if (((btni + 1) % 4) == 0)//At the end of filling each row with buttons, add a label
+                    fpga_panel.Controls.Add(lightCMBlabels[btni / 4], 5, (btni % 16) / 4);
+                if (((btni + 1) % 16) == 0)//At the end of filling the panel with buttons and cmb labels, add the FPGA 
                     fpga_panel.Controls.Add(qaFPGALabels[fpga], 6, 1);//Add the FPGA label to the layout table
             }
             #endregion LightCheckButtons
@@ -1910,7 +1910,7 @@ namespace TB_mu2e
 
                 //Data are written to the Google Drive, CRV Fabrication Documents folder ScanningData, subfolder DicounterQA
                 //'using' will ensure the writer is closed/destroyed if the scope of the structure is left due to code-completion or a thrown exception
-                using (StreamWriter writer = File.AppendText("C:\\Users\\FEB-Laptop-1\\Google Drive\\CRV Fabrication Documents\\QA_Safety\\QA\\Dicounter Source Testing\\ScanningData_" + qaOutputFileName.Text + ".txt")) //The output file
+                using (StreamWriter writer = File.AppendText("C:\\Users\\FEB-Laptop-1\\Google Drive\\CRV Fabrication Documents\\Data\\QA\\Dicounter Source Testing\\ScanningData_" + qaOutputFileName.Text + ".txt")) //The output file
                 {
                     writer.Write("{0}\t", numTextBox.Text); //Write dicounter number to file
 
@@ -1925,7 +1925,7 @@ namespace TB_mu2e
 
                     PP.FEB1.SetV(Convert.ToDouble(qaBias.Text)); //Turn on bias for the first FPGA (since this is the only one used for dicounter QA
 
-                    foreach(var btn in qaDiButtons) { if (!btn.Checked) { btn.BackColor = Color.Green; btn.Update(); } } //Reset all active channel indicators to green
+                    foreach (var btn in qaDiButtons) { if (!btn.Checked) { btn.BackColor = Color.Green; btn.Update(); } } //Reset all active channel indicators to green
 
                     foreach (var btn in qaDiButtons)
                     {
@@ -1974,7 +1974,7 @@ namespace TB_mu2e
 
                 PP.FEB1.SetVAll(Convert.ToDouble(qaBias.Text)); //Turn on the bias for ALL FPGAs
 
-                foreach (var btn in lightButtons) 
+                foreach (var btn in lightButtons)
                 {
                     if (!btn.Checked)
                     {
@@ -2008,7 +2008,7 @@ namespace TB_mu2e
                 lightAutoThreshProgress.Update();
 
                 lightCheckChanThresh.Text = PP.lightCheckChanThreshs[Convert.ToUInt16(lightCheckChanSelec.Value)].ToString("0.0000"); //update the current channel to display the new thresh
-                
+
                 autoThreshBtn.Enabled = true;
                 qaStartButton.Enabled = true;
                 lightCheckResetThresh.Enabled = true;
@@ -2044,7 +2044,7 @@ namespace TB_mu2e
 
                 //Writes the file to the CRV Fabrication Documents, ScanningData folder on the Google Drive, subfolder ModuleLightCheck
                 //'using' will ensure the writer is closed/destroyed if the scope of the structure is left due to code-completion or a thrown exception
-                using (StreamWriter writer = File.AppendText("C:\\Users\\FEB-Laptop-1\\Google Drive\\CRV Fabrication Documents\\QA_Safety\\QA\\Module Light Leak Testing\\LightCheck.txt")) //Path for file output of lightcheck
+                using (StreamWriter writer = File.AppendText("C:\\Users\\FEB-Laptop-1\\Google Drive\\CRV Fabrication Documents\\Data\\QA\\Module Light Leak Testing\\LightCheck.txt")) //Path for file output of lightcheck
                 {
                     if (lightWriteToFileBox.Checked)
                     {
@@ -2057,7 +2057,7 @@ namespace TB_mu2e
                     PP.FEB1.SetVAll(Convert.ToDouble(qaBias.Text)); //Turn on the bias
 
                     //initially set to green
-                    for(int btn = 0; btn < lightButtons.Length; btn++)
+                    for (int btn = 0; btn < lightButtons.Length; btn++)
                     {
                         if (!lightButtons[btn].Checked)
                         {
@@ -2250,7 +2250,7 @@ namespace TB_mu2e
 
         private void LightButton_Click(object sender, EventArgs e)
         {
-            RadioButton btn = (RadioButton) sender;
+            RadioButton btn = (RadioButton)sender;
             if (!btn.Checked)
             {
                 btn.BackColor = Color.DimGray;
@@ -2269,7 +2269,7 @@ namespace TB_mu2e
         {
             System.Windows.Forms.Label lbl = (System.Windows.Forms.Label)sender; //Get the label that was clicked
             int cmb = Convert.ToInt16(lbl.Text); //Convert to CMB number index starting at 0
-            for(int btn = (cmb*4); btn < (cmb*4)+4; btn++) //Set loop bounds and 'click' all of the buttons
+            for (int btn = (cmb * 4); btn < (cmb * 4) + 4; btn++) //Set loop bounds and 'click' all of the buttons
             {
                 sender = lightButtons[btn];
                 LightButton_Click(sender, e);
@@ -2279,8 +2279,8 @@ namespace TB_mu2e
         private void LightFPGALabel_Click(object sender, EventArgs e)
         {
             System.Windows.Forms.Label lbl = (System.Windows.Forms.Label)sender;
-            int fpga_num = Convert.ToInt16(lbl.Text.Substring(lbl.Text.Length-1, 1));
-            for(int btni = fpga_num*16; btni < (fpga_num*16)+16; btni++)
+            int fpga_num = Convert.ToInt16(lbl.Text.Substring(lbl.Text.Length - 1, 1));
+            for (int btni = fpga_num * 16; btni < (fpga_num * 16) + 16; btni++)
             {
                 sender = lightButtons[btni];
                 LightButton_Click(sender, e);
@@ -2344,7 +2344,10 @@ namespace TB_mu2e
                                 cmbs[cmb].temp = Convert.ToDouble(tok[(cmb * 3) + 5]); //Starting at index 5, every 3rd string is the cmb temperature
                                 cmbs[cmb].rom_id = tok[(cmb * 3) + 6]; //Starting at index 6, every 3rd string is the cmb ROM_ID
                                 if (cmbs[cmb].temp == 0 || cmbs[cmb].rom_id == "0")
-                                    cmbs[cmb].flagged = true;
+                                {
+                                    cmbs[cmb].flagged = true; //Flag the CMB if the temp or ROM_ID couldn't be read
+                                    cmbs[cmb].failureType = (int)CMB.Failure.TempRom;
+                                }
                                 else
                                     cmbs[cmb].flagged = false;
                             }
@@ -2357,7 +2360,10 @@ namespace TB_mu2e
                                 cmbs[cmb].temp = Convert.ToDouble(tok[(cmb * 4) + 5]); //Starting at index 5, every 4th string is the cmb temperature
                                 cmbs[cmb].rom_id = tok[(cmb * 4) + 6]; //Starting at index 6, every 4th string is the cmb ROM_ID
                                 if (cmbs[cmb].temp == 0 || cmbs[cmb].rom_id == "0")
-                                    cmbs[cmb].flagged = true;
+                                {
+                                    cmbs[cmb].flagged = true; //Flag the CMB if the temp or ROM_ID couldn't be read
+                                    cmbs[cmb].failureType = (int)CMB.Failure.TempRom;
+                                }
                                 else
                                     cmbs[cmb].flagged = false;
                             }
@@ -2365,7 +2371,10 @@ namespace TB_mu2e
                         else
                         {
                             for (int cmb = 0; cmb < 16; cmb++)
+                            {
                                 cmbs[cmb].flagged = true;
+                            }
+
                         } //unknown format
                     }
                     catch //Catch errors
@@ -2379,7 +2388,7 @@ namespace TB_mu2e
                 {
                     if (cmbInfoLabels[cmb.num] == null) //If this is the first time the labels will be displayed, make new labels
                     {
-                        cmbInfoLabels[cmb.num] = new System.Windows.Forms.Label[3];
+                        cmbInfoLabels[cmb.num] = new System.Windows.Forms.Label[12];
                         cmbInfoLabels[cmb.num][0] = new System.Windows.Forms.Label
                         {
                             Name = "cmbnum" + cmb.num,
@@ -2404,26 +2413,38 @@ namespace TB_mu2e
                             TextAlign = System.Drawing.ContentAlignment.MiddleCenter,
                             Dock = System.Windows.Forms.DockStyle.Fill
                         };
-                        for (int i = 0; i < 3; i++)
+                        for (int i = 3; i < 12; i++)//initialize the remaining labels
+                        {
+                            cmbInfoLabels[cmb.num][i] = new System.Windows.Forms.Label
+                            {
+                                Name = "cmbinfo" + i + "_" + cmb.num,
+                                Text = "",
+                                Margin = new System.Windows.Forms.Padding(0, 3, 0, 3),
+                                TextAlign = System.Drawing.ContentAlignment.MiddleCenter,
+                                Dock = System.Windows.Forms.DockStyle.Fill
+                            };
+                        }
+                        for (int i = 0; i < 12; i++)
                             cmbDataTable.Controls.Add(cmbInfoLabels[cmb.num][i], i, cmb.num); //Put the info into the table
 
                     }
                     else //Just update the labels
                     {
+                        ClearCMBInfoLabel(cmb.num);
                         cmbInfoLabels[cmb.num][0].Text = (cmb.num + 1).ToString();
                         cmbInfoLabels[cmb.num][1].Text = cmb.temp.ToString();
                         cmbInfoLabels[cmb.num][2].Text = cmb.rom_id;
                     }
 
-                    for (int i = 0; i < 3; i++)
+                    if (cmb.flagged) //Flag the CMB if the temp or ROM_ID couldn't be read
                     {
-                        if (cmb.flagged)
-                            cmbInfoLabels[cmb.num][i].BackColor = Color.MistyRose; //Flag the CMB if the temp or ROM_ID couldn't be read
-                        else
-                            cmbInfoLabels[cmb.num][i].BackColor = SystemColors.Control;
-
-                        cmbInfoLabels[cmb.num][i].Update();
+                        cmbInfoLabels[cmb.num][11].Text = cmb.FailType();
+                        SetRowColor(cmb.num, Color.MistyRose);
                     }
+                    else
+                        SetRowColor(cmb.num, SystemColors.Control);
+
+                    UpdateCMBInfoLabel(cmb.num);
                 }
 
                 #endregion Read CMB Temps and IDs
@@ -2431,22 +2452,21 @@ namespace TB_mu2e
                 //Open up the file used to store/read channel responses
                 //Stores in single line per channel format, channel# AverageADCresponse
                 #region ReadFileAvgs
+                String cmbAvgFileName = "D:\\data\\cmb_tester_data\\cmb_channel_averages.root";
+                ROOTNET.NTH1I[] channelAvgHist = new ROOTNET.NTH1I[64];
                 if (updateFilesChkBox.Checked)
-                {
-                    String cmbAvgFileName = "D:\\data\\cmb_tester_data\\cmb_channel_averages.root";
-                    ROOTNET.NTH1I[] channelAvgHist = new ROOTNET.NTH1I[64];
+                { 
                     if (File.Exists(cmbAvgFileName))
                     {
                         ROOTNET.NTFile cmbAvgsFile = new ROOTNET.NTFile(cmbAvgFileName);
                         for (int channel = 0; channel < 64; channel++)
-                        {
                             channelAvgHist[channel] = (ROOTNET.NTH1I)cmbAvgsFile.FindObject("Chan" + channel.ToString()); //convert the average recorded value for each channel into a usable number
-                        }
                     }
-                    else //If the channel averages file does not exist, then print out an error
+                    else //If the channel averages file does not exist, then print out an error and return, we need the average response to make comparisons
                     {
                         System.Console.WriteLine("ERR: Could not find " + cmbAvgFileName + "!");
                         System.Console.WriteLine("Does the file exist and is it accessible?");
+                        return;
                     }
                 }
                 #endregion ReadFileAvgs
@@ -2472,14 +2492,15 @@ namespace TB_mu2e
                 cmbInfoBox.Text = "LED/Calibrating"; cmbInfoBox.Update();
 
                 Mu2e_Register.WriteReg(0x100, ref trigControlReg, ref PP.FEB1.client); //Enable the on-board test pulser, output of this signal will be delivered to external pulser to flash LED
-                Mu2e_Register.WriteReg(0x505E5E/*0x5E5E5E*/, ref testPulseFreqReg, ref PP.FEB1.client); //Set the on-board test pulser's frequency to ~230kHz
+                Mu2e_Register.WriteReg(0x5E5E5E/*0x5E5E5E*/, ref testPulseFreqReg, ref PP.FEB1.client); //Set the on-board test pulser's frequency to ~230kHz
                 Mu2e_Register.WriteReg(0x1, ref hitPipelineDelayReg, ref PP.FEB1.client); //Set the hit pipeline delay to minimum value (12.56ns)
 
-                for (uint channel = 0; channel < 4; channel++)
+                for (uint channel = 0; channel < 64; channel++)
                 {
-                    if (peHistos[channel] == null && !(cmbs[channel / 4].flagged)) //skip the channels that have already been histogrammed (due to the two channel histograms return from the FEB), and skip any channels on flagged cmbs
+                    int cmbNum = (int)channel / 4; //spans from 0-15
+                    if (peHistos[channel] == null && !(cmbs[cmbNum].flagged)) //skip the channels that have already been histogrammed (due to the two channel histograms return from the FEB), and skip any channels on flagged cmbs
                     {
-                        histos = hist_helper.GetHistogram(channel, 2);
+                        histos = hist_helper.GetHistogram(channel, 1);
                         uint[] channels = { channel, Convert.ToUInt32(histos[1].GetTitle()) }; //Lazily grab the other channel's label from the histogram title...
                         System.Console.WriteLine("Histo Chans: " + channels[0] + ", " + channels[1]);
 
@@ -2490,16 +2511,33 @@ namespace TB_mu2e
                             peHistos[channels[hist]] = histos[hist];
                             peCalibs[channels[hist]] = new ROOTNET.NTGraph();
                             int peaksFound = peakFinder.Search(peHistos[channels[hist]], 1.5, "nobackground", 0.00001); //Don't try and estimate background, and set the threshold to only include pedestal, 1st, and 2nd PE
-                            if (peaksFound < 2) { System.Console.WriteLine("Cannot find 1+ PE for Chan {0}", channels[hist]); continue; } //Need this beacuse we need to know the gain, which is impossible if we can't see first PE
+                            if (peaksFound < 2)
+                            {
+                                System.Console.WriteLine("Cannot find 1+ PE for Chan {0}", channels[hist]);
+                                cmbs[cmbNum].flagged = true;
+                                cmbs[cmbNum].failureType = (int)CMB.Failure.SiPMResp;
+                                cmbInfoLabels[cmbNum][11].Text = "PeakFinder";
+                                SetRowColor(cmbNum, Color.MistyRose);
+                                UpdateCMBInfoLabel(cmbNum);
+                                continue;
+                            } //Need this beacuse we need to know the gain, which is impossible if we can't see first PE
                             List<float> peakPositions = peakFinder.GetPositionX().as_array(peaksFound).ToList();
-                            for(int p = 1; p < peakPositions.Count; p++)
+                            for (int p = 1; p < peakPositions.Count; p++)
                                 if (peakPositions[p] < peakPositions[0])//if there are any peaks less than pedestal, remove them
                                     peakPositions.RemoveAt(p);
                             peakPositions.Sort(); //Should sort in ascending order by default
+                            pedestals[channel] = peakPositions[0]; //first entry should be pedestal
                             List<int> fittingRanges = new List<int>();
                             if (peakPositions.Count < 2)
+                            {
+                                cmbs[cmbNum].flagged = true;
+                                cmbs[cmbNum].failureType = (int) CMB.Failure.SiPMResp;
+                                cmbInfoLabels[cmbNum][11].Text = "GainFail";
+                                SetRowColor(cmbNum, Color.MistyRose);
+                                UpdateCMBInfoLabel(cmbNum);
                                 continue;
-                            float gain_estimate_thresh = (peakPositions[1] - peakPositions[0])*2; //Set threshold at ~2pe difference
+                            }
+                            float gain_estimate_thresh = (peakPositions[1] - peakPositions[0]) * 2; //Set threshold at ~2pe difference
                             fittingRanges.Add(0);
                             for (int p = 1; p < peakPositions.Count; p++)
                             {
@@ -2507,14 +2545,14 @@ namespace TB_mu2e
                                 {
                                     fittingRanges.Add(p - 1);
                                     fittingRanges.Add(p);
-                                }                                    
+                                }
                             }
-                            fittingRanges.Add(peakPositions.Count-1);
+                            fittingRanges.Add(peakPositions.Count - 1);
                             for (int peak = 0; peak < peakPositions.Count; peak++) //This is under the assumption that peak 0 = pedestal, peak 1 = 1st PE, ...
-                                    peCalibs[channels[hist]].SetPoint(peak, peak, peakPositions[peak]);
+                                peCalibs[channels[hist]].SetPoint(peak, peak, peakPositions[peak]);
                             for (int fitRange = 0; fitRange < fittingRanges.Count; fitRange += 2)
                             {
-                                peCalibs[channels[hist]].Fit(gainFit, "CRQ+", "", fittingRanges[fitRange], fittingRanges[fitRange+1]); //Fit quietly please
+                                peCalibs[channels[hist]].Fit(gainFit, "CRQ+", "", fittingRanges[fitRange], fittingRanges[fitRange + 1]); //Fit quietly please
                                 gains[channels[hist]] += gainFit.GetParameter(1); //get the slope of the line, which is the gain
                             }
                             gains[channels[hist]] /= (fittingRanges.Count / 2); //Average the gain fits
@@ -2524,6 +2562,28 @@ namespace TB_mu2e
                             peCalibs[channels[hist]].GetXaxis().SetTitle("PE");
                             peCalibs[channels[hist]].GetYaxis().SetTitle("ADC");
                             peHistos[channels[hist]].Fit(bulkRespFit, "CRQ+", "", gains[channels[hist]] * 7.5, 512); //Fit from 7.5 PE (in ADC) up to max of histogram (will need to adjust later)
+
+                            //Display info for gain and pedestal
+                            cmbInfoLabels[cmbNum][(channel % 4) * 2 + 3].Text = Math.Floor(pedestals[channel]).ToString();
+                            cmbInfoLabels[cmbNum][(channel % 4) * 2 + 4].Text = Math.Floor(gains[channel]).ToString();
+                            UpdateCMBInfoLabel(cmbNum);
+
+
+                            //compare fit response to 'lookup value'
+                            //For gaus fit: p0 is amplitude, p1 is mean, p2 is sigma
+                            if (updateFilesChkBox.Checked)
+                            {
+                                if (PercentDifference(bulkRespFit.GetParameter(1), channelAvgHist[channel].GetMean() /*table value*/) > 20) //if the differnce is greater than 20%
+                                {
+                                    cmbs[cmbNum].flagged = true;
+                                    cmbs[cmbNum].failureType = (int)CMB.Failure.SiPMResp;
+                                    cmbInfoLabels[cmbNum][11].Text = cmbs[cmbNum].FailType();
+                                    SetRowColor(cmbNum, Color.MistyRose);
+                                    UpdateCMBInfoLabel(cmbNum);
+                                }
+                            }
+
+
                             //peakFits = new ROOTNET.NTF1[peaksFound];
                             //for (uint peak = 0; peak < peaksFound; peak++)
                             //{
@@ -2546,24 +2606,86 @@ namespace TB_mu2e
                     histo_file = ROOTNET.NTFile.Open("D:/Resp_Calib_BACKUP_" + System.DateTime.Now.ToFileTime().ToString() + ".root", "RECREATE");
                     System.Console.WriteLine("Cannot open/modify D:/Response_Calibrations.root. A backup has been created.");
                 }
+                
+                if(histo_file != null)
+                {
+                    foreach (var histo in peHistos)
+                        if (histo != null)
+                        {
+                            histo.Write();
+                            histo.Delete();
+                        }
+                    foreach (var plot in peCalibs)
+                        if (plot != null)
+                        {
+                            plot.Write();
+                            plot.Delete();
+                        }
 
-                //histo_file.Write();
-                foreach (var histo in peHistos)
-                    if (histo != null)
-                    {
-                        histo.Write();
-                        histo.Delete();
-                    }
-                foreach(var plot in peCalibs)
-                    if(plot != null)
-                    {
-                        plot.Write();
-                        plot.Delete();
-                    }
-
-                histo_file.Close();
+                    histo_file.Close();
+                }
 
                 passed_calibration = false; //find a new home for this guy
+
+                #region FlashGate
+                cmbInfoBox.Text = "Testing flashgate"; cmbInfoBox.Update();
+
+                //Set registers for flashgate
+
+                for (uint channel = 0; channel < 64; channel++)
+                {
+                    int cmbNum = (int)channel / 4; //spans from 0-15
+                    if (peHistos[channel] == null && !(cmbs[cmbNum].flagged)) //skip the channels that have already been histogrammed (due to the two channel histograms return from the FEB), and skip any channels on flagged cmbs
+                    {
+                        histos = hist_helper.GetHistogram(channel, 1);
+                        uint[] channels = { channel, Convert.ToUInt32(histos[1].GetTitle()) }; //Lazily grab the other channel's label from the histogram title...
+                        System.Console.WriteLine("Histo Chans: " + channels[0] + ", " + channels[1]);
+
+                        for (int hist = 0; hist < 2; hist++)//Loop over each of the two histograms
+                        {
+                            if (cmbs[channels[hist] / 4].flagged) //Skip if one of the two received channels was flagged
+                                continue;
+                            peHistos[channels[hist]] = histos[hist];
+                            peHistos[channels[hist]].Fit(bulkRespFit, "CRQ+", "", gains[channels[hist]] * 7.5, 512); //Fit from 7.5 PE (in ADC) up to max of histogram (will need to adjust later)
+
+                            //compare fit response to 'lookup value'
+                            //For gaus fit: p0 is amplitude, p1 is mean, p2 is sigma
+                            if (updateFilesChkBox.Checked)
+                            {
+                                //
+                                // TODO:
+                                //
+                                // Modify logic to determine if the flash gate is working...
+                                //
+                                if (PercentDifference(bulkRespFit.GetParameter(1), channelAvgHist[channel].GetMean() /*table value*/) < 20) //if the differnce is less than 20%, flashgate must not be working...
+                                {
+                                    cmbs[cmbNum].flagged = true;
+                                    cmbs[cmbNum].failureType = (int)CMB.Failure.Flashgate;
+                                    cmbInfoLabels[cmbNum][11].Text = cmbs[cmbNum].FailType();
+                                    SetRowColor(cmbNum, Color.MistyRose);
+                                    UpdateCMBInfoLabel(cmbNum);
+                                }
+                            }
+
+
+                            //peakFits = new ROOTNET.NTF1[peaksFound];
+                            //for (uint peak = 0; peak < peaksFound; peak++)
+                            //{
+                            //    float x_loc = peakPositions[(int)peak];
+                            //    peakFits[peak] = new ROOTNET.NTF1("Ch" + channels[hist].ToString() + "peak" + peak.ToString(), "gaus", x_loc - 2.5, x_loc + 2.5);
+                            //    peakFits[peak].SetLineColor(Convert.ToInt16(peak + 2));
+                            //    peHistos[channels[hist]].Fit(peakFits[peak], "R+");// R option forces the function to fit only over its specified range, + option tells it to add fit to histogram list without deleting previous fits
+                            //}
+                            //pedestals[channels[hist]] = peakFits[0].GetParameter(1);
+                            //gains[channels[hist]] = peakFits[1].GetParameter(1) - pedestals[channels[hist]];
+                            //if (peakFits.Length > 2) //if it can find the second PE, improve the estimation of the gain
+                            //    gains[channels[hist]] = (gains[channels[hist]] + peakFits[2].GetParameter(1) - peakFits[1].GetParameter(1)) / 2.0;
+                        }
+                    }
+                }
+
+
+                #endregion FlashGate
 
                 //return;
                 #endregion LED Response Evaluation and Gain/Pedestal Computation
@@ -2664,7 +2786,7 @@ namespace TB_mu2e
 
                 cmbInfoBox.Text = ""; cmbInfoBox.Update();
 
-                return; //FULL STOP, DONT DO ANYTHING MORE, SHIT BELOW IS ABSOLUTELY CRAY CRAY
+                return; //FULL STOP, DONT DO ANYTHING MORE, SHIT BELOW IS ABSOLUTELY CRAY CRAY, Useful for examining tail cancellation... later
 
                 #region Move this
                 febSocket.Send(sendRDB);
@@ -2930,12 +3052,48 @@ namespace TB_mu2e
                 qaStartButton.Enabled = true;
         }
 
+        private void SetRowColor(int cmbRow, Color col)
+        {
+            for (int i = 0; i < 12; i++)
+            {
+                cmbInfoLabels[cmbRow][i].BackColor = col;
+                cmbInfoLabels[cmbRow][i].Update();
+            }
+        }
+
+        private void UpdateCMBInfoLabels()
+        {
+            foreach (var lblRow in cmbInfoLabels)
+                foreach (var lbl in lblRow)
+                    lbl.Update();
+        }
+
+        private void UpdateCMBInfoLabel(int cmb)
+        {
+            foreach (var lbl in cmbInfoLabels[cmb])
+                lbl.Update();
+        }
+
+        private void ClearCMBInfoLabel(int cmb)
+        {
+            foreach (var lbl in cmbInfoLabels[cmb])
+            {
+                lbl.Text = "";
+                lbl.BackColor = SystemColors.Control;
+                lbl.Update();
+            }
+        }
+
+        private double PercentDifference(double first, double second)
+        {
+            return 100*Math.Abs(first - second) / (0.5 * (first + second));
+        }
+
     }
 
-
-    public class ConnectAttemptEventArgs : EventArgs
-    {
-        public int ConnectAttempt { get; set; }
-    }
+        public class ConnectAttemptEventArgs : EventArgs
+        {
+            public int ConnectAttempt { get; set; }
+        }
 
 }
