@@ -236,6 +236,7 @@
             this.cmbBiasOverride = new System.Windows.Forms.CheckBox();
             this.cmbTestBtn = new System.Windows.Forms.Button();
             this.timer1 = new System.Windows.Forms.Timer(this.components);
+            this.lostCMBavgsBtn = new System.Windows.Forms.Button();
             this.statusStrip1.SuspendLayout();
             this.tabControl.SuspendLayout();
             this.tabRUN.SuspendLayout();
@@ -2548,6 +2549,7 @@
             // 
             // cmbTestControl
             // 
+            this.cmbTestControl.Controls.Add(this.lostCMBavgsBtn);
             this.cmbTestControl.Controls.Add(this.updateFilesChkBox);
             this.cmbTestControl.Controls.Add(this.cmbInfoBox);
             this.cmbTestControl.Controls.Add(this.requestNumTrigsLabel);
@@ -2558,7 +2560,7 @@
             this.cmbTestControl.Controls.Add(this.cmbTestBtn);
             this.cmbTestControl.Location = new System.Drawing.Point(16, 15);
             this.cmbTestControl.Name = "cmbTestControl";
-            this.cmbTestControl.Size = new System.Drawing.Size(436, 198);
+            this.cmbTestControl.Size = new System.Drawing.Size(411, 184);
             this.cmbTestControl.TabIndex = 0;
             this.cmbTestControl.TabStop = false;
             this.cmbTestControl.Text = "CMB Test Control";
@@ -2566,7 +2568,7 @@
             // updateFilesChkBox
             // 
             this.updateFilesChkBox.AutoSize = true;
-            this.updateFilesChkBox.Location = new System.Drawing.Point(250, 21);
+            this.updateFilesChkBox.Location = new System.Drawing.Point(209, 21);
             this.updateFilesChkBox.Name = "updateFilesChkBox";
             this.updateFilesChkBox.Size = new System.Drawing.Size(114, 21);
             this.updateFilesChkBox.TabIndex = 9;
@@ -2664,6 +2666,16 @@
             this.timer1.Enabled = true;
             this.timer1.Interval = 200;
             this.timer1.Tick += new System.EventHandler(this.Timer1_Tick);
+            // 
+            // lostCMBavgsBtn
+            // 
+            this.lostCMBavgsBtn.Location = new System.Drawing.Point(323, 19);
+            this.lostCMBavgsBtn.Name = "lostCMBavgsBtn";
+            this.lostCMBavgsBtn.Size = new System.Drawing.Size(75, 23);
+            this.lostCMBavgsBtn.TabIndex = 10;
+            this.lostCMBavgsBtn.Text = "Lost File";
+            this.lostCMBavgsBtn.UseVisualStyleBackColor = true;
+            this.lostCMBavgsBtn.Click += new System.EventHandler(this.LostCMBavgsBtn_Click);
             // 
             // frmMain
             // 
@@ -2953,5 +2965,6 @@
         private System.Windows.Forms.TableLayoutPanel cmbDataTable;
         private System.Windows.Forms.Label[][] cmbInfoLabels;
         private System.Windows.Forms.CheckBox saveAsciiBox;
+        private System.Windows.Forms.Button lostCMBavgsBtn;
     }
 }

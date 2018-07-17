@@ -2289,11 +2289,17 @@ namespace TB_mu2e
 
         private void CmbTestBtn_Click(object sender, EventArgs e)
         {
+            double fitThresh = 7.5;
+            double flashGateDifferenceThresh = 20;
+            double ledDifferenceThresh = 50; //Initial testing value
+            uint ledFlasherIntensity = 0x400; //3.5V
+            double maxUndershootThresh = 30; //Value is in ADC
             //Check that an FEB client exists, otherwise, don't bother setting up the pulser or trying to get data
             if (PP.FEB1.client != null)
             {
-                cmbInfoBox.Text = "";
-                cmbInfoBox.Update();
+                cmbInfoBox.Text = ""; cmbInfoBox.Update();
+
+                #region Registers
                 //These registers are required for setting up the FEB to record triggered events and the flashing of the LED.
                 //The FEB is responsible for controlling the pulser via the FEB's GPO port into the pulser's external clock port
                 Mu2e_Register.FindAddr(0x303, ref PP.FEB1.arrReg, out Mu2e_Register trigControlReg); //Trigger control register
@@ -2313,6 +2319,7 @@ namespace TB_mu2e
                 Mu2e_Register.WriteAllReg(0x20, ref controlStatusReg, ref PP.FEB1.client); //issue a general reset for each FPGA
                 Mu2e_Register[][] gainControlReg = Mu2e_Register.FindAllAddrRange(0x46, 0x47, ref PP.FEB1.arrReg);
                 Mu2e_Register.WriteAllRegRange(0x300, ref gainControlReg, ref PP.FEB1.client); //Set the gain of all AFE chips on all FPGAs to the same value
+                #endregion Registers
 
                 System.Net.Sockets.Socket febSocket = PP.FEB1.TNETSocket_prop; //Declare and define FEB socket variable
                 febSocket.ReceiveTimeout = 500; //Set timeout on FEB socket to 500ms
@@ -2454,22 +2461,42 @@ namespace TB_mu2e
                 #region ReadFileAvgs
                 String cmbAvgFileName = "D:\\data\\cmb_tester_data\\cmb_channel_averages.root";
                 ROOTNET.NTH1I[] channelAvgHist = new ROOTNET.NTH1I[64];
-                if (updateFilesChkBox.Checked)
-                { 
-                    if (File.Exists(cmbAvgFileName))
+                ROOTNET.NTFile cmbAvgsFile;
+                double[] avgResp = new double[64];
+
+                if (File.Exists(cmbAvgFileName))
+                {
+                    String fileOptn = "";
+                    if (updateFilesChkBox.Checked) //If the file is to be updated, change the open option to "UPDATE" instead of just "READ" (preserves existing data)
+                        fileOptn = "UPDATE";
+                    else
+                        fileOptn = "READ";
+                    cmbAvgsFile = new ROOTNET.NTFile(cmbAvgFileName, fileOptn); //update file prevents destorying an already existing file
+                    for (int channel = 0; channel < 64; channel++)
                     {
-                        ROOTNET.NTFile cmbAvgsFile = new ROOTNET.NTFile(cmbAvgFileName);
-                        for (int channel = 0; channel < 64; channel++)
-                            channelAvgHist[channel] = (ROOTNET.NTH1I)cmbAvgsFile.FindObject("Chan" + channel.ToString()); //convert the average recorded value for each channel into a usable number
-                    }
-                    else //If the channel averages file does not exist, then print out an error and return, we need the average response to make comparisons
-                    {
-                        System.Console.WriteLine("ERR: Could not find " + cmbAvgFileName + "!");
-                        System.Console.WriteLine("Does the file exist and is it accessible?");
-                        return;
+                        channelAvgHist[channel] = (ROOTNET.NTH1I)cmbAvgsFile.Get("Chan" + channel.ToString()); //convert the average recorded value for each channel into a usable number
+                        if (channelAvgHist[channel] != null)
+                        {
+                            avgResp[channel] = channelAvgHist[channel].GetMean();
+                            channelAvgHist[channel].Fill(450);
+                        }
                     }
                 }
+                else //If the channel averages file does not exist, then print out an error and return, we need the average response to make comparisons
+                {
+                    System.Console.WriteLine("ERR: Could not find " + cmbAvgFileName + "!");
+                    System.Console.WriteLine("Does the file exist and is it accessible?");
+                    return;
+                }
                 #endregion ReadFileAvgs
+
+                #region Output histograms
+                var histo_file = ROOTNET.NTFile.Open("D:/Resp_Calib_BACKUP_" + System.DateTime.Now.ToFileTime().ToString() + ".root", "RECREATE");
+                bool outputOpened = false;
+                if (histo_file != null)
+                    outputOpened = true;
+                #endregion Output histograms
+
 
                 #region LED Response Evaluation and Gain/Pedestal Computation
 
@@ -2478,7 +2505,6 @@ namespace TB_mu2e
                 PP.FEB1.SetVAll(Convert.ToDouble(cmbBias.Text));
                 #endregion BiasWait
 
-                bool passed_calibration = false;
                 double[] pedestals = new double[64]; //pedestal for each channel
                 double[] gains = new double[64]; //gain for each channel (adc/pe)      
 
@@ -2486,7 +2512,7 @@ namespace TB_mu2e
                 ROOTNET.NTGraph[] peCalibs = new ROOTNET.NTGraph[64]; //2D Plots used to compute gains/pedestal
                 ROOTNET.NTSpectrum peakFinder = new ROOTNET.NTSpectrum(20, 2); //Peak finder, set it to find a maximum of 10 peaks (pedestal + 9 peaks)
                 HistoHelper hist_helper = new HistoHelper(ref PP.FEB1, 0xFFE);//0x400); //Tune later
-                ROOTNET.NTH1I[] histos = new ROOTNET.NTH1I[2]; //temporary spot to store the incoming histograms from the histohelper
+                ROOTNET.NTH1I[] histos_temp = new ROOTNET.NTH1I[2]; //temporary spot to store the incoming histograms from the histohelper
                 ROOTNET.NTF1 gainFit = new ROOTNET.NTF1("gainfit", "pol1"); //linear fit for computing the gain
                 ROOTNET.NTF1 bulkRespFit = new ROOTNET.NTF1("respfit", "gaus"); //Gaussian fit for bulk of LED Response
                 cmbInfoBox.Text = "LED/Calibrating"; cmbInfoBox.Update();
@@ -2500,15 +2526,15 @@ namespace TB_mu2e
                     int cmbNum = (int)channel / 4; //spans from 0-15
                     if (peHistos[channel] == null && !(cmbs[cmbNum].flagged)) //skip the channels that have already been histogrammed (due to the two channel histograms return from the FEB), and skip any channels on flagged cmbs
                     {
-                        histos = hist_helper.GetHistogram(channel, 1);
-                        uint[] channels = { channel, Convert.ToUInt32(histos[1].GetTitle()) }; //Lazily grab the other channel's label from the histogram title...
+                        histos_temp = hist_helper.GetHistogram(channel, 1);
+                        uint[] channels = { channel, Convert.ToUInt32(histos_temp[1].GetTitle()) }; //Lazily grab the other channel's label from the histogram title...
                         System.Console.WriteLine("Histo Chans: " + channels[0] + ", " + channels[1]);
 
                         for (int hist = 0; hist < 2; hist++)//Loop over each of the two histograms
                         {
                             if (cmbs[channels[hist] / 4].flagged) //Skip if one of the two received channels was flagged
                                 continue;
-                            peHistos[channels[hist]] = histos[hist];
+                            peHistos[channels[hist]] = histos_temp[hist];
                             peCalibs[channels[hist]] = new ROOTNET.NTGraph();
                             int peaksFound = peakFinder.Search(peHistos[channels[hist]], 1.5, "nobackground", 0.00001); //Don't try and estimate background, and set the threshold to only include pedestal, 1st, and 2nd PE
                             if (peaksFound < 2)
@@ -2561,53 +2587,40 @@ namespace TB_mu2e
                             peCalibs[channels[hist]].SetName(channels[hist].ToString());
                             peCalibs[channels[hist]].GetXaxis().SetTitle("PE");
                             peCalibs[channels[hist]].GetYaxis().SetTitle("ADC");
-                            peHistos[channels[hist]].Fit(bulkRespFit, "CRQ+", "", gains[channels[hist]] * 7.5, 512); //Fit from 7.5 PE (in ADC) up to max of histogram (will need to adjust later)
+                            peHistos[channels[hist]].Fit(bulkRespFit, "CRQ+", "", gains[channels[hist]] * fitThresh, 512); //Fit from 7.5 PE (in ADC) up to max of histogram (will need to adjust later)
 
                             //Display info for gain and pedestal
                             cmbInfoLabels[cmbNum][(channel % 4) * 2 + 3].Text = Math.Floor(pedestals[channel]).ToString();
                             cmbInfoLabels[cmbNum][(channel % 4) * 2 + 4].Text = Math.Floor(gains[channel]).ToString();
                             UpdateCMBInfoLabel(cmbNum);
 
-
                             //compare fit response to 'lookup value'
                             //For gaus fit: p0 is amplitude, p1 is mean, p2 is sigma
-                            if (updateFilesChkBox.Checked)
+                            if (PercentDifference(bulkRespFit.GetParameter(1), avgResp[channel] /*table value*/) > 200) //if the differnce is greater than 20%
                             {
-                                if (PercentDifference(bulkRespFit.GetParameter(1), channelAvgHist[channel].GetMean() /*table value*/) > 20) //if the differnce is greater than 20%
-                                {
-                                    cmbs[cmbNum].flagged = true;
-                                    cmbs[cmbNum].failureType = (int)CMB.Failure.SiPMResp;
-                                    cmbInfoLabels[cmbNum][11].Text = cmbs[cmbNum].FailType();
-                                    SetRowColor(cmbNum, Color.MistyRose);
-                                    UpdateCMBInfoLabel(cmbNum);
-                                }
+                                cmbs[cmbNum].flagged = true;
+                                cmbs[cmbNum].failureType = (int)CMB.Failure.SiPMResp;
+                                cmbInfoLabels[cmbNum][11].Text = cmbs[cmbNum].FailType();
+                                SetRowColor(cmbNum, Color.MistyRose);
+                                UpdateCMBInfoLabel(cmbNum);
                             }
-
-
-                            //peakFits = new ROOTNET.NTF1[peaksFound];
-                            //for (uint peak = 0; peak < peaksFound; peak++)
-                            //{
-                            //    float x_loc = peakPositions[(int)peak];
-                            //    peakFits[peak] = new ROOTNET.NTF1("Ch" + channels[hist].ToString() + "peak" + peak.ToString(), "gaus", x_loc - 2.5, x_loc + 2.5);
-                            //    peakFits[peak].SetLineColor(Convert.ToInt16(peak + 2));
-                            //    peHistos[channels[hist]].Fit(peakFits[peak], "R+");// R option forces the function to fit only over its specified range, + option tells it to add fit to histogram list without deleting previous fits
-                            //}
-                            //pedestals[channels[hist]] = peakFits[0].GetParameter(1);
-                            //gains[channels[hist]] = peakFits[1].GetParameter(1) - pedestals[channels[hist]];
-                            //if (peakFits.Length > 2) //if it can find the second PE, improve the estimation of the gain
-                            //    gains[channels[hist]] = (gains[channels[hist]] + peakFits[2].GetParameter(1) - peakFits[1].GetParameter(1)) / 2.0;
+                            else if (updateFilesChkBox.Checked) //Update file here
+                                channelAvgHist[channel].Fill(bulkRespFit.GetParameter(1)); //Add mean response to histogram
                         }
                     }
                 }
 
-                var histo_file = ROOTNET.NTFile.Open("D:/Response_Calibrations.root", "RECREATE");
-                if (histo_file == null)
+                //Write the updated response histograms
+                if(updateFilesChkBox.Checked)
                 {
-                    histo_file = ROOTNET.NTFile.Open("D:/Resp_Calib_BACKUP_" + System.DateTime.Now.ToFileTime().ToString() + ".root", "RECREATE");
-                    System.Console.WriteLine("Cannot open/modify D:/Response_Calibrations.root. A backup has been created.");
+                    cmbAvgsFile.cd();
+                    for (uint channel = 0; channel < 64; channel++)
+                        channelAvgHist[channel].Write("", 2); //2 = kOverwrite
+                    cmbAvgsFile.Close();
                 }
-                
-                if(histo_file != null)
+
+                histo_file.cd();
+                if (outputOpened)
                 {
                     foreach (var histo in peHistos)
                         if (histo != null)
@@ -2621,69 +2634,59 @@ namespace TB_mu2e
                             plot.Write();
                             plot.Delete();
                         }
-
-                    histo_file.Close();
                 }
 
-                passed_calibration = false; //find a new home for this guy
 
                 #region FlashGate
                 cmbInfoBox.Text = "Testing flashgate"; cmbInfoBox.Update();
 
-                //Set registers for flashgate
+                ROOTNET.NTH1I[] flashHistos = new ROOTNET.NTH1I[64]; //Histograms used to determine response to LED (flashgate)
 
-                for (uint channel = 0; channel < 64; channel++)
+                //Set registers for flashgate (0x3 enables flash gate and sets the routing to the flash gate (not LED)
+                Mu2e_Register.WriteAllReg(0x3, ref flashGateControlReg, ref PP.FEB1.client);
+
+                for (uint channel = 0; channel < 64; channel++) //Loop over the channels, re-histogram response to LED flashing, check that response is low
                 {
                     int cmbNum = (int)channel / 4; //spans from 0-15
-                    if (peHistos[channel] == null && !(cmbs[cmbNum].flagged)) //skip the channels that have already been histogrammed (due to the two channel histograms return from the FEB), and skip any channels on flagged cmbs
+                    if (flashHistos[channel] == null && !(cmbs[cmbNum].flagged)) //skip the channels that have already been histogrammed (due to the two channel histograms return from the FEB), and skip any channels on flagged cmbs
                     {
-                        histos = hist_helper.GetHistogram(channel, 1);
-                        uint[] channels = { channel, Convert.ToUInt32(histos[1].GetTitle()) }; //Lazily grab the other channel's label from the histogram title...
+                        histos_temp = hist_helper.GetHistogram(channel, 1);
+                        uint[] channels = { channel, Convert.ToUInt32(histos_temp[1].GetTitle()) }; //Lazily grab the other channel's label from the histogram title...
                         System.Console.WriteLine("Histo Chans: " + channels[0] + ", " + channels[1]);
 
                         for (int hist = 0; hist < 2; hist++)//Loop over each of the two histograms
                         {
                             if (cmbs[channels[hist] / 4].flagged) //Skip if one of the two received channels was flagged
                                 continue;
-                            peHistos[channels[hist]] = histos[hist];
-                            peHistos[channels[hist]].Fit(bulkRespFit, "CRQ+", "", gains[channels[hist]] * 7.5, 512); //Fit from 7.5 PE (in ADC) up to max of histogram (will need to adjust later)
+                            flashHistos[channels[hist]] = histos_temp[hist];
+                            //flashHistos[channels[hist]].Fit(bulkRespFit, "CRQ+", "", gains[channels[hist]] * 7.5, 512); //Fit from 7.5 PE (in ADC) up to max of histogram (will need to adjust later)
+                            int lowerIntegralBin = (int) (pedestals[channels[hist]] + gains[channels[hist]] * fitThresh); //truncate the value of 7.5PE for the bin # (since all histograms start at 0 and have 512 bins)
+                            double flashIntegral = flashHistos[channels[hist]].Integral(lowerIntegralBin, 512); //512 upper bound because all histograms have 512 bins
+                            double ledIntegral = peHistos[channels[hist]].Integral(lowerIntegralBin, 512); //Also compute integral for led histogram, so we can see if the response to LED has diminished
 
-                            //compare fit response to 'lookup value'
-                            //For gaus fit: p0 is amplitude, p1 is mean, p2 is sigma
-                            if (updateFilesChkBox.Checked)
+                            if (PercentDifference(flashIntegral, ledIntegral) < flashGateDifferenceThresh) //if the differnce is less than flashGateDifferenceThresh, flashgate must not be working...
                             {
-                                //
-                                // TODO:
-                                //
-                                // Modify logic to determine if the flash gate is working...
-                                //
-                                if (PercentDifference(bulkRespFit.GetParameter(1), channelAvgHist[channel].GetMean() /*table value*/) < 20) //if the differnce is less than 20%, flashgate must not be working...
-                                {
-                                    cmbs[cmbNum].flagged = true;
-                                    cmbs[cmbNum].failureType = (int)CMB.Failure.Flashgate;
-                                    cmbInfoLabels[cmbNum][11].Text = cmbs[cmbNum].FailType();
-                                    SetRowColor(cmbNum, Color.MistyRose);
-                                    UpdateCMBInfoLabel(cmbNum);
-                                }
+                                cmbs[cmbNum].flagged = true;
+                                cmbs[cmbNum].failureType = (int)CMB.Failure.Flashgate;
+                                cmbInfoLabels[cmbNum][11].Text = cmbs[cmbNum].FailType();
+                                SetRowColor(cmbNum, Color.MistyRose);
+                                UpdateCMBInfoLabel(cmbNum);
                             }
-
-
-                            //peakFits = new ROOTNET.NTF1[peaksFound];
-                            //for (uint peak = 0; peak < peaksFound; peak++)
-                            //{
-                            //    float x_loc = peakPositions[(int)peak];
-                            //    peakFits[peak] = new ROOTNET.NTF1("Ch" + channels[hist].ToString() + "peak" + peak.ToString(), "gaus", x_loc - 2.5, x_loc + 2.5);
-                            //    peakFits[peak].SetLineColor(Convert.ToInt16(peak + 2));
-                            //    peHistos[channels[hist]].Fit(peakFits[peak], "R+");// R option forces the function to fit only over its specified range, + option tells it to add fit to histogram list without deleting previous fits
-                            //}
-                            //pedestals[channels[hist]] = peakFits[0].GetParameter(1);
-                            //gains[channels[hist]] = peakFits[1].GetParameter(1) - pedestals[channels[hist]];
-                            //if (peakFits.Length > 2) //if it can find the second PE, improve the estimation of the gain
-                            //    gains[channels[hist]] = (gains[channels[hist]] + peakFits[2].GetParameter(1) - peakFits[1].GetParameter(1)) / 2.0;
                         }
                     }
                 }
 
+                Mu2e_Register.WriteAllReg(0x2, ref flashGateControlReg, ref PP.FEB1.client); //Turn off flash gate and keep routing to the Flash Gate (to LED flasher will create interference on CMB)
+
+                if (outputOpened)
+                {
+                    foreach (var histo in flashHistos)
+                        if (histo != null)
+                        {
+                            histo.Write();
+                            histo.Delete();
+                        }
+                }
 
                 #endregion FlashGate
 
@@ -2691,82 +2694,78 @@ namespace TB_mu2e
                 #endregion LED Response Evaluation and Gain/Pedestal Computation
 
 
-                #region LED Response Evaluation
-                uint spill_status = 0;
-                uint spill_num = 0;
-                uint trig_num = 0;
-                numTrigsDisp.Text = trig_num.ToString();
-                numTrigsDisp.Update();
+                #region CMB LED Flashers
 
-                if (passed_calibration)
+                cmbInfoBox.Text = "LED Flasher Eval"; cmbInfoBox.Update();
+
+                //
+                // TO-DO:
+                //
+                // [X] Set Flash gate on individual FPGAs so we can read with adjacent FPGAs
+                // [X] Write logic to flash/read 0->1, 1->0, 2->3, 3->2
+                // [X] Evaluate flashers (need parameter or threshold, or is determining if working/not good enough?
+                // [ ] Tune LED flasher intensity to match closely to external LED flash -> could make evaluation easier (?)
+                //
+
+                Mu2e_Register[][] ledFlasherIntensityRegs = Mu2e_Register.FindAllAddrRange(0x40, 0x43, ref PP.FEB1.arrReg); //Get the led flasher intensity registers, for all FPGAs
+                Mu2e_Register.WriteReg(0x500, ref trigControlReg, ref PP.FEB1.client); //Keep the on-board pulser enabled, but set the GPO to only output a single pulse at the beginning and end of the spill gate (which should not turn on while recording histograms AFAIK)
+
+                System.Threading.Thread.Sleep(250); //wait for the pulse to go by...
+
+                ROOTNET.NTH1I[] ledHistos = new ROOTNET.NTH1I[64]; //histograms for cmb-led flashers 
+
+                for(uint fpga = 0; fpga < 4; fpga++)
                 {
-                    //This is for evaluating response to CMB LEDs
-                    //Need to get the LED Flasher DACs
-                    //Need to get the flash gate control register
-                    //Need to use the trigControlReg to set the GPO select
-                    //Need to use the testPulseFreqReg to set the on-board pulser frequency, which will send pulses out the GPO port
-                    //Need to use the Flash Gate Control to set the routing on each FPGA
-                    //Histogram SiPM Response to LEDs or Use pin-diode to measure current
+                    Mu2e_Register.WriteAllRegRange(0x0, ref ledFlasherIntensityRegs, ref PP.FEB1.client); //Set all cmb flasher intensities to 0
+                    Mu2e_Register.WriteAllReg(0x2, ref flashGateControlReg, ref PP.FEB1.client); //Set all CMBs to flash gate routing
 
-                    //SiPM response to external LED flash
-                    //[X] Need to set the flash gate control register to flash gate and not CMB LEDs (set 0x300 to 2)
-                    //[X] Need to set the trigControlReg to set the GPO select
-                    //[X] Need to set the test pulser frequency
-                    //[?] Need to set the delay between internal pulser and external LED (hit-pipeline delay if it affects the raw SiPM data for histogramming, or adjust on pulser)
-                    //[X] Get histograms
-                    //[ ] Fit data
-                    //[ ] Report evaluation
-
-                    Mu2e_Register.WriteAllReg(0x2, ref flashGateControlReg, ref PP.FEB1.client); //Set the CMB Pulse routing to the Flash Gate (to LED flasher will create interference on CMB)
-                    Mu2e_Register.WriteReg(0x100, ref trigControlReg, ref PP.FEB1.client); //Enable the on-board test pulser, output of this signal will be delivered to external pulser to flash LED
-                    Mu2e_Register.WriteReg(0x5E5E5E, ref testPulseFreqReg, ref PP.FEB1.client); //Set the on-board test pulser's frequency to ~230kHz
-                    Mu2e_Register.WriteReg(0x1, ref hitPipelineDelayReg, ref PP.FEB1.client); //Set the hit pipeline delay to minimum value (12.56ns)
-
-                    //ROOTNET.NTSpectrum[] peakFinders = new ROOTNET.NTSpectrum[2];
-                    //HistoHelper hist_helper = new HistoHelper(ref PP.FEB1, 0x400);
-                    //ROOTNET.NTH1I[] histos = new ROOTNET.NTH1I[2];
-                    //ROOTNET.NTF1[] peakFits;
-                    ROOTNET.NTH1I[] ledHistos = new ROOTNET.NTH1I[64]; //Histograms from LED flash
-                    cmbInfoBox.Text = "Flashing LED"; cmbInfoBox.Update();
-                    for (uint channel = 0; channel < 4; channel++)
+                    for (uint cmb = 0; cmb < 4; cmb++)
                     {
-                        if (ledHistos[channel] == null) //skip the channels that have already been histogrammed (due to the two channel histograms return from the FEB)
+                        //We will run as follows: 0 reads 1, 1 reads 0, 2 reads 3, 3 reads 2
+                        if (fpga == 1 || fpga == 3) //1 reads 0, 3 reads 2
                         {
-                            hist_helper.SetAccumulation_Interval(0xFFE); //Set a long accumulation interval
-                            histos = hist_helper.GetHistogram(channel, 1);
-                            uint[] channels = { channel, Convert.ToUInt32(histos[1].GetTitle()) }; //Lazily grab the other channel's label from the histogram title...
-                            System.Console.WriteLine("Histo Chans: " + channels[0] + ", " + channels[1]);
+                            Mu2e_Register.WriteReg(0x1, ref flashGateControlReg[fpga - 1], ref PP.FEB1.client); //Set LED pulse routing for single CMB
+                            Mu2e_Register.WriteReg(ledFlasherIntensity, ref ledFlasherIntensityRegs[fpga - 1][cmb], ref PP.FEB1.client); //Set single CMB flasher intensity to ledFlasherIntensity
+                        }
+                        else //0 reads 1, 2 reads 3
+                        {
+                            Mu2e_Register.WriteReg(0x1, ref flashGateControlReg[fpga + 1], ref PP.FEB1.client); //Set LED pulse routing for single CMB
+                            Mu2e_Register.WriteReg(ledFlasherIntensity, ref ledFlasherIntensityRegs[fpga+1][cmb], ref PP.FEB1.client); //Set single CMB flasher intensity to ledFlasherIntensity
+                        }
 
-                            for (int hist = 0; hist < 2; hist++) //Loop over each of the two histograms
+                        //For only the outer channels on each CMB (ch. 0 and ch. 3), histogram the flashing of 
+                        for (uint ch = 0; ch < 4; ch+=3)
+                        {
+                            uint cmbNum = (fpga * 4) + cmb;
+                            uint channel = (fpga * 16) + (cmb * 4) + ch;
+                            // [X] Get histograms
+                            // [X] Evaluate flashers
+
+                            histos_temp = hist_helper.GetHistogram(channel, 1);
+                            ledHistos[channel] = histos_temp[0]; //"Discard" the second histogram, becuase it doesn't help us atm...
+                            int lowerIntegralBin = (int)(pedestals[channel] + (gains[channel] * fitThresh)); //truncate the value of 7.5PE for the bin # (since all histograms start at 0 and have 512 bins)
+                            double cmbLedIntegral = ledHistos[channel].Integral(lowerIntegralBin, 512); //512 upper bound because all histograms have 512 bins
+                            double ledIntegral = peHistos[channel].Integral(lowerIntegralBin, 512); //Also compute integral for led histogram, so we can see if the response to LED has diminished
+                            
+                            if (PercentDifference(cmbLedIntegral, ledIntegral) > ledDifferenceThresh) //if the differnce is greater than flashGateDifferenceThresh, flashgate must not be working...
                             {
-                                ledHistos[channels[hist]] = histos[hist];
-                                //peakFinders[hist] = new ROOTNET.NTSpectrum(10); //Maybe try and get all the PEs
-                                //int peaksFound = peakFinders[hist].Search(ledHistos[channels[hist]], 1.5, "nobackground", 0.001); //Don't try and estimate background, and set the threshold to only include pedestal, 1st, and 2nd PE
-                                //if (peaksFound < 2) { System.Console.WriteLine("Cannot find 1+ PE for Chan {0}", channels[hist]); continue; } //Need this beacuse we need to know the gain, which is impossible if we can't see first PE
-                                //var peakPositions = peakFinders[hist].GetPositionX();
-                                //peakFits = new ROOTNET.NTF1[peaksFound];
-                                //for (uint peak = 0; peak < peaksFound; peak++)
-                                //{
-                                //    float x_loc = peakPositions[(int)peak];
-                                //    peakFits[peak] = new ROOTNET.NTF1("Ch" + channels[hist].ToString() + "peak" + peak.ToString(), "gaus", x_loc - 2.5, x_loc + 2.5);
-                                //    peakFits[peak].SetLineColor(Convert.ToInt16(peak + 2));
-                                //    ledHistos[channels[hist]].Fit(peakFits[peak], "R+");// R option forces the function to fit only over its specified range, + option tells it to add fit to histogram list without deleting previous fits
-                                //}
-                                //pedestals[channels[hist]] = peakFits[0].GetParameter(1);
-                                //gains[channels[hist]] = peakFits[1].GetParameter(1) - pedestals[channels[hist]];
-                                //if (peakFits.Length > 2)
-                                //gains[channels[hist]] = (gains[channels[hist]] + peakFits[2].GetParameter(1) - peakFits[1].GetParameter(1)) / 2.0;
+                                cmbs[cmbNum].flagged = true;
+                                cmbs[cmbNum].failureType = (int)CMB.Failure.LED;
+                                cmbInfoLabels[cmbNum][11].Text = cmbs[cmbNum].FailType();
+                                SetRowColor((int)cmbNum, Color.MistyRose);
+                                UpdateCMBInfoLabel((int)cmbNum);
                             }
+
                         }
                     }
 
-                    histo_file = ROOTNET.NTFile.Open("D:/Responses.root", "RECREATE");
-                    if (histo_file == null)
-                    {
-                        histo_file = ROOTNET.NTFile.Open("D:/Resp_BACKUP_" + System.DateTime.Now.ToFileTime().ToString() + ".root", "RECREATE");
-                        System.Console.WriteLine("Cannot open/modify D:/Responses.root. A backup has been created.");
-                    }
+                    Mu2e_Register.WriteAllRegRange(0x0, ref ledFlasherIntensityRegs, ref PP.FEB1.client); //Set all cmb flasher intensities to 0
+                    Mu2e_Register.WriteAllReg(0x2, ref flashGateControlReg, ref PP.FEB1.client); //Set all CMBs to flash gate routing
 
+                }
+
+                if (outputOpened)
+                {
                     foreach (var histo in ledHistos)
                         if (histo != null)
                         {
@@ -2776,19 +2775,29 @@ namespace TB_mu2e
                     histo_file.Close();
                 }
 
+                cmbInfoBox.Text = ""; cmbInfoBox.Update();
+
+                #endregion CMB LED Flashers
+
+                //This is used later for gathering trace data for tail-cancellation evaluation
+                uint spill_status = 0;
+                uint spill_num = 0;
+                uint trig_num = 0;
+                numTrigsDisp.Text = trig_num.ToString();
+                numTrigsDisp.Update();
+
+
                 Mu2e_Register.WriteReg(0x0, ref trigControlReg, ref PP.FEB1.client); //Disable the on-board test pulser
                 Mu2e_Register.WriteReg(0x0, ref testPulseFreqReg, ref PP.FEB1.client); //Set the on-board test pulser's frequency to 0
 
 
                 //Turn off bias for SiPMs
-                for (uint fpga = 0; fpga < 4; fpga++)
-                    PP.FEB1.SetV(0.0, (int)fpga);
+                //for (uint fpga = 0; fpga < 4; fpga++)
+                //    PP.FEB1.SetV(0.0, (int)fpga);
 
-                cmbInfoBox.Text = ""; cmbInfoBox.Update();
+                #region Undershoot Evaluation
+                cmbInfoBox.Text = "Undershoot Evaluation"; cmbInfoBox.Update();
 
-                return; //FULL STOP, DONT DO ANYTHING MORE, SHIT BELOW IS ABSOLUTELY CRAY CRAY, Useful for examining tail cancellation... later
-
-                #region Move this
                 febSocket.Send(sendRDB);
                 while (febSocket.Available == 0) //Wait to receive data from the FEB
                     System.Threading.Thread.Sleep(2);
@@ -2803,96 +2812,70 @@ namespace TB_mu2e
                 int lret = febSocket.Receive(rec_buf, rec_buf.Length, System.Net.Sockets.SocketFlags.None);
                 for (int iByte = 0; iByte < lret - 1; iByte++)
                     rec_buf[iByte] = rec_buf[iByte + 1]; //ignore 0x3e at the beginning of data
-                #endregion Move this
 
-                if (passed_calibration)
+                //MessageBox.Show("CMB Evaluation\nPlease connect the LED");
+                //Mu2e_Register.WriteReg(0x0C, ref controlStatusReg, ref PP.FEB1.client); //Issues a reset of the AFE deserializers on the FPGA and the MIG DDR interface
+                Mu2e_Register.WriteReg(0x2, ref spillDurReg, ref PP.FEB1.client); //Set the spill duration for 2 seconds
+                Mu2e_Register.WriteReg(0x64, ref sampleLengthReg, ref PP.FEB1.client); //Set the number of ADC samples to record per trigger
+                for (uint fpga = 0; fpga < 4; fpga++) //Turn on bias for SiPMs
+                    PP.FEB1.SetV(Convert.ToDouble(cmbBias.Text), (int)fpga);
+                Mu2e_Register.WriteReg(0x300, ref trigControlReg, ref PP.FEB1.client); //Open the spill gate: Set trig-control register to enable board to record data for 1 spill, LED flashes during this time
+                while (spill_status != 2) //trig_num < Convert.ToInt16(requestNumTrigs.Text))
                 {
-                    //MessageBox.Show("CMB Evaluation\nPlease connect the LED");
-                    //Mu2e_Register.WriteReg(0x0C, ref controlStatusReg, ref PP.FEB1.client); //Issues a reset of the AFE deserializers on the FPGA and the MIG DDR interface
-                    Mu2e_Register.WriteReg(0xA, ref spillDurReg, ref PP.FEB1.client); //Set the spill duration for 10 seconds
-                    Mu2e_Register.WriteReg(0x64, ref sampleLengthReg, ref PP.FEB1.client); //Set the number of ADC samples to record per trigger
-                    for (uint fpga = 0; fpga < 4; fpga++) //Turn on bias for SiPMs
-                        PP.FEB1.SetV(Convert.ToDouble(cmbBias.Text), (int)fpga);
-                    Mu2e_Register.WriteReg(0x300, ref trigControlReg, ref PP.FEB1.client); //Open the spill gate: Set trig-control register to enable board to record data for 1 spill
-                    while (spill_status != 2) //trig_num < Convert.ToInt16(requestNumTrigs.Text))
+                    System.Threading.Thread.Sleep(250); //Slow down the polling of the FEB for triggers/status
+                    PP.FEB1.CheckStatus(out spill_status, out spill_num, out trig_num); //Keep polling the board about how many triggers it has seen
+                    numTrigsDisp.Text = trig_num.ToString();
+                    numTrigsDisp.Update();
+                }
+                //Mu2e_Register.WriteReg(0x42, ref trigControlReg, ref PP.FEB1.client); //Stops triggering
+                Mu2e_Register.WriteReg(0x0, ref trigControlReg, ref PP.FEB1.client);
+
+                //receive data and unpack in memory
+                //Write average response to a file on disk, compare response of each CMB channel to running average (since SiPMs do not change)
+                SpillData testerData = new SpillData(); //create new SpillData object to hold incoming data from FEB
+
+                //Send RDB to FEB
+                febSocket.Send(sendRDB);
+                while (febSocket.Available == 0) //Wait to receive data from the FEB
+                    System.Threading.Thread.Sleep(10);
+
+                old_available = 0;
+                while (febSocket.Available > old_available) //Wait until the FEB has all the data to send
+                {
+                    old_available = febSocket.Available;
+                    System.Threading.Thread.Sleep(250);
+                }
+                rec_buf = new byte[febSocket.Available];
+                lret = febSocket.Receive(rec_buf, rec_buf.Length, System.Net.Sockets.SocketFlags.None);
+
+                if (testerData.ParseInput(rec_buf))
+                {
+                    double[] averageUndershoot = new double[64]; //hold the average response for each channel
+
+                    foreach (var tEvent in testerData.SpillEvents)
                     {
-                        System.Threading.Thread.Sleep(250); //Slow down the polling of the FEB for triggers/status
-                        PP.FEB1.CheckStatus(out spill_status, out spill_num, out trig_num); //Keep polling the board about how many triggers it has seen
-                        numTrigsDisp.Text = trig_num.ToString();
-                        numTrigsDisp.Update();
+                        Mu2e_Ch[] cha = tEvent.ChanData.ToArray();
+                        for (int chan = 0; chan < tEvent.ChNum; chan++)
+                            averageUndershoot[chan] = 0.5 * (averageUndershoot[chan] + (pedestals[chan] - cha[chan].data.Min())); //Compute the average undershoot for each channel from all the traces
                     }
-                    //Mu2e_Register.WriteReg(0x42, ref trigControlReg, ref PP.FEB1.client); //Stops triggering
-                    Mu2e_Register.WriteReg(0x0, ref trigControlReg, ref PP.FEB1.client);
 
-                    //receive data and unpack in memory
-                    //Write average response to a file on disk, compare response of each CMB channel to running average (since SiPMs do not change)
-                    SpillData testerData = new SpillData(); //create new SpillData object to hold incoming data from FEB
-
-                    //Send RDB to FEB
-                    febSocket.Send(sendRDB);
-                    while (febSocket.Available == 0) //Wait to receive data from the FEB
-                        System.Threading.Thread.Sleep(10);
-
-                    old_available = 0;
-                    while (febSocket.Available > old_available) //Wait until the FEB has all the data to send
+                    for(uint channel = 0; channel < 64; channel++)
                     {
-                        old_available = febSocket.Available;
-                        System.Threading.Thread.Sleep(250);
-                    }
-                    rec_buf = new byte[febSocket.Available];
-                    lret = febSocket.Receive(rec_buf, rec_buf.Length, System.Net.Sockets.SocketFlags.None);
-
-                    if (testerData.ParseInput(rec_buf))
-                    {
-                        double[] avgResponse = new double[64]; //hold the average response for each channel
-
-                        foreach (var tEvent in testerData.SpillEvents)
+                        uint cmbNum = channel / 4;
+                        if (averageUndershoot[channel] > maxUndershootThresh)
                         {
-                            Mu2e_Ch[] cha = tEvent.ChanData.ToArray();
-                            for (int chan = 0; chan < 4/*tEvent.ChNum*/; chan++) // ! ! ! INITIAL TESTING ! ! !
-                            {
-                                avgResponse[chan] += cha[chan].data.Max() - pedestals[chan];
-
-                                System.Console.Write("Chan {0}: ", chan);
-
-                                for (uint i = 0; i < tEvent.ChanData[chan].data.Length; i++)
-                                {
-                                    //In here is where the evaluation of the "CMB" will be performed
-                                    //For now, simply looking at the max ADC for each channel and comparing
-                                    //it to a running average for that channel should tell us if there are
-                                    //any extraneous issues with that particular CMB
-                                    if (tEvent.ChanData[chan].data[i] - pedestals[chan] > 0)
-                                        System.Console.Write("{0} ", (int)(tEvent.ChanData[chan].data[i] - pedestals[chan]));
-                                    else
-                                        System.Console.Write(".");
-
-
-
-                                    /*
-                                     Compare the current response to the average response in the histogram
-                                        -> Check for deviations from the mean, if > XX%, reject this CMB
-                                     If CMB appears normal, add the measurements to the histogram and resave the file
-                                        float recMean = ;
-                                        if(Math.Abs(chanAvg - recMean)/(0.5*(chanAvg + recMean)) < 0.1)
-                                        {
-                                            //If there is less than a 10% difference, must be okay... (???)
-                                            //Update the record-average with this 'good' response (avoids contamination (?))
-                                        }
-                                    */
-                                }
-                                System.Console.WriteLine();
-                            }
-
+                            cmbs[cmbNum].flagged = true;
+                            cmbs[cmbNum].failureType = (int)CMB.Failure.LED;
+                            cmbInfoLabels[cmbNum][11].Text = cmbs[cmbNum].FailType();
+                            SetRowColor((int)cmbNum, Color.MistyRose);
+                            UpdateCMBInfoLabel((int)cmbNum);
                         }
-
                     }
                 }
-                else
-                {
-                    MessageBox.Show("Calibration Failed\n\nAborting");
-                }
-                #endregion LED Response Evaluation
 
+                #endregion Undershoot Evaluation
+
+                cmbInfoBox.Text = ""; cmbInfoBox.Update();
 
                 //Turn off bias for SiPMs
                 for (uint fpga = 0; fpga < 4; fpga++)
@@ -3086,12 +3069,28 @@ namespace TB_mu2e
 
         private double PercentDifference(double first, double second)
         {
-            return 100*Math.Abs(first - second) / (0.5 * (first + second));
+            return 100*Math.Abs((first - second) / (0.5 * (first + second)));
         }
 
+        private void LostCMBavgsBtn_Click(object sender, EventArgs e)
+        {
+            String cmbAvgFileName = "D:\\data\\cmb_tester_data\\cmb_channel_averages.root";
+            ROOTNET.NTFile cmbAvgsFile;
+            if (!(File.Exists(cmbAvgFileName)))
+            {
+                cmbAvgsFile = new ROOTNET.NTFile(cmbAvgFileName, "CREATE");
+                ROOTNET.NTH1I[] channelAvgHist = new ROOTNET.NTH1I[64];
+                for (int channel = 0; channel < 64; channel++)
+                {
+                    channelAvgHist[channel] = new ROOTNET.NTH1I("Chan" + channel.ToString(), channel.ToString(), 1024, 0, 512); //convert the average recorded value for each channel into a usable number
+                    channelAvgHist[channel].Write();
+                }
+                cmbAvgsFile.Close();
+            }
+        }
     }
 
-        public class ConnectAttemptEventArgs : EventArgs
+    public class ConnectAttemptEventArgs : EventArgs
         {
             public int ConnectAttempt { get; set; }
         }
