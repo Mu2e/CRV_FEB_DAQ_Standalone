@@ -101,7 +101,7 @@
             this.dbgFEB2 = new System.Windows.Forms.Button();
             this.btnDebugLogging = new System.Windows.Forms.Button();
             this.dbgFEB1 = new System.Windows.Forms.Button();
-            this.textBox1 = new System.Windows.Forms.TextBox();
+            this.ConsoleBox = new System.Windows.Forms.TextBox();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
             this.console_Disp = new System.Windows.Forms.RichTextBox();
             this.tabFEB1 = new System.Windows.Forms.TabPage();
@@ -225,6 +225,7 @@
             this.cmbDataGroup = new System.Windows.Forms.GroupBox();
             this.cmbDataTable = new System.Windows.Forms.TableLayoutPanel();
             this.cmbTestControl = new System.Windows.Forms.GroupBox();
+            this.lostCMBavgsBtn = new System.Windows.Forms.Button();
             this.updateFilesChkBox = new System.Windows.Forms.CheckBox();
             this.cmbInfoBox = new System.Windows.Forms.TextBox();
             this.requestNumTrigsLabel = new System.Windows.Forms.Label();
@@ -235,8 +236,30 @@
             this.cmbBias = new System.Windows.Forms.TextBox();
             this.cmbBiasOverride = new System.Windows.Forms.CheckBox();
             this.cmbTestBtn = new System.Windows.Forms.Button();
+            this.tabModuleQA = new System.Windows.Forms.TabPage();
+            this.ModuleQAHomeResetBtn = new System.Windows.Forms.Button();
+            this.ModuleQADarkCurrentBtn = new System.Windows.Forms.Button();
+            this.ModuleQAHaltBtn = new System.Windows.Forms.Button();
+            this.ComPortStatusLbl = new System.Windows.Forms.Label();
+            this.ComPortStatusBox = new System.Windows.Forms.TextBox();
+            this.ComPortRefresh = new System.Windows.Forms.Button();
+            this.ComPortDisconnectBtn = new System.Windows.Forms.Button();
+            this.comPortConnectBtn = new System.Windows.Forms.Button();
+            this.ComPortLbl = new System.Windows.Forms.Label();
+            this.comPortBox = new System.Windows.Forms.ComboBox();
+            this.ModuleQAFilenameBox = new System.Windows.Forms.TextBox();
+            this.ModuleQAFileLbl = new System.Windows.Forms.Label();
+            this.ModuleQASideLbl = new System.Windows.Forms.Label();
+            this.ModuleQASide = new System.Windows.Forms.ComboBox();
+            this.ModuleQAFEB2Box = new System.Windows.Forms.GroupBox();
+            this.ModuleQATableFEB2 = new System.Windows.Forms.TableLayoutPanel();
+            this.ModuleQAFEB1Box = new System.Windows.Forms.GroupBox();
+            this.ModuleQATableFEB1 = new System.Windows.Forms.TableLayoutPanel();
+            this.ModuleQABtn = new System.Windows.Forms.Button();
             this.timer1 = new System.Windows.Forms.Timer(this.components);
-            this.lostCMBavgsBtn = new System.Windows.Forms.Button();
+            this.moduleQAHomingTimer = new System.Windows.Forms.Timer(this.components);
+            this.moduleQAMeasurementTimer = new System.Windows.Forms.Timer(this.components);
+            this.ModuleQAStepTimer = new System.Windows.Forms.Timer(this.components);
             this.statusStrip1.SuspendLayout();
             this.tabControl.SuspendLayout();
             this.tabRUN.SuspendLayout();
@@ -273,6 +296,9 @@
             this.cmbDataGroup.SuspendLayout();
             this.cmbTestControl.SuspendLayout();
             this.sipmControl.SuspendLayout();
+            this.tabModuleQA.SuspendLayout();
+            this.ModuleQAFEB2Box.SuspendLayout();
+            this.ModuleQAFEB1Box.SuspendLayout();
             this.SuspendLayout();
             // 
             // statusStrip1
@@ -329,6 +355,7 @@
             this.tabControl.Controls.Add(this.tabWC);
             this.tabControl.Controls.Add(this.tabQA);
             this.tabControl.Controls.Add(this.tabCMBTester);
+            this.tabControl.Controls.Add(this.tabModuleQA);
             this.tabControl.Location = new System.Drawing.Point(1, 0);
             this.tabControl.Name = "tabControl";
             this.tabControl.SelectedIndex = 0;
@@ -1007,7 +1034,7 @@
             this.tabConsole.Controls.Add(this.dbgFEB2);
             this.tabConsole.Controls.Add(this.btnDebugLogging);
             this.tabConsole.Controls.Add(this.dbgFEB1);
-            this.tabConsole.Controls.Add(this.textBox1);
+            this.tabConsole.Controls.Add(this.ConsoleBox);
             this.tabConsole.Controls.Add(this.groupBox3);
             this.tabConsole.Location = new System.Drawing.Point(4, 29);
             this.tabConsole.Name = "tabConsole";
@@ -1068,15 +1095,15 @@
             this.dbgFEB1.UseVisualStyleBackColor = true;
             this.dbgFEB1.Click += new System.EventHandler(this.DbgFEB_Click);
             // 
-            // textBox1
+            // ConsoleBox
             // 
-            this.textBox1.Location = new System.Drawing.Point(3, 641);
-            this.textBox1.Multiline = true;
-            this.textBox1.Name = "textBox1";
-            this.textBox1.Size = new System.Drawing.Size(936, 24);
-            this.textBox1.TabIndex = 0;
-            this.textBox1.TextChanged += new System.EventHandler(this.TextBox1_TextChanged);
-            this.textBox1.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.TextBox1_KeyPress);
+            this.ConsoleBox.Location = new System.Drawing.Point(3, 641);
+            this.ConsoleBox.Multiline = true;
+            this.ConsoleBox.Name = "ConsoleBox";
+            this.ConsoleBox.Size = new System.Drawing.Size(936, 24);
+            this.ConsoleBox.TabIndex = 0;
+            this.ConsoleBox.TextChanged += new System.EventHandler(this.ConsoleBox_TextChanged);
+            this.ConsoleBox.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.TextBox1_KeyPress);
             // 
             // groupBox3
             // 
@@ -2565,6 +2592,16 @@
             this.cmbTestControl.TabStop = false;
             this.cmbTestControl.Text = "CMB Test Control";
             // 
+            // lostCMBavgsBtn
+            // 
+            this.lostCMBavgsBtn.Location = new System.Drawing.Point(323, 19);
+            this.lostCMBavgsBtn.Name = "lostCMBavgsBtn";
+            this.lostCMBavgsBtn.Size = new System.Drawing.Size(75, 23);
+            this.lostCMBavgsBtn.TabIndex = 10;
+            this.lostCMBavgsBtn.Text = "Lost File";
+            this.lostCMBavgsBtn.UseVisualStyleBackColor = true;
+            this.lostCMBavgsBtn.Click += new System.EventHandler(this.LostCMBavgsBtn_Click);
+            // 
             // updateFilesChkBox
             // 
             this.updateFilesChkBox.AutoSize = true;
@@ -2661,21 +2698,282 @@
             this.cmbTestBtn.UseVisualStyleBackColor = true;
             this.cmbTestBtn.Click += new System.EventHandler(this.CmbTestBtn_Click);
             // 
+            // tabModuleQA
+            // 
+            this.tabModuleQA.Controls.Add(this.ModuleQAHomeResetBtn);
+            this.tabModuleQA.Controls.Add(this.ModuleQADarkCurrentBtn);
+            this.tabModuleQA.Controls.Add(this.ModuleQAHaltBtn);
+            this.tabModuleQA.Controls.Add(this.ComPortStatusLbl);
+            this.tabModuleQA.Controls.Add(this.ComPortStatusBox);
+            this.tabModuleQA.Controls.Add(this.ComPortRefresh);
+            this.tabModuleQA.Controls.Add(this.ComPortDisconnectBtn);
+            this.tabModuleQA.Controls.Add(this.comPortConnectBtn);
+            this.tabModuleQA.Controls.Add(this.ComPortLbl);
+            this.tabModuleQA.Controls.Add(this.comPortBox);
+            this.tabModuleQA.Controls.Add(this.ModuleQAFilenameBox);
+            this.tabModuleQA.Controls.Add(this.ModuleQAFileLbl);
+            this.tabModuleQA.Controls.Add(this.ModuleQASideLbl);
+            this.tabModuleQA.Controls.Add(this.ModuleQASide);
+            this.tabModuleQA.Controls.Add(this.ModuleQAFEB2Box);
+            this.tabModuleQA.Controls.Add(this.ModuleQAFEB1Box);
+            this.tabModuleQA.Controls.Add(this.ModuleQABtn);
+            this.tabModuleQA.Location = new System.Drawing.Point(4, 29);
+            this.tabModuleQA.Name = "tabModuleQA";
+            this.tabModuleQA.Padding = new System.Windows.Forms.Padding(3);
+            this.tabModuleQA.Size = new System.Drawing.Size(1255, 668);
+            this.tabModuleQA.TabIndex = 9;
+            this.tabModuleQA.Text = "Module QA";
+            this.tabModuleQA.UseVisualStyleBackColor = true;
+            // 
+            // ModuleQAHomeResetBtn
+            // 
+            this.ModuleQAHomeResetBtn.Enabled = false;
+            this.ModuleQAHomeResetBtn.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.ModuleQAHomeResetBtn.Location = new System.Drawing.Point(126, 45);
+            this.ModuleQAHomeResetBtn.Name = "ModuleQAHomeResetBtn";
+            this.ModuleQAHomeResetBtn.Size = new System.Drawing.Size(79, 29);
+            this.ModuleQAHomeResetBtn.TabIndex = 18;
+            this.ModuleQAHomeResetBtn.Text = "Home/Reset";
+            this.ModuleQAHomeResetBtn.UseVisualStyleBackColor = true;
+            this.ModuleQAHomeResetBtn.Click += new System.EventHandler(this.ModuleQAHomeResetBtn_Click);
+            // 
+            // ModuleQADarkCurrentBtn
+            // 
+            this.ModuleQADarkCurrentBtn.Location = new System.Drawing.Point(17, 16);
+            this.ModuleQADarkCurrentBtn.Name = "ModuleQADarkCurrentBtn";
+            this.ModuleQADarkCurrentBtn.Size = new System.Drawing.Size(103, 28);
+            this.ModuleQADarkCurrentBtn.TabIndex = 17;
+            this.ModuleQADarkCurrentBtn.Text = "Dark Current";
+            this.ModuleQADarkCurrentBtn.UseVisualStyleBackColor = true;
+            this.ModuleQADarkCurrentBtn.Click += new System.EventHandler(this.ModuleQADarkCurrentBtn_Click);
+            // 
+            // ModuleQAHaltBtn
+            // 
+            this.ModuleQAHaltBtn.BackColor = System.Drawing.Color.Red;
+            this.ModuleQAHaltBtn.Location = new System.Drawing.Point(126, 17);
+            this.ModuleQAHaltBtn.Name = "ModuleQAHaltBtn";
+            this.ModuleQAHaltBtn.Size = new System.Drawing.Size(79, 27);
+            this.ModuleQAHaltBtn.TabIndex = 16;
+            this.ModuleQAHaltBtn.Text = "STOP";
+            this.ModuleQAHaltBtn.UseVisualStyleBackColor = false;
+            this.ModuleQAHaltBtn.Click += new System.EventHandler(this.ModuleQAHaltBtn_Click);
+            // 
+            // ComPortStatusLbl
+            // 
+            this.ComPortStatusLbl.AutoSize = true;
+            this.ComPortStatusLbl.Location = new System.Drawing.Point(831, 61);
+            this.ComPortStatusLbl.Name = "ComPortStatusLbl";
+            this.ComPortStatusLbl.Size = new System.Drawing.Size(52, 17);
+            this.ComPortStatusLbl.TabIndex = 15;
+            this.ComPortStatusLbl.Text = "Status:";
+            // 
+            // ComPortStatusBox
+            // 
+            this.ComPortStatusBox.Location = new System.Drawing.Point(885, 58);
+            this.ComPortStatusBox.Name = "ComPortStatusBox";
+            this.ComPortStatusBox.ReadOnly = true;
+            this.ComPortStatusBox.Size = new System.Drawing.Size(109, 23);
+            this.ComPortStatusBox.TabIndex = 14;
+            // 
+            // ComPortRefresh
+            // 
+            this.ComPortRefresh.Location = new System.Drawing.Point(747, 58);
+            this.ComPortRefresh.Name = "ComPortRefresh";
+            this.ComPortRefresh.Size = new System.Drawing.Size(75, 23);
+            this.ComPortRefresh.TabIndex = 13;
+            this.ComPortRefresh.Text = "Refresh";
+            this.ComPortRefresh.UseVisualStyleBackColor = true;
+            this.ComPortRefresh.Click += new System.EventHandler(this.ComPortRefresh_Click);
+            // 
+            // ComPortDisconnectBtn
+            // 
+            this.ComPortDisconnectBtn.Location = new System.Drawing.Point(907, 29);
+            this.ComPortDisconnectBtn.Name = "ComPortDisconnectBtn";
+            this.ComPortDisconnectBtn.Size = new System.Drawing.Size(87, 23);
+            this.ComPortDisconnectBtn.TabIndex = 12;
+            this.ComPortDisconnectBtn.Text = "Disconnect";
+            this.ComPortDisconnectBtn.UseVisualStyleBackColor = true;
+            this.ComPortDisconnectBtn.Click += new System.EventHandler(this.ComPortDisconnectBtn_Click);
+            // 
+            // comPortConnectBtn
+            // 
+            this.comPortConnectBtn.Location = new System.Drawing.Point(826, 29);
+            this.comPortConnectBtn.Name = "comPortConnectBtn";
+            this.comPortConnectBtn.Size = new System.Drawing.Size(75, 23);
+            this.comPortConnectBtn.TabIndex = 11;
+            this.comPortConnectBtn.Text = "Connect";
+            this.comPortConnectBtn.UseVisualStyleBackColor = true;
+            this.comPortConnectBtn.Click += new System.EventHandler(this.ComPortConnectBtn_Click);
+            // 
+            // ComPortLbl
+            // 
+            this.ComPortLbl.AutoSize = true;
+            this.ComPortLbl.Location = new System.Drawing.Point(744, 9);
+            this.ComPortLbl.Name = "ComPortLbl";
+            this.ComPortLbl.Size = new System.Drawing.Size(76, 17);
+            this.ComPortLbl.TabIndex = 10;
+            this.ComPortLbl.Text = "COM Ports";
+            this.ComPortLbl.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // comPortBox
+            // 
+            this.comPortBox.FormattingEnabled = true;
+            this.comPortBox.Location = new System.Drawing.Point(747, 28);
+            this.comPortBox.Name = "comPortBox";
+            this.comPortBox.Size = new System.Drawing.Size(73, 25);
+            this.comPortBox.TabIndex = 9;
+            // 
+            // ModuleQAFilenameBox
+            // 
+            this.ModuleQAFilenameBox.Location = new System.Drawing.Point(593, 35);
+            this.ModuleQAFilenameBox.Name = "ModuleQAFilenameBox";
+            this.ModuleQAFilenameBox.Size = new System.Drawing.Size(117, 23);
+            this.ModuleQAFilenameBox.TabIndex = 2;
+            this.ModuleQAFilenameBox.Text = "ModuleQA";
+            // 
+            // ModuleQAFileLbl
+            // 
+            this.ModuleQAFileLbl.AutoSize = true;
+            this.ModuleQAFileLbl.Location = new System.Drawing.Point(368, 38);
+            this.ModuleQAFileLbl.Name = "ModuleQAFileLbl";
+            this.ModuleQAFileLbl.Size = new System.Drawing.Size(371, 17);
+            this.ModuleQAFileLbl.TabIndex = 8;
+            this.ModuleQAFileLbl.Text = "Output File Name: \"ScanningData_                              .txt\"";
+            // 
+            // ModuleQASideLbl
+            // 
+            this.ModuleQASideLbl.AutoSize = true;
+            this.ModuleQASideLbl.Location = new System.Drawing.Point(267, 17);
+            this.ModuleQASideLbl.Name = "ModuleQASideLbl";
+            this.ModuleQASideLbl.Size = new System.Drawing.Size(36, 17);
+            this.ModuleQASideLbl.TabIndex = 6;
+            this.ModuleQASideLbl.Text = "Side";
+            // 
+            // ModuleQASide
+            // 
+            this.ModuleQASide.FormattingEnabled = true;
+            this.ModuleQASide.Items.AddRange(new object[] {
+            "A",
+            "B",
+            "Middle"});
+            this.ModuleQASide.Location = new System.Drawing.Point(263, 35);
+            this.ModuleQASide.Name = "ModuleQASide";
+            this.ModuleQASide.Size = new System.Drawing.Size(91, 25);
+            this.ModuleQASide.TabIndex = 1;
+            // 
+            // ModuleQAFEB2Box
+            // 
+            this.ModuleQAFEB2Box.Controls.Add(this.ModuleQATableFEB2);
+            this.ModuleQAFEB2Box.Location = new System.Drawing.Point(7, 288);
+            this.ModuleQAFEB2Box.Name = "ModuleQAFEB2Box";
+            this.ModuleQAFEB2Box.Size = new System.Drawing.Size(1242, 195);
+            this.ModuleQAFEB2Box.TabIndex = 4;
+            this.ModuleQAFEB2Box.TabStop = false;
+            this.ModuleQAFEB2Box.Text = "FEB2";
+            // 
+            // ModuleQATableFEB2
+            // 
+            this.ModuleQATableFEB2.ColumnCount = 16;
+            this.ModuleQATableFEB2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 6.25F));
+            this.ModuleQATableFEB2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 6.25F));
+            this.ModuleQATableFEB2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 6.25F));
+            this.ModuleQATableFEB2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 6.25F));
+            this.ModuleQATableFEB2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 6.25F));
+            this.ModuleQATableFEB2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 6.25F));
+            this.ModuleQATableFEB2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 6.25F));
+            this.ModuleQATableFEB2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 6.25F));
+            this.ModuleQATableFEB2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 6.25F));
+            this.ModuleQATableFEB2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 6.25F));
+            this.ModuleQATableFEB2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 6.25F));
+            this.ModuleQATableFEB2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 6.25F));
+            this.ModuleQATableFEB2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 6.25F));
+            this.ModuleQATableFEB2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 6.25F));
+            this.ModuleQATableFEB2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 6.25F));
+            this.ModuleQATableFEB2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 6.25F));
+            this.ModuleQATableFEB2.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.ModuleQATableFEB2.GrowStyle = System.Windows.Forms.TableLayoutPanelGrowStyle.FixedSize;
+            this.ModuleQATableFEB2.Location = new System.Drawing.Point(3, 19);
+            this.ModuleQATableFEB2.Name = "ModuleQATableFEB2";
+            this.ModuleQATableFEB2.RowCount = 4;
+            this.ModuleQATableFEB2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 25F));
+            this.ModuleQATableFEB2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 25F));
+            this.ModuleQATableFEB2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 25F));
+            this.ModuleQATableFEB2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 25F));
+            this.ModuleQATableFEB2.Size = new System.Drawing.Size(1236, 173);
+            this.ModuleQATableFEB2.TabIndex = 2;
+            // 
+            // ModuleQAFEB1Box
+            // 
+            this.ModuleQAFEB1Box.Controls.Add(this.ModuleQATableFEB1);
+            this.ModuleQAFEB1Box.Location = new System.Drawing.Point(7, 87);
+            this.ModuleQAFEB1Box.Name = "ModuleQAFEB1Box";
+            this.ModuleQAFEB1Box.Size = new System.Drawing.Size(1242, 195);
+            this.ModuleQAFEB1Box.TabIndex = 3;
+            this.ModuleQAFEB1Box.TabStop = false;
+            this.ModuleQAFEB1Box.Text = "FEB1";
+            // 
+            // ModuleQATableFEB1
+            // 
+            this.ModuleQATableFEB1.ColumnCount = 16;
+            this.ModuleQATableFEB1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 6.25F));
+            this.ModuleQATableFEB1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 6.25F));
+            this.ModuleQATableFEB1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 6.25F));
+            this.ModuleQATableFEB1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 6.25F));
+            this.ModuleQATableFEB1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 6.25F));
+            this.ModuleQATableFEB1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 6.25F));
+            this.ModuleQATableFEB1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 6.25F));
+            this.ModuleQATableFEB1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 6.25F));
+            this.ModuleQATableFEB1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 6.25F));
+            this.ModuleQATableFEB1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 6.25F));
+            this.ModuleQATableFEB1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 6.25F));
+            this.ModuleQATableFEB1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 6.25F));
+            this.ModuleQATableFEB1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 6.25F));
+            this.ModuleQATableFEB1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 6.25F));
+            this.ModuleQATableFEB1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 6.25F));
+            this.ModuleQATableFEB1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 6.25F));
+            this.ModuleQATableFEB1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.ModuleQATableFEB1.GrowStyle = System.Windows.Forms.TableLayoutPanelGrowStyle.FixedSize;
+            this.ModuleQATableFEB1.Location = new System.Drawing.Point(3, 19);
+            this.ModuleQATableFEB1.Name = "ModuleQATableFEB1";
+            this.ModuleQATableFEB1.RowCount = 4;
+            this.ModuleQATableFEB1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 25F));
+            this.ModuleQATableFEB1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 25F));
+            this.ModuleQATableFEB1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 25F));
+            this.ModuleQATableFEB1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 25F));
+            this.ModuleQATableFEB1.Size = new System.Drawing.Size(1236, 173);
+            this.ModuleQATableFEB1.TabIndex = 1;
+            // 
+            // ModuleQABtn
+            // 
+            this.ModuleQABtn.Enabled = false;
+            this.ModuleQABtn.Location = new System.Drawing.Point(17, 45);
+            this.ModuleQABtn.Name = "ModuleQABtn";
+            this.ModuleQABtn.Size = new System.Drawing.Size(103, 29);
+            this.ModuleQABtn.TabIndex = 0;
+            this.ModuleQABtn.Text = "Source Test";
+            this.ModuleQABtn.UseVisualStyleBackColor = true;
+            this.ModuleQABtn.Click += new System.EventHandler(this.ModuleQABtn_Click);
+            // 
             // timer1
             // 
             this.timer1.Enabled = true;
             this.timer1.Interval = 200;
             this.timer1.Tick += new System.EventHandler(this.Timer1_Tick);
             // 
-            // lostCMBavgsBtn
+            // moduleQAHomingTimer
             // 
-            this.lostCMBavgsBtn.Location = new System.Drawing.Point(323, 19);
-            this.lostCMBavgsBtn.Name = "lostCMBavgsBtn";
-            this.lostCMBavgsBtn.Size = new System.Drawing.Size(75, 23);
-            this.lostCMBavgsBtn.TabIndex = 10;
-            this.lostCMBavgsBtn.Text = "Lost File";
-            this.lostCMBavgsBtn.UseVisualStyleBackColor = true;
-            this.lostCMBavgsBtn.Click += new System.EventHandler(this.LostCMBavgsBtn_Click);
+            this.moduleQAHomingTimer.Interval = 250;
+            this.moduleQAHomingTimer.Tick += new System.EventHandler(this.ModuleQAHomingTimer_Tick);
+            // 
+            // moduleQAMeasurementTimer
+            // 
+            this.moduleQAMeasurementTimer.Interval = 1000;
+            this.moduleQAMeasurementTimer.Tick += new System.EventHandler(this.ModuleQAMeasurementTimer_Tick);
+            // 
+            // ModuleQAStepTimer
+            // 
+            this.ModuleQAStepTimer.Interval = 500;
+            this.ModuleQAStepTimer.Tick += new System.EventHandler(this.ModuleQAStepTimer_Tick);
             // 
             // frmMain
             // 
@@ -2746,6 +3044,10 @@
             this.cmbTestControl.PerformLayout();
             this.sipmControl.ResumeLayout(false);
             this.sipmControl.PerformLayout();
+            this.tabModuleQA.ResumeLayout(false);
+            this.tabModuleQA.PerformLayout();
+            this.ModuleQAFEB2Box.ResumeLayout(false);
+            this.ModuleQAFEB1Box.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -2796,7 +3098,7 @@
         private System.Windows.Forms.Button dbgFEB2;
         private System.Windows.Forms.Button dbgFEB1;
         private System.Windows.Forms.GroupBox groupBox3;
-        private System.Windows.Forms.TextBox textBox1;
+        private System.Windows.Forms.TextBox ConsoleBox;
         private System.Windows.Forms.Button btnBiasREAD;
         private System.Windows.Forms.TextBox txtI;
         private System.Windows.Forms.TextBox txtV;
@@ -2966,5 +3268,29 @@
         private System.Windows.Forms.Label[][] cmbInfoLabels;
         private System.Windows.Forms.CheckBox saveAsciiBox;
         private System.Windows.Forms.Button lostCMBavgsBtn;
+        private System.Windows.Forms.TabPage tabModuleQA;
+        private System.Windows.Forms.TableLayoutPanel ModuleQATableFEB2;
+        private System.Windows.Forms.TableLayoutPanel ModuleQATableFEB1;
+        private System.Windows.Forms.Button ModuleQABtn;
+        private System.Windows.Forms.GroupBox ModuleQAFEB2Box;
+        private System.Windows.Forms.GroupBox ModuleQAFEB1Box;
+        private System.Windows.Forms.Label ModuleQASideLbl;
+        private System.Windows.Forms.ComboBox ModuleQASide;
+        private System.Windows.Forms.TextBox ModuleQAFilenameBox;
+        private System.Windows.Forms.Label ModuleQAFileLbl;
+        private System.Windows.Forms.Label[][] ModuleQALabels;
+        private System.Windows.Forms.Label ComPortLbl;
+        private System.Windows.Forms.ComboBox comPortBox;
+        private System.Windows.Forms.Button comPortConnectBtn;
+        private System.Windows.Forms.Button ComPortDisconnectBtn;
+        private System.Windows.Forms.Button ComPortRefresh;
+        private System.Windows.Forms.Timer moduleQAHomingTimer;
+        private System.Windows.Forms.Label ComPortStatusLbl;
+        private System.Windows.Forms.TextBox ComPortStatusBox;
+        private System.Windows.Forms.Timer moduleQAMeasurementTimer;
+        private System.Windows.Forms.Button ModuleQAHaltBtn;
+        private System.Windows.Forms.Button ModuleQADarkCurrentBtn;
+        private System.Windows.Forms.Timer ModuleQAStepTimer;
+        private System.Windows.Forms.Button ModuleQAHomeResetBtn;
     }
 }

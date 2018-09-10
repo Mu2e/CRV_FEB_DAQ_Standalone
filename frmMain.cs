@@ -44,6 +44,15 @@ namespace TB_mu2e
         private const int num_chans = 16;
         private System.Windows.Forms.Label[] BDVoltLabels = new System.Windows.Forms.Label[num_chans];
 
+        private SerialPort comPort;
+        private string[] portList;
+        private bool zerod;
+        private bool darkCurrent;
+        private int currentChannel;
+        private int currentDicounter;
+        private bool stepperCheckForOK;
+        private bool stepperReceivedOK;
+
         public void AddConsoleMessage(string msg)
         {
             console_Disp.Text = console.add_messg(msg);
@@ -271,11 +280,11 @@ namespace TB_mu2e
                 if (e.KeyChar.ToString() == " ")
                 {
                     if (dbgFEB2.BackColor == Color.Green)
-                    { DbgFEB_Click((object)dbgWC, null); textBox1.Text = ""; return; }
+                    { DbgFEB_Click((object)dbgWC, null); ConsoleBox.Text = ""; return; }
                     if (dbgFEB1.BackColor == Color.Green)
-                    { DbgFEB_Click((object)dbgFEB2, null); textBox1.Text = ""; return; }
+                    { DbgFEB_Click((object)dbgFEB2, null); ConsoleBox.Text = ""; return; }
                     if (dbgWC.BackColor == Color.Green)
-                    { DbgFEB_Click((object)dbgFEB1, null); textBox1.Text = ""; return; }
+                    { DbgFEB_Click((object)dbgFEB1, null); ConsoleBox.Text = ""; return; }
                 }
                 if (e.KeyChar.ToString() == "1")
                 { DbgFEB_Click((object)dbgWC, null); }
@@ -284,27 +293,27 @@ namespace TB_mu2e
             }
         }
 
-        private void TextBox1_TextChanged(object sender, EventArgs e)
+        private void ConsoleBox_TextChanged(object sender, EventArgs e)
         {
             string l = "";
             bool this_is_a_write = false;
             string sent_string = "";
 
-            if (textBox1.Text.Contains("\n"))
+            if (ConsoleBox.Text.Contains("\n"))
             {
                 try
                 {
-                    if (textBox1.Text.Contains("$")) //this is a comment
+                    if (ConsoleBox.Text.Contains("$")) //this is a comment
                     {
-                        AddConsoleMessage(textBox1.Text);
-                        textBox1.Text = "";
+                        AddConsoleMessage(ConsoleBox.Text);
+                        ConsoleBox.Text = "";
                     }
                     else
                     {
-                        byte[] buf = PP.GetBytes(textBox1.Text);
-                        sent_string = textBox1.Text;
-                        if (textBox1.Text.ToLower().Contains("wr")) { this_is_a_write = true; }
-                        textBox1.Text = "";
+                        byte[] buf = PP.GetBytes(ConsoleBox.Text);
+                        sent_string = ConsoleBox.Text;
+                        if (ConsoleBox.Text.ToLower().Contains("wr")) { this_is_a_write = true; }
+                        ConsoleBox.Text = "";
                         while (PP.active_Socket.Available > 0)
                         {
                             byte[] rbuf = new byte[PP.active_Socket.Available];
@@ -1783,6 +1792,7 @@ namespace TB_mu2e
         private void FrmMain_Load(object sender, EventArgs e)
         {
             CreateButtonArrays();
+            InitializeModuleQATab();
         }
 
         private void CreateButtonArrays()
@@ -1891,6 +1901,48 @@ namespace TB_mu2e
                     fpga_panel.Controls.Add(qaFPGALabels[fpga], 6, 1);//Add the FPGA label to the layout table
             }
             #endregion LightCheckButtons
+        }
+
+        private void InitializeModuleQATab()
+        {
+            //Create labels for the Module QA Tab
+            ModuleQALabels = new System.Windows.Forms.Label[2][]; //One collection of 64 labels for each FEB
+            for (uint feb = 0; feb < 2; feb++)
+            {
+                ModuleQALabels[feb] = new System.Windows.Forms.Label[64]; //64 channels on an FEB
+                for (uint channel = 0; channel < 64; channel++)
+                {
+                    ModuleQALabels[feb][channel] = new System.Windows.Forms.Label
+                    {
+                        Name = "moduleQAChannelLbl_FEB" + (feb).ToString() + "_ch" + (channel).ToString(),
+                        Text = (channel).ToString() + ":\n",
+                        Margin = new System.Windows.Forms.Padding(0, 3, 0, 3),
+                        TextAlign = System.Drawing.ContentAlignment.MiddleLeft,
+                        Dock = System.Windows.Forms.DockStyle.Fill
+                    };
+                    switch (feb) //Put the info into the table
+                    {
+                        case 0:
+                            ModuleQATableFEB1.Controls.Add(ModuleQALabels[feb][channel]);
+                            break;
+                        case 1:
+                            ModuleQATableFEB2.Controls.Add(ModuleQALabels[feb][channel]);
+                            break;
+                        default:
+                            break;
+                    };
+                }
+            }
+
+            portList = SerialPort.GetPortNames();
+            comPortBox.DataSource = portList;
+        }
+
+        private void UpdateModuleLabel(int feb, int channel, double value)
+        {
+            ModuleQALabels[feb][channel].Text = (channel).ToString() + ":\n";
+            ModuleQALabels[feb][channel].Text += (value).ToString("F4");
+            ModuleQALabels[feb][channel].Refresh();
         }
 
         private void GroupBoxEvDisplay_Enter(object sender, EventArgs e)
@@ -2297,7 +2349,7 @@ namespace TB_mu2e
             //Check that an FEB client exists, otherwise, don't bother setting up the pulser or trying to get data
             if (PP.FEB1.client != null)
             {
-                cmbInfoBox.Text = ""; cmbInfoBox.Update();
+                cmbInfoBox.Text = ""; cmbInfoBox.Refresh();
 
                 #region Registers
                 //These registers are required for setting up the FEB to record triggered events and the flashing of the LED.
@@ -2501,7 +2553,7 @@ namespace TB_mu2e
                 #region LED Response Evaluation and Gain/Pedestal Computation
 
                 #region BiasWait
-                cmbInfoBox.Text = "Waiting for bias"; cmbInfoBox.Update();
+                cmbInfoBox.Text = "Waiting for bias"; cmbInfoBox.Refresh();
                 PP.FEB1.SetVAll(Convert.ToDouble(cmbBias.Text));
                 #endregion BiasWait
 
@@ -2515,7 +2567,7 @@ namespace TB_mu2e
                 ROOTNET.NTH1I[] histos_temp = new ROOTNET.NTH1I[2]; //temporary spot to store the incoming histograms from the histohelper
                 ROOTNET.NTF1 gainFit = new ROOTNET.NTF1("gainfit", "pol1"); //linear fit for computing the gain
                 ROOTNET.NTF1 bulkRespFit = new ROOTNET.NTF1("respfit", "gaus"); //Gaussian fit for bulk of LED Response
-                cmbInfoBox.Text = "LED/Calibrating"; cmbInfoBox.Update();
+                cmbInfoBox.Text = "LED/Calibrating"; cmbInfoBox.Refresh();
 
                 Mu2e_Register.WriteReg(0x100, ref trigControlReg, ref PP.FEB1.client); //Enable the on-board test pulser, output of this signal will be delivered to external pulser to flash LED
                 Mu2e_Register.WriteReg(0x5E5E5E/*0x5E5E5E*/, ref testPulseFreqReg, ref PP.FEB1.client); //Set the on-board test pulser's frequency to ~230kHz
@@ -2638,7 +2690,7 @@ namespace TB_mu2e
 
 
                 #region FlashGate
-                cmbInfoBox.Text = "Testing flashgate"; cmbInfoBox.Update();
+                cmbInfoBox.Text = "Testing flashgate"; cmbInfoBox.Refresh();
 
                 ROOTNET.NTH1I[] flashHistos = new ROOTNET.NTH1I[64]; //Histograms used to determine response to LED (flashgate)
 
@@ -2696,7 +2748,7 @@ namespace TB_mu2e
 
                 #region CMB LED Flashers
 
-                cmbInfoBox.Text = "LED Flasher Eval"; cmbInfoBox.Update();
+                cmbInfoBox.Text = "LED Flasher Eval"; cmbInfoBox.Refresh();
 
                 //
                 // TO-DO:
@@ -2775,7 +2827,7 @@ namespace TB_mu2e
                     histo_file.Close();
                 }
 
-                cmbInfoBox.Text = ""; cmbInfoBox.Update();
+                cmbInfoBox.Text = ""; cmbInfoBox.Refresh();
 
                 #endregion CMB LED Flashers
 
@@ -2784,7 +2836,7 @@ namespace TB_mu2e
                 uint spill_num = 0;
                 uint trig_num = 0;
                 numTrigsDisp.Text = trig_num.ToString();
-                numTrigsDisp.Update();
+                numTrigsDisp.Refresh();
 
 
                 Mu2e_Register.WriteReg(0x0, ref trigControlReg, ref PP.FEB1.client); //Disable the on-board test pulser
@@ -2796,7 +2848,7 @@ namespace TB_mu2e
                 //    PP.FEB1.SetV(0.0, (int)fpga);
 
                 #region Undershoot Evaluation
-                cmbInfoBox.Text = "Undershoot Evaluation"; cmbInfoBox.Update();
+                cmbInfoBox.Text = "Undershoot Evaluation"; cmbInfoBox.Refresh();
 
                 febSocket.Send(sendRDB);
                 while (febSocket.Available == 0) //Wait to receive data from the FEB
@@ -2825,7 +2877,7 @@ namespace TB_mu2e
                     System.Threading.Thread.Sleep(250); //Slow down the polling of the FEB for triggers/status
                     PP.FEB1.CheckStatus(out spill_status, out spill_num, out trig_num); //Keep polling the board about how many triggers it has seen
                     numTrigsDisp.Text = trig_num.ToString();
-                    numTrigsDisp.Update();
+                    numTrigsDisp.Refresh();
                 }
                 //Mu2e_Register.WriteReg(0x42, ref trigControlReg, ref PP.FEB1.client); //Stops triggering
                 Mu2e_Register.WriteReg(0x0, ref trigControlReg, ref PP.FEB1.client);
@@ -2875,7 +2927,7 @@ namespace TB_mu2e
 
                 #endregion Undershoot Evaluation
 
-                cmbInfoBox.Text = ""; cmbInfoBox.Update();
+                cmbInfoBox.Text = ""; cmbInfoBox.Refresh();
 
                 //Turn off bias for SiPMs
                 for (uint fpga = 0; fpga < 4; fpga++)
@@ -2885,7 +2937,7 @@ namespace TB_mu2e
             else
             {
                 cmbInfoBox.Text = "Connect to FEB";
-                cmbInfoBox.Update();
+                cmbInfoBox.Refresh();
             }
         }
 
@@ -3048,13 +3100,13 @@ namespace TB_mu2e
         {
             foreach (var lblRow in cmbInfoLabels)
                 foreach (var lbl in lblRow)
-                    lbl.Update();
+                    lbl.Refresh();
         }
 
         private void UpdateCMBInfoLabel(int cmb)
         {
             foreach (var lbl in cmbInfoLabels[cmb])
-                lbl.Update();
+                lbl.Refresh();
         }
 
         private void ClearCMBInfoLabel(int cmb)
@@ -3088,11 +3140,394 @@ namespace TB_mu2e
                 cmbAvgsFile.Close();
             }
         }
+
+        private void ModuleQADarkCurrentBtn_Click(object sender, EventArgs e)
+        {
+            if (true)//PP.FEB1.client != null && PP.FEB2.client != null)
+            {
+                if (PP.moduleQACurrentMeasurements == null) //if we didn't make a measurement object yet, do so, else purge the existing one of information
+                    PP.moduleQACurrentMeasurements = new ModuleQACurrentMeasurements();
+                else
+                    PP.moduleQACurrentMeasurements.Purge();
+
+
+                ModuleQADarkCurrentBtn.Enabled = false; //disabled the button to prevent repeated clicks
+                //Loop
+                // take current measurements
+                // move source
+                //repeat until entire module is scanned
+                //Move source back to position 0
+                currentChannel = 0; //Set back to 0, controlled by measurment timer
+                currentDicounter = 0; //Set back to 0, controlled by measurement timer
+                //PP.FEB1.SetVAll(Convert.ToDouble(qaBias.Text)); //Turn on the bias for the FEBs
+                //PP.FEB2.SetVAll(Convert.ToDouble(qaBias.Text));
+                darkCurrent = true;
+                moduleQAMeasurementTimer.Enabled = true;
+            }
+            else
+            {
+                if (PP.FEB1.client == null && PP.FEB2.client == null)
+                {
+                    MessageBox.Show("Check FEB 1 and FEB 2 connection.", "Connect to the FEBs, you dummy", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+                else if (PP.FEB1.client == null)
+                {
+                    MessageBox.Show("Check FEB 1 connection.", "Connect to FEB 1, you dummy", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+                else if (PP.FEB2.client == null)
+                {
+                    MessageBox.Show("Check FEB 2 connection.", "Connect to FEB 2, you dummy", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            }
+
+        }
+
+        private void ModuleQABtn_Click(object sender, EventArgs e)
+        {
+            //Check that both FEBs are connected
+            if(true)//PP.FEB1.client != null && PP.FEB2.client != null)
+            {
+                if (PP.moduleQACurrentMeasurements == null) //if we didn't make a measurement object yet, do so, else purge the existing one of information
+                    PP.moduleQACurrentMeasurements = new ModuleQACurrentMeasurements();
+                else
+                    PP.moduleQACurrentMeasurements.Purge();
+
+
+                ModuleQABtn.Enabled = false; //disabled the button to prevent repeated clicks
+                ModuleQADarkCurrentBtn.Enabled = false;
+                ModuleQAHomeResetBtn.Enabled = false;
+
+                //Loop
+                // take current measurements
+                // move source
+                //repeat until entire module is scanned
+                //Move source back to position 0
+                currentChannel = 0; //Set back to 0, controlled by measurment timer
+                currentDicounter = 0; //Set back to 0, controlled by measurement timer
+                comPort.WriteLine(PP.moduleQACurrentMeasurements.getgCodeDicounterPosition(currentDicounter)); //tell it to go to the 0th dicounter position
+                ModuleQAStepTimer.Enabled = true;
+                //PP.FEB1.SetVAll(Convert.ToDouble(qaBias.Text)); //Turn on the bias for the FEBs
+                //PP.FEB2.SetVAll(Convert.ToDouble(qaBias.Text));
+                moduleQAMeasurementTimer.Enabled = true;
+            }
+            else
+            {
+                if (PP.FEB1.client == null && PP.FEB2.client == null)
+                {
+                    MessageBox.Show("Check FEB 1 and FEB 2 connection.", "Connect to the FEBs, you dummy", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+                else if (PP.FEB1.client == null)
+                {
+                    MessageBox.Show("Check FEB 1 connection.", "Connect to FEB 1, you dummy", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+                else if(PP.FEB2.client == null)
+                {
+                    MessageBox.Show("Check FEB 2 connection.", "Connect to FEB 2, you dummy", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            }
+        }
+
+        private void ComPortConnectBtn_Click(object sender, EventArgs e)
+        {
+            if (!string.IsNullOrEmpty(comPortBox.Text) && comPort == null)
+            {
+                ComPortStatusBox.Text = "Connecting";
+
+                comPort = new SerialPort()
+                {
+                    PortName = comPortBox.Text,
+                    BaudRate = 115200,
+                    Parity = Parity.None,
+                    DataBits = 8,
+                    StopBits = StopBits.One,
+                    WriteTimeout = 1000,
+                    ReadTimeout = 2000
+                };
+
+                try
+                {
+                    comPort.Open();
+                    comPort.WriteLine("");                    
+                    if (comPort.ReadLine().Contains("Smoothie")) //Success, we are talking to the controller
+                    {
+                        StepperCheckForMessages();
+                        zerod = false;
+                        stepperCheckForOK = false;
+                        stepperReceivedOK = false;
+                        moduleQAHomingTimer.Enabled = true; //start the thread which moves the stepper home
+                    }
+                    //check status
+                    ////if connected, enable the source test button
+                    ////if not connected, keep the source test button disabled
+                }
+                catch(TimeoutException)
+                {
+                    MessageBox.Show("Reached timeout while communicating with controller.", "Oh shit, something went wrong", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                    comPort.Close();
+                    ModuleQABtn.Enabled = false; //disable the QA button if we aren't connected to the stepper controller
+                }
+                catch
+                {
+                    MessageBox.Show("Trouble communicating with controller.", "Oh shit, something went wrong", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                    comPort.Close();
+                    ModuleQABtn.Enabled = false; //disable the QA button if we aren't connected to the stepper controller
+                }
+            }
+        }
+
+        private void ComPortDisconnectBtn_Click(object sender, EventArgs e)
+        {
+            if (comPort != null && moduleQAMeasurementTimer.Enabled == false)
+            {
+                try
+                {
+                    comPort.WriteLine("reset");
+                    comPort.Close();
+                }
+                catch (TimeoutException)
+                { comPort.Close(); } //if we can't issue a reset, then just close the comPort  
+                catch //Catch comport IO exception or anything else
+                {  }
+            }
+            ModuleQABtn.Enabled = false; //disable the QA button if we aren't connected to the stepper controller
+            zerod = false;
+            ComPortStatusBox.Text = "Disconnected";
+        }
+
+        private void ComPortRefresh_Click(object sender, EventArgs e)
+        {
+            portList = SerialPort.GetPortNames();
+            comPortBox.Refresh();
+        }
+
+        private void ModuleQAHomingTimer_Tick(object sender, EventArgs e)
+        {
+            ComPortStatusBox.Text = "Homing";
+            try
+            {
+                if (!zerod)
+                {
+                    if (!stepperCheckForOK && !stepperReceivedOK) //if its not zeroed, and doesn't need to look for an OK, then we can issue a home command
+                    {
+                        comPort.WriteLine("G28 X0"); //tell the controller to find the home position
+                        stepperCheckForOK = true;
+                        stepperReceivedOK = false;
+                    }
+                    else if (stepperCheckForOK && !stepperReceivedOK) //if it hasn't been zeroed yet and needs to check for the OK, look for it
+                    {
+                        if (comPort.BytesToRead > 0)
+                            if (comPort.ReadLine().Contains("ok")) //if it gets the OK, then it received the OK (yeah)
+                                stepperReceivedOK = true;
+                    }
+                    else if (stepperCheckForOK && stepperReceivedOK) //if it hasn't been zeroed yet and received the OK
+                    {
+                        comPort.WriteLine("G92 X0"); //Set origin to home position
+                        comPort.ReadLine(); //grab the 'ok'
+                        zerod = true;
+                        stepperCheckForOK = false;
+                        stepperReceivedOK = false;
+                        ComPortStatusBox.Text = "Zero'd";
+                        moduleQAHomingTimer.Enabled = false;
+                    }
+                }
+            }
+            catch (TimeoutException)
+            {
+                moduleQAHomingTimer.Enabled = false;
+                MessageBox.Show("Reached timeout while communicating with controller.", "Oh shit, something went wrong", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                comPort.Close();
+                ModuleQABtn.Enabled = false; //disable the QA button if we aren't connected to the stepper controller
+                ComPortStatusBox.Text = "ERR";
+            }
+            catch
+            {
+                moduleQAHomingTimer.Enabled = false;
+                MessageBox.Show("Trouble communicating with controller.", "Oh shit, something went wrong", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                comPort.Close();
+                ModuleQABtn.Enabled = false; //disable the QA button if we aren't connected to the stepper controller
+                ComPortStatusBox.Text = "ERR";
+            }
+        }
+
+        private void ModuleQAMeasurementTimer_Tick(object sender, EventArgs e)
+        {
+            if (ModuleQAStepTimer.Enabled == false) //Block the contents of this timer if the stepper is moving
+            {
+                if (!darkCurrent)
+                {
+                    if (currentDicounter < 8)
+                    {
+                        if (currentChannel < 64)
+                        {
+                            //take measurments
+                            //PP.moduleQACurrentMeasurements.TakeMeasurement(currentChannel);
+                            ComPortStatusBox.Text = "Measuring " + currentDicounter + " " + currentChannel;
+                            System.Threading.Thread.Sleep(1000);
+                            currentChannel += 4; //increment the channel
+                        }
+                        else //must have reached the end of 64 channels
+                        {
+                            //PP.moduleQACurrentMeasurements.WriteMeasurements("ScanningData_" + ModuleQAFilenameBox.Text + ".txt", 0, currentDicounter);
+                            currentDicounter++; //increment the dicounter
+                            if (currentDicounter < 8)
+                                comPort.WriteLine(PP.moduleQACurrentMeasurements.getgCodeDicounterPosition(currentDicounter)); //tell it the position to go to
+                            currentChannel = 0;
+                            ModuleQAStepTimer.Enabled = true;
+                        }
+                    }
+                    else //must have reached the end of scanning across the module
+                    {
+                        ModuleQADarkCurrentBtn.Enabled = true;
+                        moduleQAMeasurementTimer.Enabled = false;
+                    }
+                }
+                else if (darkCurrent) //if it is a dark current measurement, just record all 64 channels
+                {
+                    if (currentChannel < 64)
+                    {
+                        //take measurments
+                        //PP.moduleQACurrentMeasurements.TakeMeasurement(currentChannel);
+                        Console.WriteLine("Measuring " + currentChannel);
+                        System.Threading.Thread.Sleep(10);
+                        currentChannel += 64;
+                    }
+                    else //must have reached the end of 64 channels, write out the dark currents
+                    {
+                        //PP.moduleQACurrentMeasurements.WriteMeasurements("ScanningData_" + ModuleQAFilenameBox.Text + ".txt", 0, -1); //-1 will denote dark current measurement
+                        darkCurrent = false; //done with darkcurrent
+                        ModuleQADarkCurrentBtn.Enabled = true;
+                        ModuleQABtn.Enabled = true; //since we took the dark current measurements, now we can QA a module
+                        moduleQAMeasurementTimer.Enabled = false;
+                    }
+                }
+            }
+        }
+
+        private void ModuleQAHaltBtn_Click(object sender, EventArgs e)
+        {
+            if (moduleQAHomingTimer.Enabled == false) //cannot issue a halt while it is homing, a property of the controller...
+            {
+                moduleQAMeasurementTimer.Enabled = false;
+                ModuleQAStepTimer.Enabled = false;
+                moduleQAHomingTimer.Enabled = false;
+                ModuleQABtn.Enabled = false;
+                ModuleQAHomeResetBtn.Enabled = true;
+                zerod = false;
+
+                try
+                {
+                    StepperCheckForMessages();
+                    comPort.WriteLine("M112"); //Issue HALT to stepper controller
+                    StepperCheckForMessages();
+                }
+                catch (TimeoutException)
+                {
+                    moduleQAHomingTimer.Enabled = false;
+                    MessageBox.Show("Reached timeout while communicating with controller.", "Oh shit, something went wrong", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                    comPort.Close();
+                    ModuleQABtn.Enabled = false; //disable the QA button if we aren't connected to the stepper controller
+                    zerod = false;
+                }
+                catch
+                {
+                    moduleQAHomingTimer.Enabled = false;
+                    MessageBox.Show("Trouble communicating with controller.", "Oh shit, something went wrong", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                    comPort.Close();
+                    ModuleQABtn.Enabled = false; //disable the QA button if we aren't connected to the stepper controller
+                    zerod = false;
+                }
+
+                ComPortStatusBox.Text = "HALT, RESET REQUIRED";
+            }
+        }
+
+        private void ModuleQAHomeResetBtn_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                comPort.WriteLine("M999"); //issue a reset
+                StepperCheckForMessages();
+                moduleQAHomingTimer.Enabled = true;
+            }
+            catch { ComPortStatusBox.Text = "It's dead, Jim.";  }
+            zerod = false;
+            stepperCheckForOK = false;
+            stepperReceivedOK = false;
+        }
+
+        private void ModuleQAStepTimer_Tick(object sender, EventArgs e)
+        {
+            ComPortStatusBox.Text = "Moving";
+            try
+            {
+                StepperCheckForMessages();
+
+                comPort.WriteLine("get pos");
+                System.Threading.Thread.Sleep(100); //wait for it to reply
+                List<string> positionInfo = new List<string>();
+                while (comPort.BytesToRead > 0)
+                {
+                    string s = comPort.ReadLine(); //grab the positions
+                    if (s.Contains("last") || s.Contains("realtime")) //if it doesn't contain last or realtime
+                        positionInfo.Add(s);
+                }
+                if (positionInfo.Count == 2) //Double check that we only have the strings for current and destination positions
+                {
+                    double destination_xPos = Convert.ToDouble(positionInfo[0].Split(new char[] { ' ', ':' })[4]); //split the string and extract the destination X position
+                    double current_xPos = Convert.ToDouble(positionInfo[1].Split(new char[] { ' ', ':' })[4]); //split the string and extract the current X position
+
+                    if (Math.Abs(destination_xPos - current_xPos) < 0.01) //arbitrary threshold, if the current position is at the destination, we are done moving
+                    {
+                        ModuleQAStepTimer.Enabled = false;
+                        ComPortStatusBox.Text = "";
+                    }
+                }
+            }
+            catch (TimeoutException)
+            {
+                moduleQAHomingTimer.Enabled = false;
+                MessageBox.Show("Reached timeout while communicating with controller.", "Oh shit, something went wrong", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                comPort.Close();
+                ModuleQABtn.Enabled = false; //disable the QA button if we aren't connected to the stepper controller
+            }
+            catch
+            {
+                moduleQAHomingTimer.Enabled = false;
+                MessageBox.Show("Trouble communicating with controller.", "Oh shit, something went wrong", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                comPort.Close();
+                ModuleQABtn.Enabled = false; //disable the QA button if we aren't connected to the stepper controller
+            }
+
+        }
+
+        private void StepperCheckForMessages()
+        {
+            if (comPort != null)
+            {
+                try
+                {
+                    if (comPort.BytesToRead > 0)
+                    {
+                        while (comPort.BytesToRead > 0) //clear any messages that were being sent
+                            comPort.ReadLine();
+                    }
+                }
+                catch (TimeoutException)
+                {
+                    moduleQAHomingTimer.Enabled = false;
+                    MessageBox.Show("Reached timeout while communicating with controller.", "Oh shit, something went wrong", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                    comPort.Close();
+                    ModuleQABtn.Enabled = false; //disable the QA button if we aren't connected to the stepper controller
+                }
+            }
+        }
     }
 
+    
+
     public class ConnectAttemptEventArgs : EventArgs
-        {
-            public int ConnectAttempt { get; set; }
-        }
+    {
+        public int ConnectAttempt { get; set; }
+    }
 
 }

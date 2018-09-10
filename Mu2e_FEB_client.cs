@@ -205,33 +205,41 @@ namespace TB_mu2e
 
         public double ReadA0(int fpga = 0, int ch = 0)
         {
-            SendStr("mux " + fpga); //Set the mux correctly
+            if (ch < 0 || ch > 15 || fpga < 0 || fpga > 3) //stop any bad values from reaching the code below
+                return 0;
+
+            SendStr("mux " + fpga); //Set the mux
             Thread.Sleep(20);
-            if (ch == 0)
-            { SendStr("wr " + Convert.ToString(4 * fpga, 16) + "20 10"); }
-            else
+
+            if (fpga > 0)
             {
-                if (ch < 16)
-                {
-                    string sch = Convert.ToString(ch, 16);
-                    SendStr("wr " + Convert.ToString(4 * fpga, 16) + "20 1" + sch);
-                }
+                //determine CMB
+                //change channel on CMB
+                int fpga_cmb = ((int) ch / 4)*4; //similar to the fpga's, apparently this value needs to be 1 4 8 C
+                int cmb_ch = ch % 4;
+                SendStr("wr " + Convert.ToString(4 * fpga, 16) + "20 1" + Convert.ToString(fpga_cmb, 16)); //write to the proper FPGA mux register to change which cmb is being read
+                Thread.Sleep(20);
+                SendStr("wr 20 " + Convert.ToString(cmb_ch, 16)); //write to the mux register to change which channel on the given cmb is being read
             }
+            else
+                SendStr("wr 20 1" + Convert.ToString(ch, 16));
             Thread.Sleep(20);
             SendStr("gain 8");
             Thread.Sleep(20);
             ReadStr(out string t, out int dt, 100);
             SendStr("A0 2");
-            Thread.Sleep(250);
+            Thread.Sleep(300);
             ReadStr(out t, out dt, 100);
-            string[] tok = t.Split(new string[] { " ", Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
+            string[] tok = t.Split(new string[] { " ", "\r\n", Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
             double adc;
-            try { adc = Convert.ToDouble(tok[2]); }
+            try { adc = Convert.ToDouble(tok[tok.Length-2]); }
             catch { adc = -1; }
             if (adc > 4.096) { adc = 8.192 - adc; }
             double I = adc / 8 * 250;
-            //for (int i = 0; i < tok.Length; i++)
-            { SendStr("wr " + Convert.ToString(4 * fpga, 16) + "20 00"); }
+            if (fpga > 0)
+                SendStr("wr " + Convert.ToString(4 * fpga, 16) + "20 0"); //disable mux for fpga
+            SendStr("wr 20 0"); //disable mux
+
             return I;
         }
 
