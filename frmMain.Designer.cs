@@ -2962,17 +2962,17 @@
             // 
             // moduleQAHomingTimer
             // 
-            this.moduleQAHomingTimer.Interval = 250;
+            this.moduleQAHomingTimer.Interval = 1000;
             this.moduleQAHomingTimer.Tick += new System.EventHandler(this.ModuleQAHomingTimer_Tick);
             // 
             // moduleQAMeasurementTimer
             // 
-            this.moduleQAMeasurementTimer.Interval = 1000;
+            this.moduleQAMeasurementTimer.Interval = 2000;
             this.moduleQAMeasurementTimer.Tick += new System.EventHandler(this.ModuleQAMeasurementTimer_Tick);
             // 
             // ModuleQAStepTimer
             // 
-            this.ModuleQAStepTimer.Interval = 500;
+            this.ModuleQAStepTimer.Interval = 1000;
             this.ModuleQAStepTimer.Tick += new System.EventHandler(this.ModuleQAStepTimer_Tick);
             // 
             // frmMain

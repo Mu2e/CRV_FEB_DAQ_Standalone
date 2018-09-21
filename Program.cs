@@ -331,30 +331,57 @@ namespace TB_mu2e
 
     public class CurrentMeasurements
     {
-        public List<SortedDictionary<int, double>> currentMeasurements;
+        private SortedDictionary<int, double> currentMeasurements;
+        private Mu2e_FEB_client feb;
 
-        public CurrentMeasurements()
+        public CurrentMeasurements(Mu2e_FEB_client feb_client)
         {
-            currentMeasurements = new List<SortedDictionary<int, double>>
-            {
-                new SortedDictionary<int, double>(),
-                new SortedDictionary<int, double>()
-            };
+            feb = feb_client;
+            currentMeasurements = new SortedDictionary<int, double>();
         }
+
+        public void Purge()
+        {
+            currentMeasurements.Clear();
+        }
+
+        public void TakeMeasurement(int channel) //takes a current measurement for the same channel on all FEBs
+        {
+            int fpga = channel / 16;
+            int chan_fpga = channel % 16;
+                currentMeasurements.Add(channel, Convert.ToDouble(feb.ReadA0(fpga, chan_fpga)));
+        }
+
+        public void WriteMeasurements(string filename, string side, double temperature)
+        {
+            using (StreamWriter writer = File.AppendText(filename)) //The output file
+            {
+                writer.Write("{0}\t{1}\t{2}\t{3}\t{4}\t", DateTime.Now.ToString("MM/dd/yy HH:mm\t"), side, temperature); //Write current time, name of module, which side, and current temperature
+                foreach (KeyValuePair<int, double> channel in currentMeasurements)
+                    writer.Write("{0}\t", channel.Value.ToString("0.0000")); //write the measured current to file
+                writer.WriteLine();
+            }
+        }
+
     }
 
     //TODO: FIX THIS CLASS - To QA a module current measurements from 4 different FEBs are needed
-    public class ModuleQACurrentMeasurements : CurrentMeasurements
+    // Should be fixed by code below, accepts any number of FEBs, so if it is 2 or 4 or however many, it should work fine.
+    public class ModuleQACurrentMeasurements
     {
-        public string moduleName, side;
+        private List<SortedDictionary<int, double>> currentMeasurements;
+        private string moduleName, side;
+        List<Mu2e_FEB_client> febs;
 
-        public ModuleQACurrentMeasurements()
+        public ModuleQACurrentMeasurements(params Mu2e_FEB_client[] feb_clients)
         {
-            currentMeasurements = new List<SortedDictionary<int, double>>
+            febs = new List<Mu2e_FEB_client>();
+            currentMeasurements = new List<SortedDictionary<int, double>>();
+            foreach (Mu2e_FEB_client feb in feb_clients)
             {
-                new SortedDictionary<int, double>(),
-                new SortedDictionary<int, double>()
-            };
+                febs.Add(feb);
+                currentMeasurements.Add(new SortedDictionary<int, double>()); //Add a sorted dictionary for each FEB given  
+            }
         }
 
         public void Purge()
@@ -364,13 +391,12 @@ namespace TB_mu2e
                 feb.Clear();
         }
         
-        public bool TakeMeasurement(int channel)
+        public void TakeMeasurement(int channel) //takes a current measurement for the same channel on all FEBs
         {
             int fpga = channel / 16;
             int chan_fpga = channel % 16;
-            currentMeasurements[0].Add(channel, Convert.ToDouble(PP.FEB1.ReadA0(fpga, chan_fpga)));
-            //currentMeasurements[1].Add(channel, Convert.ToDouble(PP.FEB2.ReadA0(fpga, chan_fpga)));
-            return false;
+            for(int i = 0; i < febs.Count; i++)
+                currentMeasurements[i].Add(channel, Convert.ToDouble(febs[i].ReadA0(fpga, chan_fpga)));
         }
 
         public void WriteMeasurements(string filename, double temperature, int dicounter)
@@ -385,10 +411,6 @@ namespace TB_mu2e
             }
         }
 
-
-        //TODO: FIX THIS - There are 4 FEBs that are needed to completely outfit an entire module, 
-        //                 which means two FEBs read the top 16 dicounters and two FEBs read the 
-        //                 bottom 16 dicounters
         public string getgCodeDicounterPosition(int dicounter)
         {
             if (dicounter > 7 || dicounter < 0)
@@ -547,7 +569,7 @@ namespace TB_mu2e
             FEB1.name = "FEB1";
             //FEB1.host_name_prop = "131.225.52.181";
             //FEB1.host_name_prop = "128.143.196.218";
-            FEB1.host_name_prop = "128.143.196.55";
+            FEB1.host_name_prop = "128.143.196.54";
             //FEB1.host_name_prop = "131.225.52.177";
 
             FEB2 = new Mu2e_FEB_client();

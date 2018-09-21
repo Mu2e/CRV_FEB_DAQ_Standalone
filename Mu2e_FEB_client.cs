@@ -11,7 +11,7 @@ using ZedGraph;
 
 namespace TB_mu2e
 {
-    class Mu2e_FEB_client : IStenComms
+    public class Mu2e_FEB_client : IStenComms
     {
         #region InterfaceStenComms
         public string m_prop { get { return m; } set { m = value; } }

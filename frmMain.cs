@@ -3146,7 +3146,7 @@ namespace TB_mu2e
             if (true)//PP.FEB1.client != null && PP.FEB2.client != null)
             {
                 if (PP.moduleQACurrentMeasurements == null) //if we didn't make a measurement object yet, do so, else purge the existing one of information
-                    PP.moduleQACurrentMeasurements = new ModuleQACurrentMeasurements();
+                    PP.moduleQACurrentMeasurements = new ModuleQACurrentMeasurements(PP.FEB1);//, PP.FEB2);
                 else
                     PP.moduleQACurrentMeasurements.Purge();
 
@@ -3159,7 +3159,7 @@ namespace TB_mu2e
                 //Move source back to position 0
                 currentChannel = 0; //Set back to 0, controlled by measurment timer
                 currentDicounter = 0; //Set back to 0, controlled by measurement timer
-                //PP.FEB1.SetVAll(Convert.ToDouble(qaBias.Text)); //Turn on the bias for the FEBs
+                PP.FEB1.SetVAll(Convert.ToDouble(qaBias.Text)); //Turn on the bias for the FEBs
                 //PP.FEB2.SetVAll(Convert.ToDouble(qaBias.Text));
                 darkCurrent = true;
                 moduleQAMeasurementTimer.Enabled = true;
@@ -3188,7 +3188,7 @@ namespace TB_mu2e
             if(true)//PP.FEB1.client != null && PP.FEB2.client != null)
             {
                 if (PP.moduleQACurrentMeasurements == null) //if we didn't make a measurement object yet, do so, else purge the existing one of information
-                    PP.moduleQACurrentMeasurements = new ModuleQACurrentMeasurements();
+                    PP.moduleQACurrentMeasurements = new ModuleQACurrentMeasurements(PP.FEB1);//, PP.FEB2);
                 else
                     PP.moduleQACurrentMeasurements.Purge();
 
@@ -3204,9 +3204,9 @@ namespace TB_mu2e
                 //Move source back to position 0
                 currentChannel = 0; //Set back to 0, controlled by measurment timer
                 currentDicounter = 0; //Set back to 0, controlled by measurement timer
+                PP.FEB1.SetVAll(Convert.ToDouble(qaBias.Text)); //Turn on the bias for the FEBs
                 comPort.WriteLine(PP.moduleQACurrentMeasurements.getgCodeDicounterPosition(currentDicounter)); //tell it to go to the 0th dicounter position
                 ModuleQAStepTimer.Enabled = true;
-                //PP.FEB1.SetVAll(Convert.ToDouble(qaBias.Text)); //Turn on the bias for the FEBs
                 //PP.FEB2.SetVAll(Convert.ToDouble(qaBias.Text));
                 moduleQAMeasurementTimer.Enabled = true;
             }
@@ -3355,21 +3355,21 @@ namespace TB_mu2e
             {
                 if (!darkCurrent)
                 {
-                    if (currentDicounter < 8)
+                    if (currentDicounter < 5)//8)
                     {
-                        if (currentChannel < 64)
+                        if (currentChannel < 20)//64)
                         {
                             //take measurments
-                            //PP.moduleQACurrentMeasurements.TakeMeasurement(currentChannel);
                             ComPortStatusBox.Text = "Measuring " + currentDicounter + " " + currentChannel;
-                            System.Threading.Thread.Sleep(1000);
-                            currentChannel += 4; //increment the channel
+                            PP.moduleQACurrentMeasurements.TakeMeasurement(currentChannel);
+                            currentChannel++; //increment the channel
                         }
                         else //must have reached the end of 64 channels
                         {
-                            //PP.moduleQACurrentMeasurements.WriteMeasurements("ScanningData_" + ModuleQAFilenameBox.Text + ".txt", 0, currentDicounter);
+                            PP.moduleQACurrentMeasurements.WriteMeasurements("C:\\Users\\Boi\\Desktop\\ScanningData_" + ModuleQAFilenameBox.Text + ".txt", 0, currentDicounter);
+                            PP.moduleQACurrentMeasurements.Purge();
                             currentDicounter++; //increment the dicounter
-                            if (currentDicounter < 8)
+                            if (currentDicounter < 5)//8)
                                 comPort.WriteLine(PP.moduleQACurrentMeasurements.getgCodeDicounterPosition(currentDicounter)); //tell it the position to go to
                             currentChannel = 0;
                             ModuleQAStepTimer.Enabled = true;
@@ -3377,23 +3377,26 @@ namespace TB_mu2e
                     }
                     else //must have reached the end of scanning across the module
                     {
+                        comPort.WriteLine(PP.moduleQACurrentMeasurements.getgCodeDicounterPosition(0)); //go back to the zeroth dicounter
+                        ModuleQAStepTimer.Enabled = true;
                         ModuleQADarkCurrentBtn.Enabled = true;
                         moduleQAMeasurementTimer.Enabled = false;
                     }
                 }
                 else if (darkCurrent) //if it is a dark current measurement, just record all 64 channels
                 {
-                    if (currentChannel < 64)
+                    if (currentChannel < 20)//64)
                     {
                         //take measurments
-                        //PP.moduleQACurrentMeasurements.TakeMeasurement(currentChannel);
                         Console.WriteLine("Measuring " + currentChannel);
-                        System.Threading.Thread.Sleep(10);
-                        currentChannel += 64;
+                        PP.moduleQACurrentMeasurements.TakeMeasurement(currentChannel);
+                        //System.Threading.Thread.Sleep(10);
+                        currentChannel++;
                     }
                     else //must have reached the end of 64 channels, write out the dark currents
                     {
-                        //PP.moduleQACurrentMeasurements.WriteMeasurements("ScanningData_" + ModuleQAFilenameBox.Text + ".txt", 0, -1); //-1 will denote dark current measurement
+                        PP.moduleQACurrentMeasurements.WriteMeasurements("C:\\Users\\Boi\\Desktop\\ScanningData_" + ModuleQAFilenameBox.Text + ".txt", 0, -1); //-1 will denote dark current measurement
+                        PP.moduleQACurrentMeasurements.Purge();
                         darkCurrent = false; //done with darkcurrent
                         ModuleQADarkCurrentBtn.Enabled = true;
                         ModuleQABtn.Enabled = true; //since we took the dark current measurements, now we can QA a module
@@ -3445,14 +3448,22 @@ namespace TB_mu2e
         {
             try
             {
-                comPort.WriteLine("M999"); //issue a reset
-                StepperCheckForMessages();
-                moduleQAHomingTimer.Enabled = true;
+                if (zerod)
+                {
+                    comPort.WriteLine("G1 X0"); //Go back to zero if zero'd
+                    ModuleQAStepTimer.Enabled = true;
+                }
+                else
+                { //Else issue a reset, since a halt must have been issued
+                    zerod = false;
+                    stepperCheckForOK = false;
+                    stepperReceivedOK = false;
+                    comPort.WriteLine("M999"); //Reset
+                    StepperCheckForMessages();
+                    moduleQAHomingTimer.Enabled = true; //re-home the device
+                }
             }
             catch { ComPortStatusBox.Text = "It's dead, Jim.";  }
-            zerod = false;
-            stepperCheckForOK = false;
-            stepperReceivedOK = false;
         }
 
         private void ModuleQAStepTimer_Tick(object sender, EventArgs e)
@@ -3468,7 +3479,7 @@ namespace TB_mu2e
                 while (comPort.BytesToRead > 0)
                 {
                     string s = comPort.ReadLine(); //grab the positions
-                    if (s.Contains("last") || s.Contains("realtime")) //if it doesn't contain last or realtime
+                    if (s.Contains("last") || s.Contains("realtime")) //if it contains last or realtime, this holds the information we are interested in
                         positionInfo.Add(s);
                 }
                 if (positionInfo.Count == 2) //Double check that we only have the strings for current and destination positions
@@ -3490,11 +3501,13 @@ namespace TB_mu2e
                 comPort.Close();
                 ModuleQABtn.Enabled = false; //disable the QA button if we aren't connected to the stepper controller
             }
-            catch
+            catch(Exception exc)
             {
+                Console.WriteLine(exc);
                 moduleQAHomingTimer.Enabled = false;
-                MessageBox.Show("Trouble communicating with controller.", "Oh shit, something went wrong", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
-                comPort.Close();
+                var answer = MessageBox.Show("Trouble communicating with controller. Close connection?", "Oh shit, something went wrong", MessageBoxButtons.YesNo, MessageBoxIcon.Exclamation);
+                if(answer.Equals(DialogResult.Yes))
+                    comPort.Close();
                 ModuleQABtn.Enabled = false; //disable the QA button if we aren't connected to the stepper controller
             }
 
@@ -3509,7 +3522,13 @@ namespace TB_mu2e
                     if (comPort.BytesToRead > 0)
                     {
                         while (comPort.BytesToRead > 0) //clear any messages that were being sent
-                            comPort.ReadLine();
+                            if(comPort.ReadLine().Contains("!"))
+                            {
+                                MessageBox.Show("The controller is alarmed, did you say something mean to it?", "Oh shit, something went wrong", MessageBoxButtons.YesNo, MessageBoxIcon.Exclamation);
+                                comPort.Close();
+                                ModuleQABtn.Enabled = false; //disable the QA button if we aren't connected to the stepper controller
+
+                            }
                     }
                 }
                 catch (TimeoutException)
