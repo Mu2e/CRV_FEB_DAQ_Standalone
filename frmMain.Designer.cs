@@ -218,7 +218,7 @@
             this.autoDataProgress = new System.Windows.Forms.ProgressBar();
             this.qaStartButton = new System.Windows.Forms.Button();
             this.numLabel = new System.Windows.Forms.Label();
-            this.numTextBox = new System.Windows.Forms.TextBox();
+            this.dicounterNumberTextBox = new System.Windows.Forms.TextBox();
             this.qaBiasLbl = new System.Windows.Forms.Label();
             this.qaBias = new System.Windows.Forms.TextBox();
             this.tabCMBTester = new System.Windows.Forms.TabPage();
@@ -260,6 +260,7 @@
             this.moduleQAHomingTimer = new System.Windows.Forms.Timer(this.components);
             this.moduleQAMeasurementTimer = new System.Windows.Forms.Timer(this.components);
             this.ModuleQAStepTimer = new System.Windows.Forms.Timer(this.components);
+            this.qaDiCounterMeasurementTimer = new System.Windows.Forms.Timer(this.components);
             this.statusStrip1.SuspendLayout();
             this.tabControl.SuspendLayout();
             this.tabRUN.SuspendLayout();
@@ -2250,7 +2251,7 @@
             // lightAutoThreshProgress
             // 
             this.lightAutoThreshProgress.Location = new System.Drawing.Point(24, 301);
-            this.lightAutoThreshProgress.Maximum = 31;
+            this.lightAutoThreshProgress.Maximum = 64;
             this.lightAutoThreshProgress.Name = "lightAutoThreshProgress";
             this.lightAutoThreshProgress.Size = new System.Drawing.Size(239, 23);
             this.lightAutoThreshProgress.Step = 1;
@@ -2369,7 +2370,7 @@
             this.dicounterQAGroup.Controls.Add(this.autoDataProgress);
             this.dicounterQAGroup.Controls.Add(this.qaStartButton);
             this.dicounterQAGroup.Controls.Add(this.numLabel);
-            this.dicounterQAGroup.Controls.Add(this.numTextBox);
+            this.dicounterQAGroup.Controls.Add(this.dicounterNumberTextBox);
             this.dicounterQAGroup.Location = new System.Drawing.Point(21, 60);
             this.dicounterQAGroup.Name = "dicounterQAGroup";
             this.dicounterQAGroup.Size = new System.Drawing.Size(950, 100);
@@ -2379,7 +2380,7 @@
             // 
             // qaOutputFileName
             // 
-            this.qaOutputFileName.Location = new System.Drawing.Point(751, 60);
+            this.qaOutputFileName.Location = new System.Drawing.Point(759, 60);
             this.qaOutputFileName.Name = "qaOutputFileName";
             this.qaOutputFileName.Size = new System.Drawing.Size(112, 23);
             this.qaOutputFileName.TabIndex = 119;
@@ -2387,7 +2388,7 @@
             // qaOutputFileNameLabel
             // 
             this.qaOutputFileNameLabel.AutoSize = true;
-            this.qaOutputFileNameLabel.Location = new System.Drawing.Point(524, 64);
+            this.qaOutputFileNameLabel.Location = new System.Drawing.Point(532, 64);
             this.qaOutputFileNameLabel.Name = "qaOutputFileNameLabel";
             this.qaOutputFileNameLabel.Size = new System.Drawing.Size(371, 17);
             this.qaOutputFileNameLabel.TabIndex = 118;
@@ -2396,7 +2397,7 @@
             // oneReadout
             // 
             this.oneReadout.AutoSize = true;
-            this.oneReadout.Location = new System.Drawing.Point(527, 30);
+            this.oneReadout.Location = new System.Drawing.Point(535, 30);
             this.oneReadout.Name = "oneReadout";
             this.oneReadout.Size = new System.Drawing.Size(153, 21);
             this.oneReadout.TabIndex = 117;
@@ -2406,6 +2407,7 @@
             // 
             // qaDiNumAvg
             // 
+            this.qaDiNumAvg.Enabled = false;
             this.qaDiNumAvg.Location = new System.Drawing.Point(251, 54);
             this.qaDiNumAvg.Maximum = new decimal(new int[] {
             1000,
@@ -2430,6 +2432,7 @@
             // qaDiNumAvgLabel
             // 
             this.qaDiNumAvgLabel.AutoSize = true;
+            this.qaDiNumAvgLabel.Enabled = false;
             this.qaDiNumAvgLabel.Location = new System.Drawing.Point(249, 31);
             this.qaDiNumAvgLabel.Name = "qaDiNumAvgLabel";
             this.qaDiNumAvgLabel.Size = new System.Drawing.Size(61, 17);
@@ -2484,12 +2487,12 @@
             this.numLabel.TabIndex = 99;
             this.numLabel.Text = "Dicounter Number";
             // 
-            // numTextBox
+            // dicounterNumberTextBox
             // 
-            this.numTextBox.Location = new System.Drawing.Point(16, 53);
-            this.numTextBox.Name = "numTextBox";
-            this.numTextBox.Size = new System.Drawing.Size(112, 23);
-            this.numTextBox.TabIndex = 98;
+            this.dicounterNumberTextBox.Location = new System.Drawing.Point(16, 53);
+            this.dicounterNumberTextBox.Name = "dicounterNumberTextBox";
+            this.dicounterNumberTextBox.Size = new System.Drawing.Size(112, 23);
+            this.dicounterNumberTextBox.TabIndex = 98;
             // 
             // qaBiasLbl
             // 
@@ -2975,6 +2978,11 @@
             this.ModuleQAStepTimer.Interval = 1000;
             this.ModuleQAStepTimer.Tick += new System.EventHandler(this.ModuleQAStepTimer_Tick);
             // 
+            // qaDiCounterMeasurementTimer
+            // 
+            this.qaDiCounterMeasurementTimer.Interval = 1000;
+            this.qaDiCounterMeasurementTimer.Tick += new System.EventHandler(this.QaDiCounterMeasurementTimer_Tick);
+            // 
             // frmMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 17F);
@@ -3198,7 +3206,7 @@
         private System.Windows.Forms.ProgressBar autoDataProgress;
         private System.Windows.Forms.Button qaStartButton;
         private System.Windows.Forms.Label numLabel;
-        private System.Windows.Forms.TextBox numTextBox;
+        private System.Windows.Forms.TextBox dicounterNumberTextBox;
         private System.Windows.Forms.GroupBox lightCheckGroup;
         private System.Windows.Forms.GroupBox[] lightCheckGroupFPGAs;
         private System.Windows.Forms.Button lightCheckBtn;
@@ -3292,5 +3300,6 @@
         private System.Windows.Forms.Button ModuleQADarkCurrentBtn;
         private System.Windows.Forms.Timer ModuleQAStepTimer;
         private System.Windows.Forms.Button ModuleQAHomeResetBtn;
+        private System.Windows.Forms.Timer qaDiCounterMeasurementTimer;
     }
 }

@@ -1799,7 +1799,7 @@ namespace TB_mu2e
         {
             //To-do: put these buttons into a TableLayoutPanel for easy organization as well as adding/subtracting buttons
             #region DiCounterQAButtons
-            qaDiButtons = new System.Windows.Forms.RadioButton[8]; //Create an array of new buttons
+            qaDiButtons = new System.Windows.Forms.RadioButton[12]; //Create an array of new buttons, originally 8, but extra 4 for crystals,
             for (int btni = 0; btni < qaDiButtons.Length; btni++)
             {
                 qaDiButtons[btni] = new System.Windows.Forms.RadioButton
@@ -1807,9 +1807,9 @@ namespace TB_mu2e
                     Appearance = System.Windows.Forms.Appearance.Button,
                     AutoCheck = false,
                     BackColor = System.Drawing.Color.Green,
-                    Location = new System.Drawing.Point(385 + ((btni % 4) * 30), 25 + ((btni / 4) * 30)),
+                    Location = new System.Drawing.Point(385 + ((btni % 4) * 35), 17 + ((btni / 4) * 25)),
                     Name = "qaDiButton" + btni,
-                    Size = new System.Drawing.Size(25, 25),
+                    Size = new System.Drawing.Size(35, 25),
                     TabIndex = 109 + btni,
                     Text = btni.ToString(),
                     TextAlign = System.Drawing.ContentAlignment.MiddleCenter,
@@ -1952,66 +1952,79 @@ namespace TB_mu2e
 
         private void QaStartButton_Click(object sender, EventArgs e)
         {
-            if (PP.FEB1.client != null) //If the FEB is connected, then proceed.
+            if (PP.FEB1.client != null && qaDiCounterMeasurementTimer.Enabled == false) //If the FEB is connected and we aren't currently taking measurements, then proceed.
             {
-                qaStartButton.Enabled = false;  //prevents multiple clicks of the buttons
+                //qaStartButton.Enabled = false;  //prevents multiple clicks of the buttons
                 autoThreshBtn.Enabled = false;
                 lightCheckResetThresh.Enabled = false;
                 lightCheckBtn.Enabled = false;
-                string[] chanOuts = new string[8];
+                string[] chanOuts = new string[qaDiButtons.Length];
+                autoDataProgress.Maximum = qaDiButtons.Length; //set the max of the progress bar
 
-                //Data are written to the Google Drive, CRV Fabrication Documents folder ScanningData, subfolder DicounterQA
-                //'using' will ensure the writer is closed/destroyed if the scope of the structure is left due to code-completion or a thrown exception
-                using (StreamWriter writer = File.AppendText("C:\\Users\\FEB-Laptop-1\\Google Drive\\CRV Fabrication Documents\\Data\\QA\\Dicounter Source Testing\\ScanningData_" + qaOutputFileName.Text + ".txt")) //The output file
-                {
-                    writer.Write("{0}\t", numTextBox.Text); //Write dicounter number to file
+                if (PP.qaDicounterMeasurements == null)
+                    PP.qaDicounterMeasurements = new CurrentMeasurements(PP.FEB1, "C:\\Users\\Boi\\Desktop\\DiCounterQA_Test.txt");
+                else
+                    PP.qaDicounterMeasurements.Purge();
 
-                    //Write temp to file
-                    double[] temp = { 0, 0, 0, 0 };
-                    for (int numTries = 0; numTries < 10; numTries++) //Try and read the temperature 10 times
-                        temp = PP.FEB1.ReadTempFPGA();                    //read the temperatures on FPGA 0
-                    writer.Write("{0}\t", temp[0].ToString("0.00"));  //Write the temperature, in degrees C, as measured by the CMB
+                foreach (var btn in qaDiButtons) { if (!btn.Checked) { btn.BackColor = Color.Green; btn.Update(); } } //Reset all active channel indicators to green
 
-                    //Write date to file
-                    writer.Write("{0}\t", DateTime.Now.ToString("MM/dd/yy HH:mm\t")); //Changed to 24 hour time format to match database storage format
+                PP.FEB1.SetV(Convert.ToDouble(qaBias.Text)); //Turn on the bias
 
-                    PP.FEB1.SetV(Convert.ToDouble(qaBias.Text)); //Turn on bias for the first FPGA (since this is the only one used for dicounter QA
+                currentChannel = 0; //Set the current channel being measured to 0
+                dicounterNumberTextBox.Enabled = false;
+                qaDiCounterMeasurementTimer.Enabled = true;
 
-                    foreach (var btn in qaDiButtons) { if (!btn.Checked) { btn.BackColor = Color.Green; btn.Update(); } } //Reset all active channel indicators to green
+                ////Data are written to the Google Drive, CRV Fabrication Documents folder ScanningData, subfolder DicounterQA
+                ////'using' will ensure the writer is closed/destroyed if the scope of the structure is left due to code-completion or a thrown exception
+                //using (StreamWriter writer = File.AppendText("C:\\Users\\Boi\\Desktop\\ScanningData_test.txt"))//"C:\\Users\\FEB-Laptop-1\\Google Drive\\CRV Fabrication Documents\\Data\\QA\\Dicounter Source Testing\\ScanningData_" + qaOutputFileName.Text + ".txt")) //The output file
+                //{
+                //    writer.Write("{0}\t", numTextBox.Text); //Write dicounter number to file
 
-                    foreach (var btn in qaDiButtons)
-                    {
-                        double averageCurrent = 0;
-                        int channel = Convert.ToInt16(btn.Text);
-                        if (!btn.Checked)
-                        {
-                            for (int measI = 0; measI < Convert.ToInt16(qaDiNumAvg.Value); measI++)
-                                averageCurrent += Convert.ToDouble(PP.FEB1.ReadA0(0, channel)); //read the current for the specified channel on FPGA 0
-                            averageCurrent /= Convert.ToDouble(qaDiNumAvg.Value);
-                            if (averageCurrent < Convert.ToDouble(qaDiIWarningThresh.Text)) //if the current was less than warning thresh && we still have current, update the color of the lamp
-                                qaDiButtons[channel].BackColor = Color.Red;
-                            if (averageCurrent < 0.025) //if there was no current then
-                                qaDiButtons[channel].BackColor = Color.Blue; //set indicator color to blue: "cold-no-current"
-                            qaDiButtons[channel].Update();
-                        }
+                //    //Write temp to file
+                //    double[] temp = { 0, 0, 0, 0 };
+                //    for (int numTries = 0; numTries < 10; numTries++) //Try and read the temperature 10 times
+                //        temp = PP.FEB1.ReadTempFPGA();                    //read the temperatures on FPGA 0
+                //    writer.Write("{0}\t", temp[0].ToString("0.00"));  //Write the temperature, in degrees C, as measured by the first CMB
 
-                        chanOuts[channel] = averageCurrent.ToString("0.0000");
-                        Console.WriteLine("Channel {0}: {1}", channel, chanOuts[channel]);
-                        writer.Write("{0}\t", chanOuts[channel]); //write out the current for the channel
-                        autoDataProgress.Increment(1);
-                    }
+                //    //Write date to file
+                //    writer.Write("{0}\t", DateTime.Now.ToString("MM/dd/yy HH:mm\t")); //Changed to 24 hour time format to match database storage format
 
-                    writer.WriteLine(); //write a 'return' to file
+                //    PP.FEB1.SetV(Convert.ToDouble(qaBias.Text)); //Turn on bias for the first FPGA (since this is the only one used for dicounter QA)
 
-                    PP.FEB1.SetV(0.0); //Turn off the bias
-                    autoDataProgress.Value = 0; //Set the progress bar back to 0
-                    autoDataProgress.Update();
-                }
+                //    foreach (var btn in qaDiButtons) { if (!btn.Checked) { btn.BackColor = Color.Green; btn.Update(); } } //Reset all active channel indicators to green
 
-                qaStartButton.Enabled = true;
-                autoThreshBtn.Enabled = true;
-                lightCheckResetThresh.Enabled = true;
-                lightCheckBtn.Enabled = true;
+                //    foreach (var btn in qaDiButtons)
+                //    {
+                //        double averageCurrent = 0;
+                //        int channel = Convert.ToInt16(btn.Name.Substring(10)); //Gets the channel number from the name "qaDiButton##"
+                //        if (!btn.Checked)
+                //        {
+                //            for (int measI = 0; measI < Convert.ToInt16(qaDiNumAvg.Value); measI++)
+                //                averageCurrent += Convert.ToDouble(PP.FEB1.ReadA0(0, channel)); //read the current for the specified channel on FPGA 0
+                //            averageCurrent /= Convert.ToDouble(qaDiNumAvg.Value);
+                //            if (averageCurrent < Convert.ToDouble(qaDiIWarningThresh.Text)) //if the current was less than warning thresh && we still have current, update the color of the lamp
+                //                qaDiButtons[channel].BackColor = Color.Red;
+                //            if (averageCurrent < 0.025) //if there was no current then
+                //                qaDiButtons[channel].BackColor = Color.Blue; //set indicator color to blue: "cold-no-current"
+                //            qaDiButtons[channel].Update();
+                //        }
+
+                //        chanOuts[channel] = averageCurrent.ToString("0.0000");
+                //        Console.WriteLine("Channel {0}: {1}", channel, chanOuts[channel]);
+                //        writer.Write("{0}\t", chanOuts[channel]); //write out the current for the channel
+                //        autoDataProgress.Increment(1);
+                //    }
+                //    writer.WriteLine(); //write a 'return' to file
+
+                //    PP.FEB1.SetV(0.0); //Turn off the bias
+                //    autoDataProgress.Value = 0; //Set the progress bar back to 0
+                //    autoDataProgress.Update();
+                //}
+
+                //qaStartButton.Enabled = true;
+                //autoThreshBtn.Enabled = true;
+                //lightCheckResetThresh.Enabled = true;
+                //lightCheckBtn.Enabled = true;
             }
         }
 
@@ -2096,7 +2109,7 @@ namespace TB_mu2e
 
                 //Writes the file to the CRV Fabrication Documents, ScanningData folder on the Google Drive, subfolder ModuleLightCheck
                 //'using' will ensure the writer is closed/destroyed if the scope of the structure is left due to code-completion or a thrown exception
-                using (StreamWriter writer = File.AppendText("C:\\Users\\FEB-Laptop-1\\Google Drive\\CRV Fabrication Documents\\Data\\QA\\Module Light Leak Testing\\LightCheck.txt")) //Path for file output of lightcheck
+                using (StreamWriter writer = File.AppendText("C:\\Users\\Boi\\Desktop\\Module.txt"))// "C:\\Users\\FEB-Laptop-1\\Google Drive\\CRV Fabrication Documents\\Data\\QA\\Module Light Leak Testing\\LightCheck.txt")) //Path for file output of lightcheck
                 {
                     if (lightWriteToFileBox.Checked)
                     {
@@ -2191,62 +2204,52 @@ namespace TB_mu2e
                         //{
                         //    sum += d / (double)numAverages;
                         //}
-                        Console.WriteLine("Sum: " + total_avg_I);
-                        if (total_avg_I >= 0.1)
-                        {
-                            int signal = 0;
-                            if (total_avg_I / .1 < 1)
-                            {
-                                signal = 1;
-                            }
-                            else if (total_avg_I / .1 > 20)
-                            {
-                                signal = 20;
-                            }
-                            else
-                            {
-                                signal = (int)(total_avg_I / .1);
-                            }
-                            Console.WriteLine("Signal: " + signal);
-                            //System.Windows.Media.MediaPlayer[] players = new System.Windows.Media.MediaPlayer[signal];
-                            for (int m = 0; m < signal; m++)
-                            {
-                                new System.Threading.Thread(() =>
-                                {
-                                    var c = new System.Windows.Media.MediaPlayer();
-                                    c.Open(new System.Uri(@"C:\Users\FEB-Laptop-1\Desktop\beep-07.wav"));
-                                    c.Play();
-                                }).Start();
-                                //players[m] = new System.Windows.Media.MediaPlayer();
-                                //players[m].Open(new System.Uri(@"C:\Users\FEB-Laptop-1\Desktop\chimes.wav"));
-                                //players[m].Play();
-                                System.Threading.Thread.Sleep(100);
-                                //                        System.Media.SystemSounds.Beep.Play();
+                        //Console.WriteLine("Sum: " + total_avg_I);
+                        //if (total_avg_I >= 0.1)
+                        //{
+                        //    int signal = 0;
+                        //    if (total_avg_I / .1 < 1)
+                        //    {
+                        //        signal = 1;
+                        //    }
+                        //    else if (total_avg_I / .1 > 20)
+                        //    {
+                        //        signal = 20;
+                        //    }
+                        //    else
+                        //    {
+                        //        signal = (int)(total_avg_I / .1);
+                        //    }
+                        //    Console.WriteLine("Signal: " + signal);
+                        //    //System.Windows.Media.MediaPlayer[] players = new System.Windows.Media.MediaPlayer[signal];
+                        //    for (int m = 0; m < signal; m++)
+                        //    {
+                        //        new System.Threading.Thread(() =>
+                        //        {
+                        //            var c = new System.Windows.Media.MediaPlayer();
+                        //            c.Open(new System.Uri(@"C:\Users\FEB-Laptop-1\Desktop\beep-07.wav"));
+                        //            c.Play();
+                        //        }).Start();
+                        //        //players[m] = new System.Windows.Media.MediaPlayer();
+                        //        //players[m].Open(new System.Uri(@"C:\Users\FEB-Laptop-1\Desktop\chimes.wav"));
+                        //        //players[m].Play();
+                        //        System.Threading.Thread.Sleep(100);
+                        //        //                        System.Media.SystemSounds.Beep.Play();
 
-                            }
-                        }
+                        //    }
+                        //}
                         lightAutoThreshProgress.Increment(1);
                     }
 
-                    switch (_ActiveFEB)
-                    {
-                        case 1:
-                            //PP.FEB1.SetV(0.0, (int)udFPGA.Value);
-                            PP.FEB1.SetVAll(0.0);
 
-                            txtI.Text = PP.FEB1.ReadA0((int)udFPGA.Value, (int)udChan.Value).ToString("0.0000");
-                            break;
-                        case 2:
-                            PP.FEB2.SetV(0.0);
-                            txtI.Text = PP.FEB2.ReadA0((int)udFPGA.Value, (int)udChan.Value).ToString("0.0000");
-                            break;
+                    PP.FEB1.SetVAll(0.0);
+                    txtI.Text = PP.FEB1.ReadA0((int)udFPGA.Value, (int)udChan.Value).ToString("0.0000");
 
-                        default:
-                            break;
-                    }
+
                     if (lightWriteToFileBox.Checked)
                         writer.WriteLine();
                 }
+
                 lightAutoThreshProgress.Increment(-64);
                 lightCheckBtn.Enabled = true;
                 autoThreshBtn.Enabled = true;
@@ -3159,6 +3162,7 @@ namespace TB_mu2e
                 //Move source back to position 0
                 currentChannel = 0; //Set back to 0, controlled by measurment timer
                 currentDicounter = 0; //Set back to 0, controlled by measurement timer
+                PP.moduleQACurrentMeasurements.SetSide(ModuleQASide.Text);
                 PP.FEB1.SetVAll(Convert.ToDouble(qaBias.Text)); //Turn on the bias for the FEBs
                 //PP.FEB2.SetVAll(Convert.ToDouble(qaBias.Text));
                 darkCurrent = true;
@@ -3185,7 +3189,7 @@ namespace TB_mu2e
         private void ModuleQABtn_Click(object sender, EventArgs e)
         {
             //Check that both FEBs are connected
-            if(true)//PP.FEB1.client != null && PP.FEB2.client != null)
+            if(true && moduleQAMeasurementTimer.Enabled == false)//PP.FEB1.client != null && PP.FEB2.client != null)
             {
                 if (PP.moduleQACurrentMeasurements == null) //if we didn't make a measurement object yet, do so, else purge the existing one of information
                     PP.moduleQACurrentMeasurements = new ModuleQACurrentMeasurements(PP.FEB1);//, PP.FEB2);
@@ -3193,7 +3197,7 @@ namespace TB_mu2e
                     PP.moduleQACurrentMeasurements.Purge();
 
 
-                ModuleQABtn.Enabled = false; //disabled the button to prevent repeated clicks
+                //ModuleQABtn.Enabled = false; //disabled the button to prevent repeated clicks
                 ModuleQADarkCurrentBtn.Enabled = false;
                 ModuleQAHomeResetBtn.Enabled = false;
 
@@ -3204,8 +3208,9 @@ namespace TB_mu2e
                 //Move source back to position 0
                 currentChannel = 0; //Set back to 0, controlled by measurment timer
                 currentDicounter = 0; //Set back to 0, controlled by measurement timer
+                PP.moduleQACurrentMeasurements.SetSide(ModuleQASide.Text);
                 PP.FEB1.SetVAll(Convert.ToDouble(qaBias.Text)); //Turn on the bias for the FEBs
-                comPort.WriteLine(PP.moduleQACurrentMeasurements.getgCodeDicounterPosition(currentDicounter)); //tell it to go to the 0th dicounter position
+                comPort.WriteLine(PP.moduleQACurrentMeasurements.GetgCodeDicounterPosition(currentDicounter, 1200)); //tell it to go to the 0th dicounter position
                 ModuleQAStepTimer.Enabled = true;
                 //PP.FEB2.SetVAll(Convert.ToDouble(qaBias.Text));
                 moduleQAMeasurementTimer.Enabled = true;
@@ -3229,20 +3234,21 @@ namespace TB_mu2e
 
         private void ComPortConnectBtn_Click(object sender, EventArgs e)
         {
-            if (!string.IsNullOrEmpty(comPortBox.Text) && comPort == null)
+            if (!string.IsNullOrEmpty(comPortBox.Text))
             {
                 ComPortStatusBox.Text = "Connecting";
 
-                comPort = new SerialPort()
-                {
-                    PortName = comPortBox.Text,
-                    BaudRate = 115200,
-                    Parity = Parity.None,
-                    DataBits = 8,
-                    StopBits = StopBits.One,
-                    WriteTimeout = 1000,
-                    ReadTimeout = 2000
-                };
+                if (comPort == null)
+                    comPort = new SerialPort()
+                    {
+                        PortName = comPortBox.Text,
+                        BaudRate = 115200,
+                        Parity = Parity.None,
+                        DataBits = 8,
+                        StopBits = StopBits.One,
+                        WriteTimeout = 1000,
+                        ReadTimeout = 2000
+                    };
 
                 try
                 {
@@ -3269,8 +3275,8 @@ namespace TB_mu2e
                 catch
                 {
                     MessageBox.Show("Trouble communicating with controller.", "Oh shit, something went wrong", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
-                    comPort.Close();
-                    ModuleQABtn.Enabled = false; //disable the QA button if we aren't connected to the stepper controller
+                    //comPort.Close();
+                    //ModuleQABtn.Enabled = false; //disable the QA button if we aren't connected to the stepper controller
                 }
             }
         }
@@ -3351,11 +3357,12 @@ namespace TB_mu2e
 
         private void ModuleQAMeasurementTimer_Tick(object sender, EventArgs e)
         {
+            System.Threading.Thread.Sleep(0); //yield
             if (ModuleQAStepTimer.Enabled == false) //Block the contents of this timer if the stepper is moving
             {
                 if (!darkCurrent)
                 {
-                    if (currentDicounter < 5)//8)
+                    if (currentDicounter < 100)//5)//8)
                     {
                         if (currentChannel < 20)//64)
                         {
@@ -3369,18 +3376,19 @@ namespace TB_mu2e
                             PP.moduleQACurrentMeasurements.WriteMeasurements("C:\\Users\\Boi\\Desktop\\ScanningData_" + ModuleQAFilenameBox.Text + ".txt", 0, currentDicounter);
                             PP.moduleQACurrentMeasurements.Purge();
                             currentDicounter++; //increment the dicounter
-                            if (currentDicounter < 5)//8)
-                                comPort.WriteLine(PP.moduleQACurrentMeasurements.getgCodeDicounterPosition(currentDicounter)); //tell it the position to go to
+                            if (currentDicounter < 100)//5)//8)
+                                comPort.WriteLine(PP.moduleQACurrentMeasurements.GetgCodeDicounterPosition(currentDicounter, 1200)); //tell it the position to go to
                             currentChannel = 0;
                             ModuleQAStepTimer.Enabled = true;
                         }
                     }
                     else //must have reached the end of scanning across the module
                     {
-                        comPort.WriteLine(PP.moduleQACurrentMeasurements.getgCodeDicounterPosition(0)); //go back to the zeroth dicounter
+                        comPort.WriteLine(PP.moduleQACurrentMeasurements.GetgCodeDicounterPosition(0, 2800)); //go back to the home position quickly
                         ModuleQAStepTimer.Enabled = true;
                         ModuleQADarkCurrentBtn.Enabled = true;
                         moduleQAMeasurementTimer.Enabled = false;
+                        PP.moduleQACurrentMeasurements.TurnOffBias(); //turn off the bias
                     }
                 }
                 else if (darkCurrent) //if it is a dark current measurement, just record all 64 channels
@@ -3468,6 +3476,7 @@ namespace TB_mu2e
 
         private void ModuleQAStepTimer_Tick(object sender, EventArgs e)
         {
+            System.Threading.Thread.Sleep(0); //yield
             ComPortStatusBox.Text = "Moving";
             try
             {
@@ -3540,9 +3549,37 @@ namespace TB_mu2e
                 }
             }
         }
+
+        private void QaDiCounterMeasurementTimer_Tick(object sender, EventArgs e)
+        {
+            System.Threading.Thread.Sleep(0); //yield
+            if(currentChannel < qaDiButtons.Length)
+            {
+                if (!qaDiButtons[currentChannel].Checked)
+                {
+                    double measurement = PP.qaDicounterMeasurements.TakeMeasurement(currentChannel);
+                    if (measurement < Convert.ToDouble(qaDiIWarningThresh.Text)) //Low current
+                        qaDiButtons[currentChannel].BackColor = Color.Red;
+                    if (measurement < 0.025) //No Current
+                        qaDiButtons[currentChannel].BackColor = Color.Blue;
+                    qaDiButtons[currentChannel].Update();
+                }
+                currentChannel++;
+                autoDataProgress.Increment(1);
+            }
+            else
+            {
+                PP.qaDicounterMeasurements.WriteMeasurements(dicounterNumberTextBox.Text, PP.FEB1.ReadTemp(0));
+                PP.qaDicounterMeasurements.TurnOffBias();
+                currentChannel = 0;
+                autoDataProgress.Value = 0;
+                autoDataProgress.Update();
+                qaDiCounterMeasurementTimer.Enabled = false;
+            }
+        }
     }
 
-    
+
 
     public class ConnectAttemptEventArgs : EventArgs
     {

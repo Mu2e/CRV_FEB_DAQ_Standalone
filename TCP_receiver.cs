@@ -168,27 +168,27 @@ namespace TB_mu2e
 
             time_read_done = DateTime.Now;
 
-            SpillData new_spill = new SpillData();
-            bool parse_ok=new_spill.ParseInput(buf);
-            if (parse_ok)
-            {
-                PP.myRun.Spills.AddLast(new_spill);
-                if (PP.myRun.Spills.Count > 2)
+                SpillData new_spill = new SpillData();
+                bool parse_ok=new_spill.ParseInput(buf);
+                if (parse_ok)
                 {
-                    if (PP.myRun.Spills.First.Value.IsDisplayed) { PP.myRun.Spills.Remove(PP.myRun.Spills.First.Next); }
-                    else { PP.myRun.Spills.RemoveFirst();}
-                }
-                if (PP.myRun != null)
-                {
-                    if (PP.myRun.sw != null)
+                    PP.myRun.Spills.AddLast(new_spill);
+                    if (PP.myRun.Spills.Count > 2)
                     {
-                        if (SaveEnabled && !PP.myRun.SaveAscii) { Save(buf); } //If it should NOT save in a human readable format
-                        else if(SaveEnabled && PP.myRun.SaveAscii) { Save(new_spill); } //If it should save in a human readable format
+                        if (PP.myRun.Spills.First.Value.IsDisplayed) { PP.myRun.Spills.Remove(PP.myRun.Spills.First.Next); }
+                        else { PP.myRun.Spills.RemoveFirst();}
+                    }
+                    if (PP.myRun != null)
+                    {
+                        if (PP.myRun.sw != null)
+                        {
+                            if (SaveEnabled && !PP.myRun.SaveAscii) { Save(buf); } //If it should NOT save in a human readable format
+                            else if(SaveEnabled && PP.myRun.SaveAscii) { Save(new_spill); } //If it should save in a human readable format
+                        }
                     }
                 }
-            }
-            else
-            { }
+                else
+                { }
             AllDone = true;
 
             PP.myMain.timer1.Enabled = true;

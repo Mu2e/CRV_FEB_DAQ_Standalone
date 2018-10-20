@@ -165,7 +165,6 @@ namespace TB_mu2e
             try { counts = Convert.ToUInt32(System.Math.Round(V / 5.38 * 256)); }
             catch { counts = 0; }
             SendStr("wr " + Convert.ToString(4 * fpga, 16) + "44 " + Convert.ToString(counts, 16));
-            Thread.Sleep(5);
             SendStr("wr " + Convert.ToString(4 * fpga, 16) + "45 " + Convert.ToString(counts, 16));
             Thread.Sleep((int)(Math.Ceiling(V / 10.0)*1000) + 500); //Wait for the bias to come up
         }
@@ -179,7 +178,6 @@ namespace TB_mu2e
             for (int fpga = 0; fpga < 4; fpga++)
             {
                 SendStr("wr " + Convert.ToString(4 * fpga, 16) + "44 " + Convert.ToString(counts, 16));
-                Thread.Sleep(5);
                 SendStr("wr " + Convert.ToString(4 * fpga, 16) + "45 " + Convert.ToString(counts, 16));
             }
             Thread.Sleep((int)(Math.Ceiling(V / 10.0) * 1000) + 500); //Wait for the bias to come up
@@ -208,8 +206,9 @@ namespace TB_mu2e
             if (ch < 0 || ch > 15 || fpga < 0 || fpga > 3) //stop any bad values from reaching the code below
                 return 0;
 
+            string t;
+
             SendStr("mux " + fpga); //Set the mux
-            Thread.Sleep(20);
 
             if (fpga > 0)
             {
@@ -218,22 +217,17 @@ namespace TB_mu2e
                 int fpga_cmb = ((int) ch / 4)*4; //similar to the fpga's, apparently this value needs to be 1 4 8 C
                 int cmb_ch = ch % 4;
                 SendStr("wr " + Convert.ToString(4 * fpga, 16) + "20 1" + Convert.ToString(fpga_cmb, 16)); //write to the proper FPGA mux register to change which cmb is being read
-                Thread.Sleep(20);
                 SendStr("wr 20 " + Convert.ToString(cmb_ch, 16)); //write to the mux register to change which channel on the given cmb is being read
             }
             else
                 SendStr("wr 20 1" + Convert.ToString(ch, 16));
-            Thread.Sleep(20);
             SendStr("gain 8");
-            Thread.Sleep(20);
-            ReadStr(out string t, out int dt, 100);
             SendStr("A0 2");
-            Thread.Sleep(300);
-            ReadStr(out t, out dt, 100);
+            while (ReadStr(out t, out int dt) || !t.Contains("avg")) { Thread.Sleep(5); } //If after """reading""" we don't have the current, READ IT AGAIN DAMMIT
             string[] tok = t.Split(new string[] { " ", "\r\n", Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
-            double adc;
+            double adc = -4.096;
             try { adc = Convert.ToDouble(tok[tok.Length-2]); }
-            catch { adc = -1; }
+            catch { adc = -4.096; }
             if (adc > 4.096) { adc = 8.192 - adc; }
             double I = adc / 8 * 250;
             if (fpga > 0)
@@ -411,33 +405,38 @@ namespace TB_mu2e
                 //byte[] b = PP.GetBytes(t + Convert.ToChar((byte)0x0d));
                 byte[] b = PP.GetBytes(t + "\r");
                 TNETSocket.Send(b);
+                Thread.Sleep(20);
             }
         }
 
-        public void ReadStr(out string t, out int ret_time, int tmo = 100)
+        public bool ReadStr(out string t, out int ret_time, int tmo = 250)
         {
             t = "";
             bool tmo_reached = false;
             int this_t = 0;
             if (_ClientOpen)
             {
-                DateTime s = DateTime.Now;
+                DateTime timeLimit = DateTime.Now.AddMilliseconds(tmo);
                 while (TNETSocket.Available == 0 && !tmo_reached)
                 {
                     Thread.Sleep(5);
                     this_t += 5;
-                    if (this_t > tmo) { tmo_reached = true; }
+                    if (DateTime.Now > timeLimit) { tmo_reached = true; }
                 }
                 if (!tmo_reached)
                 {
-                    byte[] rec_buf = new byte[TNETSocket.Available];
-                    Thread.Sleep(10);
-                    int ret_len = TNETSocket.Receive(rec_buf);
-                    t = PP.GetString(rec_buf, ret_len);
+                    while (TNETSocket.Available > 0)
+                    {
+                        byte[] rec_buf = new byte[TNETSocket.Available];
+                        int ret_len = TNETSocket.Receive(rec_buf);
+                        t += PP.GetString(rec_buf, ret_len);
+                        Thread.Sleep(100); //Wait a little before it checks the socket again
+                    }
                     t = t.Trim(new char[] { '>' }); //remove >
                 }
             }
             ret_time = this_t;
+            return tmo_reached;
         }
 
         //public  static int GetStatus(out string[] status)

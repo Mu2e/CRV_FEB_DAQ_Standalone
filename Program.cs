@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Concurrent;
 using System.Linq;
 using System.Windows.Forms;
 using System.IO;
@@ -331,13 +332,15 @@ namespace TB_mu2e
 
     public class CurrentMeasurements
     {
-        private SortedDictionary<int, double> currentMeasurements;
+        private ConcurrentDictionary<int, double> currentMeasurements; //concurrent dictionary is thread-safe
         private Mu2e_FEB_client feb;
+        private string filename;
 
-        public CurrentMeasurements(Mu2e_FEB_client feb_client)
+        public CurrentMeasurements(Mu2e_FEB_client feb_client, string _filename)
         {
             feb = feb_client;
-            currentMeasurements = new SortedDictionary<int, double>();
+            filename = _filename;
+            currentMeasurements = new ConcurrentDictionary<int, double>();
         }
 
         public void Purge()
@@ -345,58 +348,93 @@ namespace TB_mu2e
             currentMeasurements.Clear();
         }
 
-        public void TakeMeasurement(int channel) //takes a current measurement for the same channel on all FEBs
+        public void TurnOffBias()
+        {
+            feb.SetVAll(0); //turns off the bias
+        }
+
+        public double TakeMeasurement(int channel) //takes a current measurement for the same channel on all FEBs
         {
             int fpga = channel / 16;
             int chan_fpga = channel % 16;
-                currentMeasurements.Add(channel, Convert.ToDouble(feb.ReadA0(fpga, chan_fpga)));
+            double measurement = Convert.ToDouble(feb.ReadA0(fpga, chan_fpga));
+            currentMeasurements.TryAdd(channel, measurement);
+            return measurement;
         }
 
-        public void WriteMeasurements(string filename, string side, double temperature)
+        public double GetMeasurement(int channel)
+        {
+            double measurement = -128;
+            currentMeasurements.TryGetValue(channel, out measurement);
+            return measurement;                
+        }
+
+        public void WriteMeasurements(string dicounter, double temperature)
         {
             using (StreamWriter writer = File.AppendText(filename)) //The output file
             {
-                writer.Write("{0}\t{1}\t{2}\t{3}\t{4}\t", DateTime.Now.ToString("MM/dd/yy HH:mm\t"), side, temperature); //Write current time, name of module, which side, and current temperature
-                foreach (KeyValuePair<int, double> channel in currentMeasurements)
-                    writer.Write("{0}\t", channel.Value.ToString("0.0000")); //write the measured current to file
+                writer.Write("{0}\t{1}\t{2}\t", DateTime.Now.ToString("MM/dd/yy HH:mm:ss\t"), dicounter, temperature); //Write current time, name of module, which side, and current temperature
+                //foreach (KeyValuePair<int, double> channel in currentMeasurements)
+                for (int chan = 0; chan < 64; chan++)
+                {
+                    if (currentMeasurements.TryGetValue(chan, out double current))
+                        writer.Write("{0}\t", current.ToString("0.0000"));
+                }
+                //writer.Write("{0}\t", channel.Value.ToString("0.0000")); //write the measured current to file
                 writer.WriteLine();
             }
         }
-
     }
 
     //TODO: FIX THIS CLASS - To QA a module current measurements from 4 different FEBs are needed
     // Should be fixed by code below, accepts any number of FEBs, so if it is 2 or 4 or however many, it should work fine.
     public class ModuleQACurrentMeasurements
     {
-        private List<SortedDictionary<int, double>> currentMeasurements;
+        //private List<SortedDictionary<int, double>> currentMeasurements;
+        private List<ConcurrentDictionary<int, double>> currentMeasurements; //concurrent dictionary should be thread safe
         private string moduleName, side;
         List<Mu2e_FEB_client> febs;
 
         public ModuleQACurrentMeasurements(params Mu2e_FEB_client[] feb_clients)
         {
             febs = new List<Mu2e_FEB_client>();
-            currentMeasurements = new List<SortedDictionary<int, double>>();
+            //currentMeasurements = new List<SortedDictionary<int, double>>();
+            currentMeasurements = new List<ConcurrentDictionary<int, double>>();
             foreach (Mu2e_FEB_client feb in feb_clients)
             {
                 febs.Add(feb);
-                currentMeasurements.Add(new SortedDictionary<int, double>()); //Add a sorted dictionary for each FEB given  
+                //currentMeasurements.Add(new SortedDictionary<int, double>()); //Add a sorted dictionary for each FEB given  
+                currentMeasurements.Add(new ConcurrentDictionary<int, double>());
             }
         }
 
         public void Purge()
         {
-            moduleName = ""; side = "";
-            foreach(SortedDictionary<int, double> feb in currentMeasurements)
+            //moduleName = ""; side = "";
+            //foreach(SortedDictionary<int, double> feb in currentMeasurements)
+            foreach(ConcurrentDictionary<int, double> feb in currentMeasurements)
                 feb.Clear();
         }
+
+        public void TurnOffBias()
+        {
+            foreach(Mu2e_FEB_client feb in febs)
+            {
+                feb.SetVAll(0); //turns off the bias for all FEBs
+            }
+        }
         
+        public void SetSide(string side_in)
+        {
+            side = side_in;
+        }
+
         public void TakeMeasurement(int channel) //takes a current measurement for the same channel on all FEBs
         {
             int fpga = channel / 16;
             int chan_fpga = channel % 16;
             for(int i = 0; i < febs.Count; i++)
-                currentMeasurements[i].Add(channel, Convert.ToDouble(febs[i].ReadA0(fpga, chan_fpga)));
+                currentMeasurements[i].TryAdd(channel, Convert.ToDouble(febs[i].ReadA0(fpga, chan_fpga)));
         }
 
         public void WriteMeasurements(string filename, double temperature, int dicounter)
@@ -404,24 +442,34 @@ namespace TB_mu2e
             using (StreamWriter writer = File.AppendText(filename)) //The output file
             {
                 writer.Write("{0}\t{1}\t{2}\t{3}\t{4}\t", DateTime.Now.ToString("MM/dd/yy HH:mm\t"), moduleName, side, temperature, dicounter); //Write current time, name of module, which side, and current temperature
-                foreach(SortedDictionary<int, double> feb in currentMeasurements)
-                    foreach (KeyValuePair<int, double> channel in feb)
-                        writer.Write("{0}\t", channel.Value.ToString("0.0000")); //write the measured current to file
+               //foreach(SortedDictionary<int, double> feb in currentMeasurements)
+               foreach(ConcurrentDictionary<int, double> feb in currentMeasurements)
+                    //foreach (KeyValuePair<int, double> channel in feb)
+                    for(int chan = 0; chan < 64; chan++)
+                    {
+                        if(feb.TryGetValue(chan, out double current))
+                            writer.Write("{0}\t", current.ToString("0.0000"));
+                        //writer.Write("{0}\t", channel.Value.ToString("0.0000")); //write the measured current to file
+                    }
                 writer.WriteLine();
             }
         }
 
-        public string getgCodeDicounterPosition(int dicounter)
+        public string GetgCodeDicounterPosition(int dicounter, int feedrate)
         {
-            if (dicounter > 7 || dicounter < 0)
-                return "G1 X0";
+            int feed = feedrate;
+            if (dicounter > 100 || dicounter < 0)
+                return "G1 X0 F1000";
+            if (feedrate <= 0 || feedrate > 3000)
+                feed = 1000;
             const double width_dicounter = 102.63,
                          width_bar = 51.33,
                          offset = 42.00;
             const string basegCode = "G1 X";
             int layer = dicounter / 8, pos_layer = dicounter % 8;
-            double position = (pos_layer * width_dicounter) + (layer * offset);
-            string dicounterPositionCommand = basegCode + position;
+            //double position = (pos_layer * width_dicounter) + (layer * offset);
+            double position = dicounter * 5.0; //5mm
+            string dicounterPositionCommand = basegCode + position + " F" + Convert.ToString(feed);
             return dicounterPositionCommand;
         }
 
@@ -432,6 +480,7 @@ namespace TB_mu2e
     {
         public static bool glbDebug=false;
         public static Run myRun;
+        public static CurrentMeasurements qaDicounterMeasurements;
         public static ModuleQACurrentMeasurements moduleQACurrentMeasurements;
         //        public static frmTelnet myTelnet;
         //        public static Plot0 myPlot;
@@ -569,12 +618,15 @@ namespace TB_mu2e
             FEB1.name = "FEB1";
             //FEB1.host_name_prop = "131.225.52.181";
             //FEB1.host_name_prop = "128.143.196.218";
-            FEB1.host_name_prop = "128.143.196.54";
+            //FEB1.host_name_prop = "128.143.196.54";
             //FEB1.host_name_prop = "131.225.52.177";
+            FEB1.host_name_prop = "crvfeb01.fnal.gov";
 
             FEB2 = new Mu2e_FEB_client();
             FEB2.name = "FEB2";
-            FEB2.host_name_prop = "DCRC5";
+            //FEB2.host_name_prop = "DCRC5";
+            FEB2.host_name_prop = "crvfeb02.fnal.gov";
+            
             //FEC = new Mu2e_FECC_client();
 
             WC = new WC_client();
