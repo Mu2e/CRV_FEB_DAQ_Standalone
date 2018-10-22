@@ -303,6 +303,7 @@ namespace TB_mu2e
         {
             string l = "";
             bool this_is_a_write = false;
+            bool multi_write = false;
             string sent_string = "";
 
             if (ConsoleBox.Text.Contains("\n"))
@@ -318,7 +319,7 @@ namespace TB_mu2e
                     {
                         byte[] buf = PP.GetBytes(ConsoleBox.Text);
                         sent_string = ConsoleBox.Text;
-                        if (ConsoleBox.Text.ToLower().Contains("wr")) { this_is_a_write = true; }
+                        if (ConsoleBox.Text.ToLower().Contains("wr")) { this_is_a_write = true; if (ConsoleBox.Text.ToLower().Contains("wri")) { multi_write = true; } }
                         ConsoleBox.Text = "";
                         while (PP.active_Socket.Available > 0)
                         {
@@ -342,18 +343,52 @@ namespace TB_mu2e
                         }
                         else if (this_is_a_write)
                         {
-                            l = sent_string;
-                            string read_string = string.Join(" ", sent_string.Split().Skip(1).Take(1));
-                            //read_string = read_string.Substring(read_string.ToLower().IndexOf("wr") + 2, read_string.Length - read_string.ToLower().IndexOf("wr") + 2);
-                            read_string = "rd " + read_string + "\r\n";
-                            buf = PP.GetBytes(read_string);
-                            PP.active_Socket.Send(buf);
-                            System.Threading.Thread.Sleep(250);
-                            byte[] rec_buf = new byte[PP.active_Socket.Available];
-                            int ret_len = PP.active_Socket.Receive(rec_buf);
-                            string t = string.Join("", PP.GetString(rec_buf, ret_len).Split('>'));
-                            t = sent_string + t;
-                            AddConsoleMessage(t);
+                            if (multi_write)
+                            {
+                                string[] write_elements = sent_string.Split(' '); //split up the command into wri, start-register, value, number of writes
+                                ushort start_reg = Convert.ToUInt16(write_elements[1], 16);
+                                ushort num_writes = Convert.ToUInt16(write_elements[3]);
+                                if (write_elements.Length == 4)
+                                {
+                                    string base_cmd = "wr ";
+                                    for (ushort register = start_reg; register < start_reg + num_writes; register++)
+                                    {
+                                        buf = PP.GetBytes(base_cmd + register.ToString("X2") + " " + write_elements[2] + "\r\n");
+                                        PP.active_Socket.Send(buf);
+                                        System.Threading.Thread.Sleep(100);
+
+                                    }
+                                    buf = PP.GetBytes("rdi " + write_elements[1] + " " + write_elements[3]); //command of the form rdi [start register] [num_reads = num_writes]
+                                    PP.active_Socket.Send(buf);
+                                    System.Threading.Thread.Sleep(500);
+                                    byte[] rec_buf = new byte[PP.active_Socket.Available];
+                                    int ret_len = PP.active_Socket.Receive(rec_buf);
+                                    string t = string.Join("", PP.GetString(rec_buf, ret_len).Split('>'));
+                                    t = sent_string + t;
+                                    AddConsoleMessage(t);
+
+                                }
+                                else
+                                {
+                                    AddConsoleMessage("Writing to multiple registers must be of the form: wri [start_reg] [value] [num_writes] \r\n Your command was: " + sent_string);
+                                }
+
+                            }
+                            else
+                            {
+                                l = sent_string;
+                                string read_string = string.Join(" ", sent_string.Split().Skip(1).Take(1));
+                                //read_string = read_string.Substring(read_string.ToLower().IndexOf("wr") + 2, read_string.Length - read_string.ToLower().IndexOf("wr") + 2);
+                                read_string = "rd " + read_string + "\r\n";
+                                buf = PP.GetBytes(read_string);
+                                PP.active_Socket.Send(buf);
+                                System.Threading.Thread.Sleep(250);
+                                byte[] rec_buf = new byte[PP.active_Socket.Available];
+                                int ret_len = PP.active_Socket.Receive(rec_buf);
+                                string t = string.Join("", PP.GetString(rec_buf, ret_len).Split('>'));
+                                t = sent_string + t;
+                                AddConsoleMessage(t);
+                            }
                         }
                     }
                 }
@@ -1922,22 +1957,22 @@ namespace TB_mu2e
 
         private void BtnTimerFix_Click(object sender, EventArgs e)
         {
-            SpillTimer.Enabled = false;
+            //SpillTimer.Enabled = false;
 
-            //PP.FEB1.client.Close();
-            //Application.DoEvents();
-            //PP.FEB1.Open();
-            //Application.DoEvents();
-            Mu2e_Register csr = new Mu2e_Register();
-            Mu2e_Register.FindName("CONTROL_STATUS", Convert.ToUInt16(udFPGA.Value), ref PP.FEB1.arrReg, out csr);
-            for (int i = 0; i < 4; i++)
-            {
-                csr.fpga_index = (UInt16)(i);
-                Mu2e_Register.WriteReg(0xfc, ref csr, ref PP.FEB1.client);
-                System.Threading.Thread.Sleep(10);
-            }
-            if (SpillTimer.Enabled) { }
-            else { SpillTimer.Enabled = true; }
+            ////PP.FEB1.client.Close();
+            ////Application.DoEvents();
+            ////PP.FEB1.Open();
+            ////Application.DoEvents();
+            //Mu2e_Register csr = new Mu2e_Register();
+            //Mu2e_Register.FindName("CONTROL_STATUS", Convert.ToUInt16(udFPGA.Value), ref PP.FEB1.arrReg, out csr);
+            //for (int i = 0; i < 4; i++)
+            //{
+            //    csr.fpga_index = (UInt16)(i);
+            //    Mu2e_Register.WriteReg(0xfc, ref csr, ref PP.FEB1.client);
+            //    System.Threading.Thread.Sleep(10);
+            //}
+            //if (SpillTimer.Enabled) { }
+            //else { SpillTimer.Enabled = true; }
         }
 
         private void ChkLast_CheckedChanged(object sender, EventArgs e)

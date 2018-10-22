@@ -595,27 +595,33 @@ namespace TB_mu2e
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
             //myRun = new Run();
-            FEB1 = new Mu2e_FEB_client();
-            FEB1.name = "FEB1";
-            //FEB1.host_name_prop = "131.225.52.181";
-            //FEB1.host_name_prop = "128.143.196.218";
-            //FEB1.host_name_prop = "128.143.196.54";
-            //FEB1.host_name_prop = "131.225.52.177";
-            FEB1.host_name_prop = "crvfeb01.fnal.gov";
+            FEB1 = new Mu2e_FEB_client
+            {
+                name = "FEB1",
+                //host_name_prop = "131.225.52.181";
+                //host_name_prop = "128.143.196.218";
+                //host_name_prop = "128.143.196.54";
+                //host_name_prop = "131.225.52.177";
+                host_name_prop = "crvfeb01.fnal.gov"
+            };
 
-            FEB2 = new Mu2e_FEB_client();
-            FEB2.name = "FEB2";
-            //FEB2.host_name_prop = "DCRC5";
-            FEB2.host_name_prop = "crvfeb02.fnal.gov";
-            
+            FEB2 = new Mu2e_FEB_client
+            {
+                name = "FEB2",
+                //host_name_prop = "DCRC5";
+                host_name_prop = "crvfeb02.fnal.gov"
+            };
+
             //FEC = new Mu2e_FECC_client();
 
-            WC = new WC_client();
-            WC.name = "WC";
-            WC.host_name_prop = "FTBFWC01.FNAL.GOV";
+            WC = new WC_client()
+            {
+                host_name_prop = "FTBFWC01.FNAL.GOV",
+                name = "WC"
+            };
 
-            DAQ_server myDAQ_server = new DAQ_server();
-            myDAQ_server.StartRC();
+            //DAQ_server myDAQ_server = new DAQ_server();
+            //myDAQ_server.StartRC();
 
             myMain = new frmMain();
             Application.Run(myMain);
