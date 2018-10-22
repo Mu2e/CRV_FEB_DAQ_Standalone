@@ -319,17 +319,17 @@ namespace TB_mu2e
                     {
                         byte[] buf = PP.GetBytes(ConsoleBox.Text);
                         sent_string = ConsoleBox.Text;
-                        if (ConsoleBox.Text.ToLower().Contains("wr")) { this_is_a_write = true; if (ConsoleBox.Text.ToLower().Contains("wri")) { multi_write = true; } }
+                        if (ConsoleBox.Text.ToLower().Contains("wr")) { this_is_a_write = true; if (ConsoleBox.Text.ToLower().Contains("wrm")) { multi_write = true; } }
                         ConsoleBox.Text = "";
                         while (PP.active_Socket.Available > 0)
                         {
                             byte[] rbuf = new byte[PP.active_Socket.Available];
                             PP.active_Socket.Receive(rbuf);
                         }
-                        PP.active_Socket.Send(buf);
-                        System.Threading.Thread.Sleep(250);
                         if (!this_is_a_write)
                         {
+                            PP.active_Socket.Send(buf);
+                            System.Threading.Thread.Sleep(100);
                             if (sent_string.ToLower().Contains("a0 "))
                             {
                                 int delay = Convert.ToInt16(sent_string.Split().Skip(1).First().ToString());
@@ -355,12 +355,11 @@ namespace TB_mu2e
                                     {
                                         buf = PP.GetBytes(base_cmd + register.ToString("X2") + " " + write_elements[2] + "\r\n");
                                         PP.active_Socket.Send(buf);
-                                        System.Threading.Thread.Sleep(100);
-
+                                        System.Threading.Thread.Sleep(10);
                                     }
                                     buf = PP.GetBytes("rdi " + write_elements[1] + " " + write_elements[3]); //command of the form rdi [start register] [num_reads = num_writes]
                                     PP.active_Socket.Send(buf);
-                                    System.Threading.Thread.Sleep(500);
+                                    System.Threading.Thread.Sleep(100);
                                     byte[] rec_buf = new byte[PP.active_Socket.Available];
                                     int ret_len = PP.active_Socket.Receive(rec_buf);
                                     string t = string.Join("", PP.GetString(rec_buf, ret_len).Split('>'));
@@ -376,13 +375,14 @@ namespace TB_mu2e
                             }
                             else
                             {
+                                PP.active_Socket.Send(buf);
                                 l = sent_string;
                                 string read_string = string.Join(" ", sent_string.Split().Skip(1).Take(1));
                                 //read_string = read_string.Substring(read_string.ToLower().IndexOf("wr") + 2, read_string.Length - read_string.ToLower().IndexOf("wr") + 2);
                                 read_string = "rd " + read_string + "\r\n";
                                 buf = PP.GetBytes(read_string);
                                 PP.active_Socket.Send(buf);
-                                System.Threading.Thread.Sleep(250);
+                                System.Threading.Thread.Sleep(100);
                                 byte[] rec_buf = new byte[PP.active_Socket.Available];
                                 int ret_len = PP.active_Socket.Receive(rec_buf);
                                 string t = string.Join("", PP.GetString(rec_buf, ret_len).Split('>'));
