@@ -126,7 +126,6 @@ namespace TB_mu2e
         {
             if (_ClientOpen)
             {
-                byte[] b = new byte[9];
                 byte[] buf = GetBytes("wr 1 0\r\n");
                 WCsocket.Send(buf);
             }
@@ -136,7 +135,6 @@ namespace TB_mu2e
         {
             if (_ClientOpen)
             {
-                byte[] b = new byte[9];
                 byte[] buf = GetBytes("wr 1 1c\r\n");
                 WCsocket.Send(buf);
             }

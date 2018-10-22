@@ -248,12 +248,18 @@ namespace TB_mu2e
                     byte[] buf = new byte[TNETSocket.Available];
                     TNETSocket.Receive(buf);
                 }
-                t = "DREC\r\n";
+                //t = "DREC\r\n";
+                //SendStr(t);
+                //t = "TRIG 0\r\n";
+                //SendStr(t);
+                //t = "WR 0 3C\r\n";
+                //SendStr(t);
+                t = "WR 0 20\r\n"; //reset the trigger counter and whatnot
                 SendStr(t);
-                t = "TRIG 0\r\n";
+                Thread.Sleep(10);
+                t = "WR 400 20\r\n"; //reset the trigger counter and whatnot
                 SendStr(t);
-                t = "WR 0 3C\r\n";
-                SendStr(t);
+                Thread.Sleep(10);
             }
             return true;
         }

@@ -71,8 +71,6 @@
             this.lblWC_TotTrig = new System.Windows.Forms.Label();
             this.lblFEB2_TotTrig = new System.Windows.Forms.Label();
             this.lblFEB1_TotTrig = new System.Windows.Forms.Label();
-            this.lblWCSpill = new System.Windows.Forms.Label();
-            this.lblFEB2Spill = new System.Windows.Forms.Label();
             this.lblSpillTime = new System.Windows.Forms.Label();
             this.lblWCTrigNum = new System.Windows.Forms.Label();
             this.lblFEB2TrigNum = new System.Windows.Forms.Label();
@@ -256,7 +254,7 @@
             this.ModuleQAFEB1Box = new System.Windows.Forms.GroupBox();
             this.ModuleQATableFEB1 = new System.Windows.Forms.TableLayoutPanel();
             this.ModuleQABtn = new System.Windows.Forms.Button();
-            this.timer1 = new System.Windows.Forms.Timer(this.components);
+            this.SpillTimer = new System.Windows.Forms.Timer(this.components);
             this.moduleQAHomingTimer = new System.Windows.Forms.Timer(this.components);
             this.moduleQAMeasurementTimer = new System.Windows.Forms.Timer(this.components);
             this.ModuleQAStepTimer = new System.Windows.Forms.Timer(this.components);
@@ -622,8 +620,6 @@
             this.groupBox1.Controls.Add(this.lblWC_TotTrig);
             this.groupBox1.Controls.Add(this.lblFEB2_TotTrig);
             this.groupBox1.Controls.Add(this.lblFEB1_TotTrig);
-            this.groupBox1.Controls.Add(this.lblWCSpill);
-            this.groupBox1.Controls.Add(this.lblFEB2Spill);
             this.groupBox1.Controls.Add(this.lblSpillTime);
             this.groupBox1.Controls.Add(this.lblWCTrigNum);
             this.groupBox1.Controls.Add(this.lblFEB2TrigNum);
@@ -664,6 +660,7 @@
             // 
             // btnTimerFix
             // 
+            this.btnTimerFix.Enabled = false;
             this.btnTimerFix.Location = new System.Drawing.Point(281, 240);
             this.btnTimerFix.Name = "btnTimerFix";
             this.btnTimerFix.Size = new System.Drawing.Size(100, 33);
@@ -706,6 +703,7 @@
             // 
             // btnOneSpill
             // 
+            this.btnOneSpill.Enabled = false;
             this.btnOneSpill.Location = new System.Drawing.Point(6, 144);
             this.btnOneSpill.Name = "btnOneSpill";
             this.btnOneSpill.Size = new System.Drawing.Size(260, 52);
@@ -713,6 +711,7 @@
             this.btnOneSpill.Tag = "";
             this.btnOneSpill.Text = "TAKE ONE SPILL";
             this.btnOneSpill.UseVisualStyleBackColor = true;
+            this.btnOneSpill.Visible = false;
             this.btnOneSpill.Click += new System.EventHandler(this.BtnOneSpill_Click);
             // 
             // btnChangeName
@@ -729,6 +728,8 @@
             // chkWC
             // 
             this.chkWC.AutoSize = true;
+            this.chkWC.Checked = true;
+            this.chkWC.CheckState = System.Windows.Forms.CheckState.Checked;
             this.chkWC.Location = new System.Drawing.Point(440, 34);
             this.chkWC.Name = "chkWC";
             this.chkWC.Size = new System.Drawing.Size(49, 21);
@@ -739,6 +740,8 @@
             // chkFEB2
             // 
             this.chkFEB2.AutoSize = true;
+            this.chkFEB2.Checked = true;
+            this.chkFEB2.CheckState = System.Windows.Forms.CheckState.Checked;
             this.chkFEB2.Location = new System.Drawing.Point(365, 34);
             this.chkFEB2.Name = "chkFEB2";
             this.chkFEB2.Size = new System.Drawing.Size(61, 21);
@@ -761,8 +764,6 @@
             // chkFakeIt
             // 
             this.chkFakeIt.AutoSize = true;
-            this.chkFakeIt.Checked = true;
-            this.chkFakeIt.CheckState = System.Windows.Forms.CheckState.Checked;
             this.chkFakeIt.Location = new System.Drawing.Point(290, 92);
             this.chkFakeIt.Name = "chkFakeIt";
             this.chkFakeIt.Size = new System.Drawing.Size(65, 21);
@@ -774,98 +775,80 @@
             // lblWC_TotTrig
             // 
             this.lblWC_TotTrig.AutoSize = true;
-            this.lblWC_TotTrig.Location = new System.Drawing.Point(540, 305);
+            this.lblWC_TotTrig.Location = new System.Drawing.Point(533, 305);
             this.lblWC_TotTrig.Name = "lblWC_TotTrig";
-            this.lblWC_TotTrig.Size = new System.Drawing.Size(54, 17);
+            this.lblWC_TotTrig.Size = new System.Drawing.Size(68, 17);
             this.lblWC_TotTrig.TabIndex = 26;
-            this.lblWC_TotTrig.Text = "label14";
+            this.lblWC_TotTrig.Text = "WC_TTot";
             // 
             // lblFEB2_TotTrig
             // 
             this.lblFEB2_TotTrig.AutoSize = true;
-            this.lblFEB2_TotTrig.Location = new System.Drawing.Point(483, 305);
+            this.lblFEB2_TotTrig.Location = new System.Drawing.Point(462, 305);
             this.lblFEB2_TotTrig.Name = "lblFEB2_TotTrig";
             this.lblFEB2_TotTrig.Size = new System.Drawing.Size(54, 17);
             this.lblFEB2_TotTrig.TabIndex = 25;
-            this.lblFEB2_TotTrig.Text = "label14";
+            this.lblFEB2_TotTrig.Text = "2_TTot";
             // 
             // lblFEB1_TotTrig
             // 
             this.lblFEB1_TotTrig.AutoSize = true;
-            this.lblFEB1_TotTrig.Location = new System.Drawing.Point(426, 305);
+            this.lblFEB1_TotTrig.Location = new System.Drawing.Point(387, 305);
             this.lblFEB1_TotTrig.Name = "lblFEB1_TotTrig";
             this.lblFEB1_TotTrig.Size = new System.Drawing.Size(54, 17);
             this.lblFEB1_TotTrig.TabIndex = 24;
-            this.lblFEB1_TotTrig.Text = "label14";
-            // 
-            // lblWCSpill
-            // 
-            this.lblWCSpill.AutoSize = true;
-            this.lblWCSpill.Location = new System.Drawing.Point(540, 276);
-            this.lblWCSpill.Name = "lblWCSpill";
-            this.lblWCSpill.Size = new System.Drawing.Size(54, 17);
-            this.lblWCSpill.TabIndex = 23;
-            this.lblWCSpill.Text = "label14";
-            // 
-            // lblFEB2Spill
-            // 
-            this.lblFEB2Spill.AutoSize = true;
-            this.lblFEB2Spill.Location = new System.Drawing.Point(483, 276);
-            this.lblFEB2Spill.Name = "lblFEB2Spill";
-            this.lblFEB2Spill.Size = new System.Drawing.Size(54, 17);
-            this.lblFEB2Spill.TabIndex = 22;
-            this.lblFEB2Spill.Text = "label14";
+            this.lblFEB1_TotTrig.Text = "1_TTot";
             // 
             // lblSpillTime
             // 
             this.lblSpillTime.AutoSize = true;
-            this.lblSpillTime.Location = new System.Drawing.Point(426, 368);
+            this.lblSpillTime.Location = new System.Drawing.Point(462, 214);
             this.lblSpillTime.Name = "lblSpillTime";
-            this.lblSpillTime.Size = new System.Drawing.Size(79, 17);
+            this.lblSpillTime.Size = new System.Drawing.Size(65, 17);
             this.lblSpillTime.TabIndex = 21;
-            this.lblSpillTime.Text = "lblSpillTime";
+            this.lblSpillTime.Text = "SpillTime";
             // 
             // lblWCTrigNum
             // 
             this.lblWCTrigNum.AutoSize = true;
-            this.lblWCTrigNum.Location = new System.Drawing.Point(540, 334);
+            this.lblWCTrigNum.Location = new System.Drawing.Point(533, 334);
             this.lblWCTrigNum.Name = "lblWCTrigNum";
-            this.lblWCTrigNum.Size = new System.Drawing.Size(46, 17);
+            this.lblWCTrigNum.Size = new System.Drawing.Size(63, 17);
             this.lblWCTrigNum.TabIndex = 20;
-            this.lblWCTrigNum.Text = "label2";
+            this.lblWCTrigNum.Text = "WC_Trig";
             // 
             // lblFEB2TrigNum
             // 
             this.lblFEB2TrigNum.AutoSize = true;
-            this.lblFEB2TrigNum.Location = new System.Drawing.Point(483, 334);
+            this.lblFEB2TrigNum.Location = new System.Drawing.Point(462, 334);
             this.lblFEB2TrigNum.Name = "lblFEB2TrigNum";
-            this.lblFEB2TrigNum.Size = new System.Drawing.Size(46, 17);
+            this.lblFEB2TrigNum.Size = new System.Drawing.Size(49, 17);
             this.lblFEB2TrigNum.TabIndex = 19;
-            this.lblFEB2TrigNum.Text = "label2";
+            this.lblFEB2TrigNum.Text = "2_Trig";
             // 
             // lblFEB1TrigNum
             // 
             this.lblFEB1TrigNum.AutoSize = true;
-            this.lblFEB1TrigNum.Location = new System.Drawing.Point(426, 334);
+            this.lblFEB1TrigNum.Location = new System.Drawing.Point(387, 334);
             this.lblFEB1TrigNum.Name = "lblFEB1TrigNum";
-            this.lblFEB1TrigNum.Size = new System.Drawing.Size(46, 17);
+            this.lblFEB1TrigNum.Size = new System.Drawing.Size(49, 17);
             this.lblFEB1TrigNum.TabIndex = 18;
-            this.lblFEB1TrigNum.Text = "label2";
+            this.lblFEB1TrigNum.Text = "1_Trig";
             // 
             // lblFEB1Spill
             // 
             this.lblFEB1Spill.AutoSize = true;
-            this.lblFEB1Spill.Location = new System.Drawing.Point(426, 276);
+            this.lblFEB1Spill.Location = new System.Drawing.Point(387, 276);
             this.lblFEB1Spill.Name = "lblFEB1Spill";
-            this.lblFEB1Spill.Size = new System.Drawing.Size(54, 17);
+            this.lblFEB1Spill.Size = new System.Drawing.Size(62, 17);
             this.lblFEB1Spill.TabIndex = 17;
-            this.lblFEB1Spill.Text = "label14";
+            this.lblFEB1Spill.Text = "1_SpTot";
             // 
             // lblRunPrep
             // 
             this.lblRunPrep.AutoSize = true;
             this.lblRunPrep.Font = new System.Drawing.Font("Microsoft Sans Serif", 14.26415F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblRunPrep.Location = new System.Drawing.Point(286, 119);
+            this.lblRunPrep.Location = new System.Drawing.Point(278, 119);
             this.lblRunPrep.Name = "lblRunPrep";
             this.lblRunPrep.Size = new System.Drawing.Size(74, 25);
             this.lblRunPrep.TabIndex = 16;
@@ -874,7 +857,7 @@
             // label6
             // 
             this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(287, 334);
+            this.label6.Location = new System.Drawing.Point(279, 334);
             this.label6.Name = "label6";
             this.label6.Size = new System.Drawing.Size(94, 17);
             this.label6.TabIndex = 15;
@@ -883,7 +866,7 @@
             // label7
             // 
             this.label7.AutoSize = true;
-            this.label7.Location = new System.Drawing.Point(287, 305);
+            this.label7.Location = new System.Drawing.Point(279, 305);
             this.label7.Name = "label7";
             this.label7.Size = new System.Drawing.Size(102, 17);
             this.label7.TabIndex = 14;
@@ -892,7 +875,7 @@
             // label8
             // 
             this.label8.AutoSize = true;
-            this.label8.Location = new System.Drawing.Point(287, 276);
+            this.label8.Location = new System.Drawing.Point(279, 276);
             this.label8.Name = "label8";
             this.label8.Size = new System.Drawing.Size(110, 17);
             this.label8.TabIndex = 13;
@@ -901,15 +884,16 @@
             // lblRunTime
             // 
             this.lblRunTime.AutoSize = true;
-            this.lblRunTime.Location = new System.Drawing.Point(426, 214);
+            this.lblRunTime.Location = new System.Drawing.Point(387, 214);
             this.lblRunTime.Name = "lblRunTime";
-            this.lblRunTime.Size = new System.Drawing.Size(0, 17);
+            this.lblRunTime.Size = new System.Drawing.Size(65, 17);
             this.lblRunTime.TabIndex = 12;
+            this.lblRunTime.Text = "RunTime";
             // 
             // label4
             // 
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(286, 214);
+            this.label4.Location = new System.Drawing.Point(278, 214);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(79, 17);
             this.label4.TabIndex = 11;
@@ -918,7 +902,7 @@
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(286, 185);
+            this.label3.Location = new System.Drawing.Point(278, 185);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(78, 17);
             this.label3.TabIndex = 10;
@@ -927,7 +911,7 @@
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(286, 156);
+            this.label2.Location = new System.Drawing.Point(278, 156);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(75, 17);
             this.label2.TabIndex = 9;
@@ -936,34 +920,34 @@
             // lblSpillWC
             // 
             this.lblSpillWC.AutoSize = true;
-            this.lblSpillWC.Location = new System.Drawing.Point(540, 185);
+            this.lblSpillWC.Location = new System.Drawing.Point(533, 185);
             this.lblSpillWC.Name = "lblSpillWC";
-            this.lblSpillWC.Size = new System.Drawing.Size(46, 17);
+            this.lblSpillWC.Size = new System.Drawing.Size(64, 17);
             this.lblSpillWC.TabIndex = 8;
-            this.lblSpillWC.Text = "label2";
+            this.lblSpillWC.Text = "WC_Spill";
             // 
             // lblSpillFEB2
             // 
             this.lblSpillFEB2.AutoSize = true;
-            this.lblSpillFEB2.Location = new System.Drawing.Point(483, 185);
+            this.lblSpillFEB2.Location = new System.Drawing.Point(462, 185);
             this.lblSpillFEB2.Name = "lblSpillFEB2";
-            this.lblSpillFEB2.Size = new System.Drawing.Size(46, 17);
+            this.lblSpillFEB2.Size = new System.Drawing.Size(50, 17);
             this.lblSpillFEB2.TabIndex = 7;
-            this.lblSpillFEB2.Text = "label2";
+            this.lblSpillFEB2.Text = "2_Spill";
             // 
             // lblSpillFEB1
             // 
             this.lblSpillFEB1.AutoSize = true;
-            this.lblSpillFEB1.Location = new System.Drawing.Point(426, 185);
+            this.lblSpillFEB1.Location = new System.Drawing.Point(387, 185);
             this.lblSpillFEB1.Name = "lblSpillFEB1";
-            this.lblSpillFEB1.Size = new System.Drawing.Size(46, 17);
+            this.lblSpillFEB1.Size = new System.Drawing.Size(50, 17);
             this.lblSpillFEB1.TabIndex = 6;
-            this.lblSpillFEB1.Text = "label2";
+            this.lblSpillFEB1.Text = "1_Spill";
             // 
             // lblRunName
             // 
             this.lblRunName.AutoSize = true;
-            this.lblRunName.Location = new System.Drawing.Point(426, 156);
+            this.lblRunName.Location = new System.Drawing.Point(387, 156);
             this.lblRunName.Name = "lblRunName";
             this.lblRunName.Size = new System.Drawing.Size(85, 17);
             this.lblRunName.TabIndex = 5;
@@ -2008,7 +1992,7 @@
             this.btnFEB2.Size = new System.Drawing.Size(99, 42);
             this.btnFEB2.TabIndex = 3;
             this.btnFEB2.Tag = "FEB2";
-            this.btnFEB2.Text = "unkown";
+            this.btnFEB2.Text = "unknown";
             this.btnFEB2.UseVisualStyleBackColor = true;
             // 
             // btnFEB1
@@ -2018,7 +2002,7 @@
             this.btnFEB1.Size = new System.Drawing.Size(99, 42);
             this.btnFEB1.TabIndex = 0;
             this.btnFEB1.Tag = "FEB1";
-            this.btnFEB1.Text = "unkown";
+            this.btnFEB1.Text = "unknown";
             this.btnFEB1.UseVisualStyleBackColor = true;
             // 
             // tabWC
@@ -2957,11 +2941,11 @@
             this.ModuleQABtn.UseVisualStyleBackColor = true;
             this.ModuleQABtn.Click += new System.EventHandler(this.ModuleQABtn_Click);
             // 
-            // timer1
+            // SpillTimer
             // 
-            this.timer1.Enabled = true;
-            this.timer1.Interval = 200;
-            this.timer1.Tick += new System.EventHandler(this.Timer1_Tick);
+            this.SpillTimer.Enabled = true;
+            this.SpillTimer.Interval = 1000;
+            this.SpillTimer.Tick += new System.EventHandler(this.SpillTimer_Tick);
             // 
             // moduleQAHomingTimer
             // 
@@ -3154,9 +3138,7 @@
         private System.Windows.Forms.Label lblSpillWC;
         private System.Windows.Forms.Label lblSpillFEB2;
         private System.Windows.Forms.Label lblSpillFEB1;
-        public System.Windows.Forms.Timer timer1;
-        private System.Windows.Forms.Label lblWCSpill;
-        private System.Windows.Forms.Label lblFEB2Spill;
+        public System.Windows.Forms.Timer SpillTimer;
         private System.Windows.Forms.Label lblWC_TotTrig;
         private System.Windows.Forms.Label lblFEB2_TotTrig;
         private System.Windows.Forms.Label lblFEB1_TotTrig;

@@ -77,7 +77,7 @@ namespace TB_mu2e
             this_trig = new long[3];
             this_bytes_written = new long[3];
             total_bytes_written = new long[3];
-            myStatus = "Starting new run";
+            myStatus = "Run Object Created";//"Starting new run";
             RunStatus = new Queue<string>();
             UpdateStatus(myStatus);
             int last_num = 0;
@@ -107,58 +107,50 @@ namespace TB_mu2e
 
             try
             {
-                sr = File.OpenText("c:\\data\\run_list.txt");
-                string l = "";
-                while (!sr.EndOfStream)
+                if (File.Exists("c:\\data\\run_list.txt"))
                 {
-                    l = sr.ReadLine();
-                }
-                last_num = Convert.ToInt32(l.Substring(0, l.IndexOf(" ")));
+                    using (sr = File.OpenText("c:\\data\\run_list.txt"))
+                    {
+                        string l = "";
+                        while (!sr.EndOfStream) //read to the last line
+                            l = sr.ReadLine();
 
-                StreamReader sr2;
-                sr2 = null;
+                        last_num = Convert.ToInt32(l.Substring(0, l.IndexOf(" ")));
+                    }
+                }
+
                 if (File.Exists("c:\\data\\run_param.txt"))
                 {
-                    sr2 = File.OpenText("c:\\data\\run_param.txt");
-                    string l2 = "";
-                    while (!sr2.EndOfStream)
+                    using (StreamReader sr2 = File.OpenText("c:\\data\\run_param.txt"))
                     {
-                        l2 = sr2.ReadLine();
+                        string l2 = "";
+                        while (!sr2.EndOfStream)
+                        {
+                            l2 = sr2.ReadLine();
+                        }
+                        string[] words = l2.Split(' ');
+                        RunParams = words;
                     }
-                    string[] words = l2.Split(' ');
-                    RunParams = words;
-                    sr2.Close();
                 }
-                sr.Close();
             }
             catch(Exception e)
             {
                 System.Console.Write("Caught Exception {0} in Program.cs!", e);
-                last_num = 1;
+                last_num = 0;
             }
             num = last_num + 1;
             run_name = "Run_" + num.ToString("0000");
-            try
-            {
-                StreamWriter sw = File.AppendText("c:\\data\\run_list2.txt");
-                sw.WriteLine(num.ToString() + " starting at: " + DateTime.Now);
-                sw.Close();
-                sw = null;
-            }
-            catch (Exception e)
-            {
-                System.Console.Write("Caught Exception {0} in Program.cs!", e);
-                try
-                {
-                    StreamWriter sw1 = File.CreateText("c:\\data\\run_list2.txt");
-                    sw1.WriteLine(num.ToString() + " starting at: " + DateTime.Now);
-                    sw1.Close();
-                }
-                catch(Exception f)
-                {
-                    System.Console.Write("Caught Exception {0} in Program.cs!", f);
-                }
-            }
+            //try
+            //{
+            //    using (StreamWriter sw = File.AppendText("c:\\data\\run_list.txt"))
+            //    {
+            //        sw.WriteLine(num.ToString() + " starting at: " + DateTime.Now);
+            //    }
+            //}
+            //catch (Exception e)
+            //{
+            //    System.Console.Write("Caught Exception {0} in Program.cs!", e);
+            //}
         }
 
         public void UpdateStatus(string m)
@@ -187,95 +179,84 @@ namespace TB_mu2e
             //hName += DateTime.Now.Minute.ToString("00");
             //hName += DateTime.Now.Second.ToString("00");
             created = DateTime.Now;
-            hName = PP.myRun.run_name;
+            hName = run_name;//PP.myRun.run_name;
             hName = dirName + hName + ".data";
             OutFileName = hName;
-            if (sw == null)
-            {
-
-                try
-                {
-                    sw = new StreamWriter(OutFileName, true);
-                    StreamWriter sw1 = File.AppendText("c:\\data\\run_list2.txt");
-                    sw1.WriteLine(this.num.ToString() + " ACTIVE at: " + DateTime.Now);
-                    sw1.WriteLine(this.num.ToString() + " Name: " + hName);
-                    sw1.Close();
-                    sw1 = null;
-                }
-                catch(Exception e)
-                {
-                    System.Console.Write("Caught Exception {0} in Program.cs!", e);
-                }
-            }
-
-            if (!File.Exists("c:\\data\\run_param.txt"))
-            {
-                try
-                {
-                    File.CreateText("c:\\data\\run_param.txt");
-                }
-                catch (Exception e)
-                {
-                    System.Console.Write("Caught Exception {0} in Program.cs!", e);
-                }
-
-            }
-
             try
             {
-                StreamWriter sw2 = File.AppendText("c:\\data\\run_param.txt");
-                sw2.WriteLine(this.num.ToString() + " " + rn.textEbeam.Text + " " + rn.textIbeam.Text + " " + rn.BIASVtextBox.Text + " " + rn.GainTextBox.Text + " " + rn.comboPID.Text + " " + rn.textAngle.Text + " " + rn.textXpos.Text + " " + rn.textZpos.Text + " " + rn.textPressure.Text);
-                sw2.Close();
-                sw2 = null;
+                using (sw = new StreamWriter(OutFileName, true))
+                {
+                    sw.WriteLine("-- START OF RUN -- " + DateTime.Now.ToString());
+
+                    using (StreamWriter sw1 = File.AppendText("c:\\data\\run_list.txt"))
+                    {
+                        sw1.WriteLine(this.num.ToString() + " ACTIVE at: " + DateTime.Now);
+                        sw1.WriteLine(this.num.ToString() + " Name: " + hName);
+                    }
+
+                    using (StreamWriter sw2 = File.AppendText("c:\\data\\run_param.txt"))
+                    {
+                        sw2.WriteLine(this.num.ToString() + " " + rn.textEbeam.Text + " " + rn.textIbeam.Text + " " + rn.BIASVtextBox.Text + " " + rn.GainTextBox.Text + " " + rn.comboPID.Text + " " + rn.textAngle.Text + " " + rn.textXpos.Text + " " + rn.textZpos.Text + " " + rn.textPressure.Text);
+                    }
+
+                    //If all goes well above, we are good to go for taking data.
+                    UpdateStatus("RUN STARTED");
+                    TCP_receiver.SaveEnabled = true;
+                    ACTIVE = true;
+                }
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 System.Console.Write("Caught Exception {0} in Program.cs!", e);
             }
 
-            TCP_receiver.SaveEnabled = true;
-            ACTIVE = true;
         }
 
         public void DeactivateRun()
         {
             try
             {
-                sw.WriteLine("-- END OF RUN -- " + DateTime.Now.ToString());
-                sw.Close();
+                using (sw = new StreamWriter(OutFileName, true))
+                {
+                    sw.WriteLine("-- END OF RUN -- " + DateTime.Now.ToString());
+                }
 
-                StreamWriter sw1 = File.AppendText("c:\\data\\run_list2.txt");
-                sw1.WriteLine(this.num.ToString() + " STOPPED at: " + DateTime.Now);
-                sw1.Close();
-                sw1 = null;
+                using (StreamWriter sw1 = File.AppendText("c:\\data\\run_list.txt"))
+                {
+                    sw1.WriteLine(this.num.ToString() + " STOPPED at: " + DateTime.Now);
+                }
             }
             catch { }
+
+            UpdateStatus("RUN STOPPED");
             TCP_receiver.SaveEnabled = false;
             ACTIVE = false;
-
         }
 
         public void RecordSpill()
         {
             if (ACTIVE)
             {
-                if (sw != null)
+                if ((PP.FEB1.client != null) || (PP.FEB2.client != null))
                 {
-                    if ((PP.FEB1.client != null) || (PP.FEB2.client != null))
+                    TCP_receiver.SaveEnabled = true;
+                    num_bytes = 0;
+                    if (PP.FEB1.client != null)
                     {
-                        TCP_receiver.SaveEnabled = true;
-                        num_bytes = 0;
-                        if (PP.FEB1.client != null)
-                        { TCP_receiver.ReadFeb("FEB1", PP.FEB1.TNETSocket_prop, out num_bytes); }
+                        TCP_receiver.ReadFeb("FEB1", PP.FEB1.TNETSocket_prop, out num_bytes);
                         this_bytes_written[0] = num_bytes;
                         total_bytes_written[0] += num_bytes;
                         Application.DoEvents();
-                        if (PP.FEB2.client != null)
-                        { TCP_receiver.ReadFeb("FEB2", PP.FEB2.TNETSocket_prop, out num_bytes); }
-                        Application.DoEvents();
-                        //                        TCP_reciever.ReadFeb("WC", PP.WC.TNETSocket_prop, out num_bytes);
-                        spill_complete = true;
                     }
+                    if (PP.FEB2.client != null)
+                    {
+                        TCP_receiver.ReadFeb("FEB2", PP.FEB2.TNETSocket_prop, out num_bytes);
+                        this_bytes_written[1] = num_bytes;
+                        total_bytes_written[1] += num_bytes;
+                        Application.DoEvents();
+                    }
+                    //                        TCP_reciever.ReadFeb("WC", PP.WC.TNETSocket_prop, out num_bytes);
+                    //spill_complete = true;
                 }
             }
         }

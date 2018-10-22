@@ -40,6 +40,7 @@ namespace TB_mu2e
         private Mu2e_Event DispEvent;
         private bool DebugLogging;
         private int[] spill_trig_num;
+        private uint spill_num;
 
         private const int num_chans = 16;
         private System.Windows.Forms.Label[] BDVoltLabels = new System.Windows.Forms.Label[num_chans];
@@ -52,10 +53,14 @@ namespace TB_mu2e
         private int currentDicounter;
         private bool stepperCheckForOK;
         private bool stepperReceivedOK;
+        private DateTime runStart;
+        private bool first_spill_taken;
+        private bool waiting_for_data;
+        private double spill_record_delay = 5;
 
         public void AddConsoleMessage(string msg)
         {
-            console_Disp.Text = console.add_messg(msg);
+            console_Disp.Text = console.Add_messg(msg);
             Application.DoEvents();
         }
 
@@ -77,6 +82,7 @@ namespace TB_mu2e
 
 
             spill_trig_num = new int[3];
+            spill_num = 0;
             for (int i = 0; i < 3; i++)
             {
                 spill_trig_num[i] = 0;
@@ -439,17 +445,17 @@ namespace TB_mu2e
             if (myName.Contains("FEB1"))
             {
                 Button1_Click((object)btnFEB1, e);
-                console_Disp.Text = console.add_messg("---- FEB1 ----\r\n");
+                console_Disp.Text = console.Add_messg("---- FEB1 ----\r\n");
             }
             if (myName.Contains("FEB2"))
             {
                 Button1_Click((object)btnFEB2, e);
-                console_Disp.Text = console.add_messg("---- FEB2 ----\r\n");
+                console_Disp.Text = console.Add_messg("---- FEB2 ----\r\n");
             }
             if (myName.Contains("WC"))
             {
                 Button1_Click((object)btnWC, e);
-                console_Disp.Text = console.add_messg("----  WC  ----\r\n");
+                console_Disp.Text = console.Add_messg("----  WC  ----\r\n");
             }
             if (myName.Contains("FECC")) { }
         }
@@ -1319,261 +1325,398 @@ namespace TB_mu2e
             BtnRegREAD_Click(null, null);
         }
 
-        private void Timer1_Tick(object sender, EventArgs e)
+        private void SpillTimer_Tick(object sender, EventArgs e)
         {
-            bool in_spill;
-            if (PP.glbDebug) { Console.WriteLine("tick"); }
-            if (tabControl.SelectedIndex == 0)
+            if (PP.myRun != null)
             {
-                //if (PP.glbDebug){ Console.WriteLine("timer");}
-                try
+                if (PP.myRun.ACTIVE) //If we are actively looking for spills
                 {
-                    TimeSpan since_last_spill = DateTime.Now.Subtract(PP.myRun.timeLastSpill);
-                    lblSpillTime.Text = since_last_spill.TotalSeconds.ToString("0.0");
-                    if ((since_last_spill.TotalSeconds > 2) && (PP.myRun.spill_complete))
+                    if (PP.FEB1.ClientOpen)
                     {
-                        Mu2e_Register.FindName("TRIG_CONTROL", Convert.ToUInt16(udFPGA.Value), ref PP.FEB1.arrReg, out Mu2e_Register r_spill);
-                        if (!PP.myRun.OneSpill)
-                        { }// Mu2e_Register.WriteReg(0x02, ref r_spill, ref PP.FEB1.client); }
+                        PP.FEB1.CheckStatus(out uint spill_status, out uint spill_num, out uint trig_num);
+                        lblSpillFEB1.Text = spill_status.ToString();
+                        lblFEB1TrigNum.Text = trig_num.ToString();
+                        spill_trig_num[0] = (int)trig_num;
                     }
-                    if (PP.myRun != null)
+
+                    if (PP.FEB2.ClientOpen)
                     {
-                        lblFEB1_TotTrig.Text = PP.myRun.total_trig[0].ToString();
-                        lblFEB2_TotTrig.Text = PP.myRun.total_trig[1].ToString();
-                        lblWC_TotTrig.Text = PP.myRun.total_trig[2].ToString();
-                        if (PP.myRun.ACTIVE)
+                        PP.FEB2.CheckStatus(out uint spill_status, out uint spill_num, out uint trig_num);
+                        lblSpillFEB2.Text = spill_status.ToString();
+                        lblFEB2TrigNum.Text = trig_num.ToString();
+                        spill_trig_num[1] = (int)trig_num;
+                    }
+
+                    if (PP.WC.ClientOpen)
+                    {
+
+                        WC_client.check_status(out bool in_spill, out string num_trig, out string mytime);
+                        lblSpillWC.Text = in_spill.ToString();
+                        try { spill_trig_num[2] = Convert.ToInt32(num_trig); } catch { spill_trig_num[2] = 0; }
+                        lblWCTrigNum.Text = spill_trig_num[2].ToString("0");
+
+                        if (in_spill)
                         {
-                            lblRunTime.Text = DateTime.Now.Subtract(PP.myRun.created).Seconds.ToString("0.0");
-                            if ((since_last_spill.Seconds > 2) & (since_last_spill.Seconds < 10))
+                            if (first_spill_taken == false)
                             {
-                                if (PP.myRun.spill_complete == false)
-                                {
-
-                                    PP.myRun.RecordSpill();
-                                    if (PP.myRun.OneSpill)
-                                    {
-                                        //display it
-                                        PP.myRun.DeactivateRun();
-                                    }
-                                    else
-                                    {
-
-
-                                    }
-                                    PP.myRun.total_trig[0] += spill_trig_num[0];
-                                    PP.myRun.total_trig[1] += spill_trig_num[1];
-                                    PP.myRun.total_trig[2] += spill_trig_num[2];
-
-
-                                    DispSpill = PP.myRun.Spills.Last();
-                                    for (LinkedListNode<Mu2e_Event> it = DispSpill.SpillEvents.First; it != null; it = it.Next)
-                                    {
-                                        DispEvent = it.Value;
-
-                                        Mu2e_Ch[] cha = DispEvent.ChanData.ToArray();
-                                        double[] y = new double[cha[0].data.Count() - 1];
-                                        for (int i = 0; i < 4; i++)
-                                        {
-                                            double ped = cha[i].data.Skip(1).Take(50).Average();
-                                            double maxADC = cha[i].data.Max() - ped;
-                                            PP.myRun.max_adc[i] += maxADC;
-                                        }
-
-                                    }
-
-                                    for (int i = 0; i < 4; i++)
-                                    {
-                                        double meanADC = PP.myRun.max_adc[i] / PP.myRun.total_trig[0];
-                                        //Console.WriteLine(i.ToString() + " " + meanADC.ToString() + " " + PP.myRun.total_trig[0]);
-                                    }
-                                    string _lblmaxadc0 = string.Format("{0:N2}", PP.myRun.max_adc[0] / PP.myRun.total_trig[0]);
-                                    lblMaxADC0.Text = _lblmaxadc0;
-
-                                    string _lblmaxadc1 = string.Format("{0:N2}", PP.myRun.max_adc[1] / PP.myRun.total_trig[0]);
-                                    lblMaxADC1.Text = _lblmaxadc1;
-
-                                    string _lblmaxadc2 = string.Format("{0:N2}", PP.myRun.max_adc[2] / PP.myRun.total_trig[0]);
-                                    lblMaxADC2.Text = _lblmaxadc2;
-
-                                    string _lblmaxadc3 = string.Format("{0:N2}", PP.myRun.max_adc[3] / PP.myRun.total_trig[0]);
-                                    lblMaxADC3.Text = _lblmaxadc3;
-
-                                }
-                                else
-                                {
-                                    if ((btnDisplaySpill.Text == "DONE") && (since_last_spill.Seconds > 8))
-                                    {
-                                        timer1.Enabled = false;
-                                        this.BtnDisplaySpill_Click(null, null);
-                                        for (int i = 0; i < 10; i++)
-                                        {
-                                            Application.DoEvents();
-                                            System.Threading.Thread.Sleep(50);
-                                        }
-                                        this.BtnDisplaySpill_Click(null, null);
-                                        timer1.Enabled = true;
-                                    }
-                                }
+                                first_spill_taken = true;
+                                PP.myRun.UpdateStatus("First Spill Synchronization");
                             }
+                            PP.myRun.timeLastSpill = DateTime.Now;
+                            PP.myRun.UpdateStatus("Detected spill. Run file is " + PP.myRun.OutFileName);
+                            PP.myRun.spill_complete = false;
+                            waiting_for_data = true;
+                        }
+                        else
+                        {
+                            PP.myRun.spill_complete = true;
+                        }
+                    }
 
+                    if (PP.myRun.spill_complete) //If we are no longer in a spill
+                    {
+                        if (first_spill_taken) //If we took the first spill, we can now see if we are a few seconds after the spill to record data
+                        {
+                            double time_past_spill = (DateTime.Now - PP.myRun.timeLastSpill).TotalSeconds;
+                            if ((time_past_spill > spill_record_delay) && waiting_for_data) //If we have waited a sufficient amount of time and we are expecting data, save the data
+                            {
+                                waiting_for_data = false;
+                                PP.myRun.RecordSpill();
+                                spill_num++;
+                                //Update the total number of triggers
+                                lblFEB1_TotTrig.Text = (Convert.ToUInt64(lblFEB1_TotTrig.Text) + (ulong)spill_trig_num[0]).ToString("0");
+                                lblFEB2_TotTrig.Text = (Convert.ToUInt64(lblFEB2_TotTrig.Text) + (ulong)spill_trig_num[1]).ToString("0");
+                                lblWC_TotTrig.Text = (Convert.ToUInt64(lblWC_TotTrig.Text) + (ulong)spill_trig_num[2]).ToString("0");
+                            }
                         }
                     }
                 }
-                catch (Exception ex) { timer1.Enabled = false; if (PP.glbDebug) { Console.WriteLine("timer off " + ex.Message); } }
 
-                if (PP.myRun != null) //update log
-                {
-                    lblRunName.Text = "Run_" + PP.myRun.num.ToString();
-                    runLog/*lblRunLog*/.Text = "";
-                    string[] all_m = PP.myRun.RunStatus.ToArray<string>();
-                    int l = all_m.Length;
-                    if (PP.myRun.RunStatus.Count > 13)
-                    {
-                        for (int i = l - 13; i < l; i++)
-                        { runLog/*lblRunLog*/.Text += all_m[i] + "\r\n"; }
-                    }
-                    else
-                    {
-                        for (int i = 0; i < all_m.Length; i++)
-                        { runLog/*lblRunLog*/.Text += all_m[i] + "\r\n"; }
-                    }
+                lblRunName.Text = "Run_" + PP.myRun.num.ToString(); //Keep the run name updated
+                while (PP.myRun.RunStatus.Count > 0) //If there are any status messages in the queue, print them to the run console
+                    runLog.AppendText(PP.myRun.RunStatus.Dequeue() + "\r\n");
+                lblRunTime.Text = (DateTime.Now - runStart).TotalSeconds.ToString("0"); //Keep the time we have been running updated
+                lblFEB1Spill.Text = spill_num.ToString("0");
+                if (first_spill_taken) //If we already took our first spill, we can now keep the spill timer updated
+                    lblSpillTime.Text = (DateTime.Now - PP.myRun.timeLastSpill).TotalSeconds.ToString("0"); //update spill timer
 
-
-                    if (PP.myRun.fake)
-                    {
-                        if ((PP.FEB1.ClientOpen) && (chkFEB1.Checked))
-                        {
-
-                            PP.FEB1.CheckStatus(out uint spill_status, out uint spill_num, out uint trig_num);
-                            if (spill_status > 2) { in_spill = true; } else { in_spill = false; }
-                            lblSpillFEB1.Text = spill_status.ToString();
-                            lblFEB1TrigNum.Text = trig_num.ToString();
-                            spill_trig_num[0] = (int)trig_num;
-                            if (in_spill)
-                            {
-                                if (PP.myRun != null)
-                                {
-                                    PP.myRun.timeLastSpill = DateTime.Now;
-                                    PP.myRun.UpdateStatus("Detected spill. Run file is " + PP.myRun.OutFileName);
-                                    PP.myRun.spill_complete = false;
-                                }
-                            }
-
-                        }
-                    }
-
-                    else //if (!PP.myRun.fake)
-                    {
-                        if (PP.FEB1.ClientOpen)
-                        {
-                            PP.FEB1.CheckStatus(out uint spill_status, out uint spill_num, out uint trig_num);
-                            lblSpillFEB1.Text = spill_status.ToString();
-                            lblFEB1TrigNum.Text = trig_num.ToString();
-                            spill_trig_num[0] = (int)trig_num;
-                        }
-
-                        if (PP.FEB2.ClientOpen)
-                        {
-                            PP.FEB2.CheckStatus(out uint spill_status, out uint spill_num, out uint trig_num);
-                            lblSpillFEB2.Text = spill_status.ToString();
-                            lblFEB2TrigNum.Text = trig_num.ToString();
-                            spill_trig_num[1] = (int)trig_num;
-                        }
-
-                        if (PP.WC.ClientOpen)
-                        {
-
-                            WC_client.check_status(out in_spill, out string num_trig, out string mytime);
-                            lblSpillWC.Text = in_spill.ToString();
-                            //spill_trig_num[2] = Convert.ToInt32(num_trig);
-
-                            if (in_spill)
-                            {
-                                if (PP.myRun != null)
-                                {
-                                    PP.myRun.timeLastSpill = DateTime.Now;
-                                    PP.myRun.UpdateStatus("Detected spill. Run file is " + PP.myRun.OutFileName);
-                                    PP.myRun.spill_complete = false;
-                                }
-                            }
-
-
-                            lblWCTrigNum.Text = num_trig;
-                        }
-                    }
-                }
             }
+            else
+            {
+                runLog.AppendText("Cannot take data, prepare to run first!\r\n");
+                SpillTimer.Enabled = false;
+            }
+
+
+            // --------------------------------------
+            // ~         Old Code Below             ~
+            // --------------------------------------
+            #region OldCode
+            //bool in_spill;
+            //if (PP.glbDebug) { Console.WriteLine("tick"); }
+            //if (tabControl.SelectedIndex == 0)
+            //{
+            //    //if (PP.glbDebug){ Console.WriteLine("timer");}
+            //    try
+            //    {
+            //        TimeSpan since_last_spill = DateTime.Now.Subtract(PP.myRun.timeLastSpill);
+            //        lblSpillTime.Text = since_last_spill.TotalSeconds.ToString("0");
+            //        if ((since_last_spill.TotalSeconds > 2) && (PP.myRun.spill_complete))
+            //        {
+            //            Mu2e_Register.FindName("TRIG_CONTROL", Convert.ToUInt16(udFPGA.Value), ref PP.FEB1.arrReg, out Mu2e_Register r_spill);
+            //            if (!PP.myRun.OneSpill)
+            //            { }// Mu2e_Register.WriteReg(0x02, ref r_spill, ref PP.FEB1.client); }
+            //        }
+            //        if (PP.myRun != null)
+            //        {
+            //            lblFEB1_TotTrig.Text = PP.myRun.total_trig[0].ToString();
+            //            lblFEB2_TotTrig.Text = PP.myRun.total_trig[1].ToString();
+            //            lblWC_TotTrig.Text = PP.myRun.total_trig[2].ToString();
+            //            if (PP.myRun.ACTIVE)
+            //            {
+            //                lblRunTime.Text = DateTime.Now.Subtract(PP.myRun.created).Seconds.ToString("0");
+            //                if ((since_last_spill.Seconds > 2) && (since_last_spill.Seconds < 20))
+            //                {
+            //                    if (PP.myRun.spill_complete == false)
+            //                    {
+
+            //                        PP.myRun.RecordSpill();
+            //                        if (PP.myRun.OneSpill)
+            //                        {
+            //                            //display it
+            //                            PP.myRun.DeactivateRun();
+            //                        }
+            //                        else
+            //                        {
+
+
+            //                        }
+            //                        PP.myRun.total_trig[0] += spill_trig_num[0];
+            //                        PP.myRun.total_trig[1] += spill_trig_num[1];
+            //                        PP.myRun.total_trig[2] += spill_trig_num[2];
+
+
+            //                        DispSpill = PP.myRun.Spills.Last();
+            //                        for (LinkedListNode<Mu2e_Event> it = DispSpill.SpillEvents.First; it != null; it = it.Next)
+            //                        {
+            //                            DispEvent = it.Value;
+
+            //                            Mu2e_Ch[] cha = DispEvent.ChanData.ToArray();
+            //                            double[] y = new double[cha[0].data.Count() - 1];
+            //                            for (int i = 0; i < 4; i++)
+            //                            {
+            //                                double ped = cha[i].data.Skip(1).Take(50).Average();
+            //                                double maxADC = cha[i].data.Max() - ped;
+            //                                PP.myRun.max_adc[i] += maxADC;
+            //                            }
+
+            //                        }
+
+            //                        for (int i = 0; i < 4; i++)
+            //                        {
+            //                            double meanADC = PP.myRun.max_adc[i] / PP.myRun.total_trig[0];
+            //                            //Console.WriteLine(i.ToString() + " " + meanADC.ToString() + " " + PP.myRun.total_trig[0]);
+            //                        }
+            //                        string _lblmaxadc0 = string.Format("{0:N2}", PP.myRun.max_adc[0] / PP.myRun.total_trig[0]);
+            //                        lblMaxADC0.Text = _lblmaxadc0;
+
+            //                        string _lblmaxadc1 = string.Format("{0:N2}", PP.myRun.max_adc[1] / PP.myRun.total_trig[0]);
+            //                        lblMaxADC1.Text = _lblmaxadc1;
+
+            //                        string _lblmaxadc2 = string.Format("{0:N2}", PP.myRun.max_adc[2] / PP.myRun.total_trig[0]);
+            //                        lblMaxADC2.Text = _lblmaxadc2;
+
+            //                        string _lblmaxadc3 = string.Format("{0:N2}", PP.myRun.max_adc[3] / PP.myRun.total_trig[0]);
+            //                        lblMaxADC3.Text = _lblmaxadc3;
+
+            //                    }
+            //                    else
+            //                    {
+            //                        if ((btnDisplaySpill.Text == "DONE") && (since_last_spill.Seconds > 8))
+            //                        {
+            //                            SpillTimer.Enabled = false;
+            //                            this.BtnDisplaySpill_Click(null, null);
+            //                            for (int i = 0; i < 10; i++)
+            //                            {
+            //                                Application.DoEvents();
+            //                                System.Threading.Thread.Sleep(50);
+            //                            }
+            //                            this.BtnDisplaySpill_Click(null, null);
+            //                            SpillTimer.Enabled = true;
+            //                        }
+            //                    }
+            //                }
+
+            //            }
+            //        }
+            //    }
+            //    catch (Exception ex) { SpillTimer.Enabled = false; if (PP.glbDebug) { Console.WriteLine("timer off " + ex.Message); } }
+
+            //    if (PP.myRun != null) //update log
+            //    {
+            //        lblRunName.Text = "Run_" + PP.myRun.num.ToString();
+            //        while(PP.myRun.RunStatus.Count > 0)
+            //            runLog.AppendText(PP.myRun.RunStatus.Dequeue() + "\r\n");
+            //        //runLog/*lblRunLog*/.Text = "";
+            //        //string[] all_m = PP.myRun.RunStatus.ToArray<string>();
+            //        //int l = all_m.Length;
+            //        //if (PP.myRun.RunStatus.Count > 13)
+            //        //{
+            //        //    for (int i = l - 13; i < l; i++)
+            //        //    { runLog/*lblRunLog*/.Text += all_m[i] + "\r\n"; }
+            //        //}
+            //        //else
+            //        //{
+            //        //    for (int i = 0; i < all_m.Length; i++)
+            //        //    { runLog/*lblRunLog*/.Text += all_m[i] + "\r\n"; }
+            //        //}
+
+
+            //        if (PP.myRun.fake)
+            //        {
+            //            if ((PP.FEB1.ClientOpen) && (chkFEB1.Checked))
+            //            {
+
+            //                PP.FEB1.CheckStatus(out uint spill_status, out uint spill_num, out uint trig_num);
+            //                if (spill_status > 2) { in_spill = true; } else { in_spill = false; }
+            //                lblSpillFEB1.Text = spill_status.ToString();
+            //                lblFEB1TrigNum.Text = trig_num.ToString();
+            //                spill_trig_num[0] = (int)trig_num;
+            //                if (in_spill)
+            //                {
+            //                    if (PP.myRun != null)
+            //                    {
+            //                        PP.myRun.timeLastSpill = DateTime.Now;
+            //                        PP.myRun.UpdateStatus("Detected spill. Run file is " + PP.myRun.OutFileName);
+            //                        PP.myRun.spill_complete = false;
+            //                    }
+            //                }
+
+            //            }
+            //        }
+
+            //        else //if (!PP.myRun.fake)
+            //        {
+            //            if (PP.FEB1.ClientOpen)
+            //            {
+            //                PP.FEB1.CheckStatus(out uint spill_status, out uint spill_num, out uint trig_num);
+            //                lblSpillFEB1.Text = spill_status.ToString();
+            //                lblFEB1TrigNum.Text = trig_num.ToString();
+            //                spill_trig_num[0] = (int)trig_num;
+            //            }
+
+            //            if (PP.FEB2.ClientOpen)
+            //            {
+            //                PP.FEB2.CheckStatus(out uint spill_status, out uint spill_num, out uint trig_num);
+            //                lblSpillFEB2.Text = spill_status.ToString();
+            //                lblFEB2TrigNum.Text = trig_num.ToString();
+            //                spill_trig_num[1] = (int)trig_num;
+            //            }
+
+            //            if (PP.WC.ClientOpen)
+            //            {
+
+            //                WC_client.check_status(out in_spill, out string num_trig, out string mytime);
+            //                lblSpillWC.Text = in_spill.ToString();
+            //                //spill_trig_num[2] = Convert.ToInt32(num_trig);
+
+            //                if (in_spill)
+            //                {
+            //                    if (PP.myRun != null)
+            //                    {
+            //                        PP.myRun.timeLastSpill = DateTime.Now;
+            //                        PP.myRun.UpdateStatus("Detected spill. Run file is " + PP.myRun.OutFileName);
+            //                        PP.myRun.spill_complete = false;
+            //                    }
+            //                }
+
+
+            //                lblWCTrigNum.Text = num_trig;
+            //            }
+            //        }
+            //    }
+            //}
+            #endregion OldCode
         }
 
         private void BtnPrepare_Click(object sender, EventArgs e)
         {
-            if ((!PP.FEB1.ClientOpen && chkFEB1.Checked) || (!PP.FEB2.ClientOpen && chkFEB2.Checked) || (!PP.WC.ClientOpen && chkWC.Checked))
-            { MessageBox.Show("Are all clients open?"); }
-            timer1.Enabled = false;
-            PP.myRun = new Run();
-            if (chkFakeIt.Checked) { PP.myRun.fake = true; }
-            else { PP.myRun.fake = false; }
+            if (SpillTimer.Enabled) //Stop the timer if it was already running
+                SpillTimer.Enabled = false;
 
-            if (PP.myRun.fake == false)
-            #region notfake
+            if (PP.myRun != null) //If a run already exists, orphan it so it gets garbage collected
+                PP.myRun = null;
+
+            if ((PP.FEB1.ClientOpen && chkFEB1.Checked) && (PP.FEB2.ClientOpen && chkFEB2.Checked) && (PP.WC.ClientOpen && chkWC.Checked))
             {
-                WC_client.DisableTrig();
-                PP.myRun.UpdateStatus("waiting for spill to disable WC");
-                if (!PP.WC.in_spill) { WC_client.FakeSpill(); }
-                int spill_timeout = 0;
-                int big_count = 0;
-                bool inspill = false;
-                string X = "";
-                string Y = "";
-                lblRunTime.Text = "not running";
-                PP.myRun.ACTIVE = false;
-                while (!inspill)
+                WC_client.check_status(out bool inspill, out string num_trig, out string time);
+                while (inspill) //in case we started prep while we are in a spill
                 {
-                    if (PP.glbDebug) { Console.WriteLine("waiting for spill"); }
-                    System.Threading.Thread.Sleep(200);
-                    Application.DoEvents();
-                    WC_client.check_status(out inspill, out X, out Y);
-                    spill_timeout++;
-                    if (spill_timeout > 500) { WC_client.FakeSpill(); spill_timeout = 0; big_count++; }
-                    if (big_count > 3) { MessageBox.Show("can't get a spill..."); return; }
-                }
-                PP.myRun.UpdateStatus("in spill....");
-                while (PP.WC.in_spill)
-                {
-                    if (PP.glbDebug) { Console.WriteLine("waiting for spill to end"); }
-                    System.Threading.Thread.Sleep(200);
-                    WC_client.check_status(out inspill, out X, out Y);
+                    System.Threading.Thread.Sleep(250);
+                    WC_client.check_status(out inspill, out num_trig, out time);
                     Application.DoEvents();
                 }
-                PP.myRun.UpdateStatus("Prepairing FEB1 and FEB2");
-                //            PP.FEB1.GetReady();
-                //            PP.FEB2.GetReady();
-                PP.myRun.UpdateStatus("Arming WC");
-                if (!PP.WC.in_spill) { WC_client.EnableTrig(); }
+
+                PP.myRun = new Run();
+
+                waiting_for_data = false;
+                first_spill_taken = false;
+                spill_num = 0;
+                for(int i = 0; i < 3; i++)
+                    spill_trig_num[i] = 0;
+                lblFEB1Spill.Text = "0";
+                lblFEB1_TotTrig.Text = "0";
+                lblFEB2_TotTrig.Text = "0";
+                lblWC_TotTrig.Text = "0";
+                lblFEB1TrigNum.Text = "0";
+                lblFEB2TrigNum.Text = "0";
+                lblWCTrigNum.Text = "0";
+                lblRunTime.Text = "0";
+                lblSpillTime.Text = "0";
                 lblRunName.Text = PP.myRun.run_name;
-                timer1.Enabled = true;
+                PP.FEB1.GetReady(); //Prep the FEB
+                PP.FEB2.GetReady(); //Prep the FEB
+
+                SpillTimer.Enabled = true;
             }
-            #endregion notfake
             else
-            {
-                PP.myRun.UpdateStatus("Fake Run- sending spills to FEB1");
-                lblRunName.Text = PP.myRun.run_name;
-                timer1.Enabled = true;
-            }
+            { SpillTimer.Enabled = false; PP.myRun = null; MessageBox.Show("Are all clients open & checked?");  }
+
+
+            // --------------------------------------
+            // ~         Old Code Below             ~
+            // --------------------------------------
+            #region OldCode
+            //timer1.Enabled = false;
+            //PP.myRun = new Run();
+            //if (chkFakeIt.Checked) { PP.myRun.fake = true; }
+            //else { PP.myRun.fake = false; }
+
+            //if (PP.myRun.fake == false)
+            //#region notfake
+            //{
+            //    WC_client.DisableTrig();
+            //    PP.myRun.UpdateStatus("waiting for spill to disable WC");
+            //    if (!PP.WC.in_spill) { WC_client.FakeSpill(); }
+            //    int spill_timeout = 0;
+            //    int big_count = 0;
+            //    bool inspill = false;
+            //    string X = "";
+            //    string Y = "";
+            //    lblRunTime.Text = "not running";
+            //    PP.myRun.ACTIVE = false;
+            //    while (!inspill)
+            //    {
+            //        if (PP.glbDebug) { Console.WriteLine("waiting for spill"); }
+            //        System.Threading.Thread.Sleep(200);
+            //        Application.DoEvents();
+            //        WC_client.check_status(out inspill, out X, out Y);
+            //        spill_timeout++;
+            //        if (spill_timeout > 500) { WC_client.FakeSpill(); spill_timeout = 0; big_count++; }
+            //        if (big_count > 3) { MessageBox.Show("can't get a spill..."); return; }
+            //    }
+            //    PP.myRun.UpdateStatus("in spill....");
+            //    while (PP.WC.in_spill)
+            //    {
+            //        if (PP.glbDebug) { Console.WriteLine("waiting for spill to end"); }
+            //        System.Threading.Thread.Sleep(200);
+            //        WC_client.check_status(out inspill, out X, out Y);
+            //        Application.DoEvents();
+            //    }
+            //    PP.myRun.UpdateStatus("Prepairing FEB1 and FEB2");
+            //    //            PP.FEB1.GetReady();
+            //    //            PP.FEB2.GetReady();
+            //    PP.myRun.UpdateStatus("Arming WC");
+            //    if (!PP.WC.in_spill) { WC_client.EnableTrig(); }
+            //    timer1.Enabled = true;
+            //}
+            //#endregion notfake
+            //else
+            //{
+            //    PP.myRun.UpdateStatus("Fake Run- sending spills to FEB1");
+            //    lblRunName.Text = PP.myRun.run_name;
+            //    timer1.Enabled = true;
+            //}
+            #endregion OldCode       
         }
 
         private void BtnStartRun_Click(object sender, EventArgs e)
         {
             if (PP.myRun != null)
             {
-                if (saveAsciiBox.Checked)
-                    PP.myRun.SaveAscii = true;
-                else
-                    PP.myRun.SaveAscii = false;
-                PP.myRun.ActivateRun(); PP.myRun.UpdateStatus("Run STARTING");
-                PP.myRun.OneSpill = false;
+                waiting_for_data = false;
+                first_spill_taken = false;
+                runStart = DateTime.Now;
+                PP.myRun.SaveAscii = saveAsciiBox.Checked;
+                PP.myRun.UpdateStatus("RUN STARTING");
+                PP.myRun.ActivateRun();
+                //if (saveAsciiBox.Checked)
+                //    PP.myRun.SaveAscii = true;
+                //else
+                //    PP.myRun.SaveAscii = false;
+                //PP.myRun.ActivateRun(); 
+                //PP.myRun.OneSpill = false;
             }
-
         }
 
         private void BtnOneSpill_Click(object sender, EventArgs e)
@@ -1592,9 +1735,11 @@ namespace TB_mu2e
         {
             if (PP.myRun != null)
             {
+                waiting_for_data = false;
+                first_spill_taken = false;
+                PP.myRun.UpdateStatus("RUN STOPPING");
                 PP.myRun.DeactivateRun();
-                PP.myRun.UpdateStatus("Run STOPPING");
-                timer1.Enabled = false;
+                //timer1.Enabled = false;
             }
         }
 
@@ -1750,23 +1895,34 @@ namespace TB_mu2e
 
         private void BtnDebugLogging_Click(object sender, EventArgs e)
         {
-            string hName = "";
+            string hName = "c:\\data\\";
             if (btnDebugLogging.Text.Contains("START LOG"))
             {
-                btnDebugLogging.Text = "STOP LOG";
-                hName = "FEB" + _ActiveFEB + "_commands_";
+                //hName += "FEB" + _ActiveFEB + "_commands_";
+                hName += "FEB_commands_";
                 hName += "_" + DateTime.Now.Year.ToString("0000");
                 hName += DateTime.Now.Month.ToString("00");
                 hName += DateTime.Now.Day.ToString("00");
                 hName += "_" + DateTime.Now.Hour.ToString("00");
                 hName += DateTime.Now.Minute.ToString("00");
                 hName += DateTime.Now.Second.ToString("00");
+                if (console.SetLogFile(hName))
+                {
+                    btnDebugLogging.Text = "STOP LOG";
+                    console.LogSave = true;
+                }
+
+            }
+            else if (btnDebugLogging.Text.Contains("STOP LOG"))
+            {
+                btnDebugLogging.Text = "START LOG";
+                console.LogSave = false;
             }
         }
 
         private void BtnTimerFix_Click(object sender, EventArgs e)
         {
-            timer1.Enabled = false;
+            SpillTimer.Enabled = false;
 
             //PP.FEB1.client.Close();
             //Application.DoEvents();
@@ -1780,8 +1936,8 @@ namespace TB_mu2e
                 Mu2e_Register.WriteReg(0xfc, ref csr, ref PP.FEB1.client);
                 System.Threading.Thread.Sleep(10);
             }
-            if (timer1.Enabled) { }
-            else { timer1.Enabled = true; }
+            if (SpillTimer.Enabled) { }
+            else { SpillTimer.Enabled = true; }
         }
 
         private void ChkLast_CheckedChanged(object sender, EventArgs e)
