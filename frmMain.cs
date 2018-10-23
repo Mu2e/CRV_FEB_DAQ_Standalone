@@ -1745,6 +1745,38 @@ namespace TB_mu2e
                 PP.myRun.SaveAscii = saveAsciiBox.Checked;
                 PP.myRun.UpdateStatus("RUN STARTING");
                 PP.myRun.ActivateRun();
+                try
+                {
+                    using (StreamWriter stabStream = new StreamWriter(PP.myRun.OutFileName, true))
+                    {
+                        byte[] buff;
+                        byte[] stab = PP.GetBytes("stab 2\r\n"); //Get the info for the first two FPGAs
+                        System.Net.Sockets.Socket[] sockets = { PP.FEB1.TNETSocket, PP.FEB2.TNETSocket };
+
+                        foreach (System.Net.Sockets.Socket socket in sockets)
+                        {
+                            if (socket.Available > 0)
+                            {
+                                buff = new byte[socket.Available];
+                                socket.Receive(buff);
+                            }
+                            socket.Send(stab);
+                            System.Threading.Thread.Sleep(10);
+                            buff = new byte[socket.Available];
+                            socket.Receive(buff);
+                            stabStream.WriteLine(Encoding.ASCII.GetString(buff));
+                            
+                            //foreach (byte b in buff)
+                            //{
+                            //    stabStream.Write(b.ToString());
+                            //    stabStream.Write(" ");
+                            //}
+                            //stabStream.WriteLine();
+                        }
+                    }
+                }
+                catch { PP.myRun.UpdateStatus("Trouble saving FEB settings to file!"); }
+
                 //if (saveAsciiBox.Checked)
                 //    PP.myRun.SaveAscii = true;
                 //else
@@ -1941,6 +1973,7 @@ namespace TB_mu2e
                 hName += "_" + DateTime.Now.Hour.ToString("00");
                 hName += DateTime.Now.Minute.ToString("00");
                 hName += DateTime.Now.Second.ToString("00");
+                hName += ".txt";
                 if (console.SetLogFile(hName))
                 {
                     btnDebugLogging.Text = "STOP LOG";

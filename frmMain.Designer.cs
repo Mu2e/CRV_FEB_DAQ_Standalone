@@ -661,13 +661,14 @@
             // btnTimerFix
             // 
             this.btnTimerFix.Enabled = false;
-            this.btnTimerFix.Location = new System.Drawing.Point(281, 240);
+            this.btnTimerFix.Location = new System.Drawing.Point(540, 214);
             this.btnTimerFix.Name = "btnTimerFix";
-            this.btnTimerFix.Size = new System.Drawing.Size(100, 33);
+            this.btnTimerFix.Size = new System.Drawing.Size(51, 33);
             this.btnTimerFix.TabIndex = 35;
             this.btnTimerFix.Tag = "";
             this.btnTimerFix.Text = "FIX";
             this.btnTimerFix.UseVisualStyleBackColor = true;
+            this.btnTimerFix.Visible = false;
             this.btnTimerFix.Click += new System.EventHandler(this.BtnTimerFix_Click);
             // 
             // label5
@@ -775,7 +776,7 @@
             // lblWC_TotTrig
             // 
             this.lblWC_TotTrig.AutoSize = true;
-            this.lblWC_TotTrig.Location = new System.Drawing.Point(533, 305);
+            this.lblWC_TotTrig.Location = new System.Drawing.Point(532, 271);
             this.lblWC_TotTrig.Name = "lblWC_TotTrig";
             this.lblWC_TotTrig.Size = new System.Drawing.Size(68, 17);
             this.lblWC_TotTrig.TabIndex = 26;
@@ -784,7 +785,7 @@
             // lblFEB2_TotTrig
             // 
             this.lblFEB2_TotTrig.AutoSize = true;
-            this.lblFEB2_TotTrig.Location = new System.Drawing.Point(462, 305);
+            this.lblFEB2_TotTrig.Location = new System.Drawing.Point(461, 271);
             this.lblFEB2_TotTrig.Name = "lblFEB2_TotTrig";
             this.lblFEB2_TotTrig.Size = new System.Drawing.Size(54, 17);
             this.lblFEB2_TotTrig.TabIndex = 25;
@@ -793,7 +794,7 @@
             // lblFEB1_TotTrig
             // 
             this.lblFEB1_TotTrig.AutoSize = true;
-            this.lblFEB1_TotTrig.Location = new System.Drawing.Point(387, 305);
+            this.lblFEB1_TotTrig.Location = new System.Drawing.Point(386, 271);
             this.lblFEB1_TotTrig.Name = "lblFEB1_TotTrig";
             this.lblFEB1_TotTrig.Size = new System.Drawing.Size(54, 17);
             this.lblFEB1_TotTrig.TabIndex = 24;
@@ -811,7 +812,7 @@
             // lblWCTrigNum
             // 
             this.lblWCTrigNum.AutoSize = true;
-            this.lblWCTrigNum.Location = new System.Drawing.Point(533, 334);
+            this.lblWCTrigNum.Location = new System.Drawing.Point(532, 300);
             this.lblWCTrigNum.Name = "lblWCTrigNum";
             this.lblWCTrigNum.Size = new System.Drawing.Size(63, 17);
             this.lblWCTrigNum.TabIndex = 20;
@@ -820,7 +821,7 @@
             // lblFEB2TrigNum
             // 
             this.lblFEB2TrigNum.AutoSize = true;
-            this.lblFEB2TrigNum.Location = new System.Drawing.Point(462, 334);
+            this.lblFEB2TrigNum.Location = new System.Drawing.Point(461, 300);
             this.lblFEB2TrigNum.Name = "lblFEB2TrigNum";
             this.lblFEB2TrigNum.Size = new System.Drawing.Size(49, 17);
             this.lblFEB2TrigNum.TabIndex = 19;
@@ -829,7 +830,7 @@
             // lblFEB1TrigNum
             // 
             this.lblFEB1TrigNum.AutoSize = true;
-            this.lblFEB1TrigNum.Location = new System.Drawing.Point(387, 334);
+            this.lblFEB1TrigNum.Location = new System.Drawing.Point(386, 300);
             this.lblFEB1TrigNum.Name = "lblFEB1TrigNum";
             this.lblFEB1TrigNum.Size = new System.Drawing.Size(49, 17);
             this.lblFEB1TrigNum.TabIndex = 18;
@@ -838,7 +839,7 @@
             // lblFEB1Spill
             // 
             this.lblFEB1Spill.AutoSize = true;
-            this.lblFEB1Spill.Location = new System.Drawing.Point(387, 276);
+            this.lblFEB1Spill.Location = new System.Drawing.Point(386, 242);
             this.lblFEB1Spill.Name = "lblFEB1Spill";
             this.lblFEB1Spill.Size = new System.Drawing.Size(62, 17);
             this.lblFEB1Spill.TabIndex = 17;
@@ -857,7 +858,7 @@
             // label6
             // 
             this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(279, 334);
+            this.label6.Location = new System.Drawing.Point(278, 300);
             this.label6.Name = "label6";
             this.label6.Size = new System.Drawing.Size(94, 17);
             this.label6.TabIndex = 15;
@@ -866,7 +867,7 @@
             // label7
             // 
             this.label7.AutoSize = true;
-            this.label7.Location = new System.Drawing.Point(279, 305);
+            this.label7.Location = new System.Drawing.Point(278, 271);
             this.label7.Name = "label7";
             this.label7.Size = new System.Drawing.Size(102, 17);
             this.label7.TabIndex = 14;
@@ -875,7 +876,7 @@
             // label8
             // 
             this.label8.AutoSize = true;
-            this.label8.Location = new System.Drawing.Point(279, 276);
+            this.label8.Location = new System.Drawing.Point(278, 242);
             this.label8.Name = "label8";
             this.label8.Size = new System.Drawing.Size(110, 17);
             this.label8.TabIndex = 13;

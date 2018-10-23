@@ -254,6 +254,12 @@ namespace TB_mu2e
                 //SendStr(t);
                 //t = "WR 0 3C\r\n";
                 //SendStr(t);
+                t = "WR 0 4\r\n"; //reset the trigger counter and whatnot
+                SendStr(t);
+                Thread.Sleep(10);
+                t = "WR 400 4\r\n"; //reset the trigger counter and whatnot
+                SendStr(t);
+                Thread.Sleep(10);
                 t = "WR 0 20\r\n"; //reset the trigger counter and whatnot
                 SendStr(t);
                 Thread.Sleep(10);
