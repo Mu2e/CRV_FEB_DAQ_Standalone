@@ -65,14 +65,15 @@ namespace TB_mu2e
             _ClientOpen = false;
             try
             {
-                client = new TcpClient();
+                client = new TcpClient();//_host_name, _TNETsocketNum + 5000);
                 TNETSocket = client.Client;
-                TNETSocket.ReceiveBufferSize = 5242880*4-1;
+                TNETSocket.ReceiveBufferSize = 65535;//5242880 * 4 - 1;
                 TNETSocket.SendBufferSize = 32000;
-                TNETSocket.ReceiveTimeout = 1;
-                TNETSocket.SendTimeout = 1;
+                TNETSocket.ReceiveTimeout = 500;
+                TNETSocket.SendTimeout = 500;
                 TNETSocket.NoDelay = true;
                 TNETSocket.Connect(_host_name, _TNETsocketNum + 5000);
+                stream = new NetworkStream(TNETSocket, true);
 
                 //Thread.Sleep(100);
                 _ClientOpen = true;
@@ -256,16 +257,16 @@ namespace TB_mu2e
                 //SendStr(t);
                 t = "WR 0 4\r\n"; //reset the trigger counter and whatnot
                 SendStr(t);
-                Thread.Sleep(10);
+                Thread.Sleep(100);
                 t = "WR 400 4\r\n"; //reset the trigger counter and whatnot
                 SendStr(t);
-                Thread.Sleep(10);
+                Thread.Sleep(100);
                 t = "WR 0 20\r\n"; //reset the trigger counter and whatnot
                 SendStr(t);
-                Thread.Sleep(10);
+                Thread.Sleep(100);
                 t = "WR 400 20\r\n"; //reset the trigger counter and whatnot
                 SendStr(t);
-                Thread.Sleep(10);
+                Thread.Sleep(100);
             }
             return true;
         }
@@ -415,7 +416,7 @@ namespace TB_mu2e
                 }
                 // ? why does this not work? SW.WriteLine(t);
                 //byte[] b = PP.GetBytes(t + Convert.ToChar((byte)0x0d));
-                byte[] b = PP.GetBytes(t + "\r");
+                byte[] b = PP.GetBytes(t + "\r\n");
                 TNETSocket.Send(b);
                 Thread.Sleep(20);
             }
@@ -445,6 +446,7 @@ namespace TB_mu2e
                         Thread.Sleep(100); //Wait a little before it checks the socket again
                     }
                     t = t.Trim(new char[] { '>' }); //remove >
+                    t = t.Trim(Environment.NewLine.ToCharArray());
                 }
             }
             ret_time = this_t;

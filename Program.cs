@@ -243,14 +243,14 @@ namespace TB_mu2e
                     num_bytes = 0;
                     if (PP.FEB1.client != null)
                     {
-                        TCP_receiver.ReadFeb("FEB1", PP.FEB1.TNETSocket_prop, out num_bytes);
+                        TCP_receiver.ReadFeb(PP.FEB1, /*PP.FEB1.client PP.FEB1.TNETSocket_prop,*/ out num_bytes);
                         this_bytes_written[0] = num_bytes;
                         total_bytes_written[0] += num_bytes;
                         Application.DoEvents();
                     }
                     if (PP.FEB2.client != null)
                     {
-                        TCP_receiver.ReadFeb("FEB2", PP.FEB2.TNETSocket_prop, out num_bytes);
+                        TCP_receiver.ReadFeb(PP.FEB2, /*PP.FEB1.client PP.FEB2.TNETSocket_prop,*/ out num_bytes);
                         this_bytes_written[1] = num_bytes;
                         total_bytes_written[1] += num_bytes;
                         Application.DoEvents();

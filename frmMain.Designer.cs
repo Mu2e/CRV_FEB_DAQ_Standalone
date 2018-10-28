@@ -956,6 +956,7 @@
             // 
             // btnStopRun
             // 
+            this.btnStopRun.Enabled = false;
             this.btnStopRun.Location = new System.Drawing.Point(6, 302);
             this.btnStopRun.Name = "btnStopRun";
             this.btnStopRun.Size = new System.Drawing.Size(260, 100);
@@ -967,6 +968,7 @@
             // 
             // btnStartRun
             // 
+            this.btnStartRun.Enabled = false;
             this.btnStartRun.Location = new System.Drawing.Point(6, 199);
             this.btnStartRun.Name = "btnStartRun";
             this.btnStartRun.Size = new System.Drawing.Size(260, 100);
@@ -2944,7 +2946,6 @@
             // 
             // SpillTimer
             // 
-            this.SpillTimer.Enabled = true;
             this.SpillTimer.Interval = 1000;
             this.SpillTimer.Tick += new System.EventHandler(this.SpillTimer_Tick);
             // 

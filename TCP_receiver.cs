@@ -111,66 +111,134 @@ namespace TB_mu2e
             }
         }
 
-        public static void ReadFeb(string BoardName, Socket s, out long l) //out List<byte> buf,
+        public static void ReadFeb(Mu2e_FEB_client feb, /*TcpClient feb_client Socket feb_socket,*/ out long lret) //out List<byte> buf,
         {
-            source_name = BoardName;
+            Socket feb_socket = feb.TNETSocket;
+            NetworkStream feb_stream = feb.stream;
+            source_name = feb.name;
             //PP.myMain.SpillTimer.Enabled = false;
             PP.myRun.ACTIVE = false; //Let the timer continue but don't let it do anything except update messages and whatnot
-            s.ReceiveTimeout = 500;
-            if (s.Available > 0)
+            feb_socket.ReceiveTimeout = 1000;
+            if (feb_socket.Available > 0)
             {
-                byte[] junk = new byte[s.Available];
-                s.Receive(junk);
+                byte[] junk = new byte[feb_socket.Available];
+                //feb_socket.Receive(junk);
+                feb_stream.Read(junk, 0, feb_socket.Available);
             }
 
-            byte[] b = PP.GetBytes("rdb\r\n");
             time_start = DateTime.Now;
-            l = 0;
+            lret = 0;
+            //byte[] b = PP.GetBytes("rdb 8 1\r\n");
+            byte[] b;
+            //b = PP.GetBytes("rd 6A\r\n");
+            //feb_socket.Send(b);
+            feb.SendStr("rd 6A");
+            Thread.Sleep(10);
+            feb.ReadStr(out string word_cnt_byte_uppr_fpga0, out int ret_time);
+            long word_cnt_uppr_fpga0 = Convert.ToInt64(word_cnt_byte_uppr_fpga0+"0000",16);
 
-            s.Send(b);
-            int old_available = 0;
-            while (old_available < s.Available || old_available==0) //wait for data
+            feb.SendStr("rd 6B");
+            Thread.Sleep(10);
+            feb.ReadStr(out string word_cnt_byte_lowr_fpga0, out ret_time);
+            long word_cnt_lowr_fpga0 = Convert.ToInt64(word_cnt_byte_lowr_fpga0,16);
+
+            long expected_word_count = word_cnt_uppr_fpga0 + word_cnt_lowr_fpga0;
+            //byte[] word_cnt_byte_uppr_fpga0 = new byte[feb_socket.Available];
+            //feb_stream.Read(word_cnt_byte_uppr_fpga0, 0, word_cnt_byte_uppr_fpga0.Length);
+
+
+
+
+            b = PP.GetBytes("RDB\r\n");
+            feb_socket.Send(b);
+            //int old_available = 0;
+
+
+
+            //while (old_available < feb_socket.Available) //wait for data
+            //{
+            //    old_available = feb_socket.Available;
+            //    Thread.Sleep(100);
+            //}
+            List<byte[]> cat_buff = new List<byte[]>();
+            do
             {
-                old_available = s.Available;
+                try
+                {
+                    byte[] sock_buf = new byte[65535];//65535];//feb_socket.Available];
+                    int read = feb_stream.Read(sock_buf, 0, sock_buf.Length);//feb_socket.Available);
+                    sock_buf = sock_buf.Take(read).ToArray();
+                    lret += read;
+                    cat_buff.Add(sock_buf);
+                }
+                catch { break; }
                 Thread.Sleep(10);
-            }
-            byte[] rec_buf = new byte[s.Available];
+            } while (lret < (8 + (expected_word_count * 2))); //(feb_stream.DataAvailable);
+
+            byte[] mem_buff = cat_buff.SelectMany(x=>x).ToArray();
+            long SpillWordCount = (mem_buff[0] * 256 * 256 * 256 +
+                                   mem_buff[1] * 256 * 256 +
+                                   mem_buff[2] * 256 +
+                                   mem_buff[3]);
+
+
+            //sock_buf = new byte[SpillWordCount * 2];
+            //long words_left = SpillWordCount;
+
+            //while(words_left > 0)
+            //{
+            //    long num_words_to_read = 0;
+            //    if (words_left > 10000)
+            //        num_words_to_read = 10000;
+            //    else
+            //        num_words_to_read = words_left;
+
+            //    words_left -= num_words_to_read;
+            //    b = PP.GetBytes("rdb " + num_words_to_read.ToString() + "\r\n");
+                
+            //    feb_socket.Send(b);
+            //    old_available = 0;
+            //    Thread.Sleep(100);
+            //    while(old_available < feb_socket.Available)
+            //    {
+            //        old_available = feb_socket.Available;
+            //        Thread.Sleep(10);
+            //    }
+            //    byte[] datachunk = new byte[feb_socket.Available];
+            //    feb_socket.Receive(datachunk, datachunk.Length, SocketFlags.None);
+            //    sock_buf.Concat(datachunk);
+
+            //    Console.WriteLine(source_name + " Got: " + num_words_to_read + " out of: " + SpillWordCount + " words.");
+            //}
+
+            int tint = (int)(mem_buff[4] * 256 * 256 * 256 +
+                             mem_buff[5] * 256 * 256 +
+                             mem_buff[6] * 256 +
+                             mem_buff[7]);
+
             //byte[] mem_buf=new byte[5242879*8]; //Currently never used!
             //int mem_ind = 0;
-            
-            int lret = s.Receive(rec_buf, rec_buf.Length, SocketFlags.None);
 
-            int tint = (int)(rec_buf[4] * 256 * 256 * 256 + 
-                             rec_buf[5] * 256 * 256 + 
-                             rec_buf[6] * 256 + 
-                             rec_buf[7]);
-            PP.myRun.UpdateStatus("Got " + rec_buf.Length + " bytes, enough for " + ((rec_buf.Length-16)/ 4112)+ " trig => " + (tint * 0x808*2+16).ToString() + ")");
+            //PP.myRun.UpdateStatus(source_name + ": Got " + sock_buf.Length + " bytes, enough for " + ((sock_buf.Length-16)/ 4112)+ " trig => " + (tint * 0x808*2+16).ToString() + ")");
             //Thread.Sleep(5);
             //byte[] buf = new byte[lret];
             //rec_buf.CopyTo(buf, 0);
-            
+
             //PP.myRun.UpdateStatus("Ended recieving " + buf.LongCount() + " bytes");
             //Thread.Sleep(25);
             //spill word count is the first 4 bytes
             //int ind = 0;
-            Int64 t = 0;
-            t = (Int64)(rec_buf[0] * 256 * 256 * 256 + 
-                        rec_buf[1] * 256 * 256 + 
-                        rec_buf[2] * 256 + 
-                        rec_buf[3]);
-            long SpillWordCount = t * 2;
-            long RecWordCount = rec_buf.LongCount<byte>();
-            DateTime start_rec = DateTime.Now;
-            TimeSpan MaxTimeSpan = TimeSpan.FromSeconds(2);
+            //long RecWordCount = sock_buf.LongCount<byte>();
+            //DateTime start_rec = DateTime.Now;
 
             //RecWordCount = rec_buf.LongCount<byte>();
-            TimeSpan elapsed = DateTime.Now.Subtract(start_rec);
-            //Console.WriteLine("read... " + rec_buf.LongCount<byte>().ToString() + " out of " + SpillWordCount.ToString() + " in " + elapsed.TotalMilliseconds + " ms");
+            TimeSpan elapsed = DateTime.Now.Subtract(time_start);
+            PP.myRun.UpdateStatus(source_name + " read: " + lret.ToString()/*sock_buf.Length.ToString()*/ + " bytes out of " + (SpillWordCount*2).ToString() + " bytes in " + elapsed.TotalMilliseconds + " ms");
 
             time_read_done = DateTime.Now;
 
             SpillData new_spill = new SpillData();
-            bool parse_ok = new_spill.ParseInput(rec_buf);
+            bool parse_ok = new_spill.ParseInput(mem_buff/*sock_buf*/);
             if (true)//(parse_ok)
             {
                 PP.myRun.Spills.AddLast(new_spill);
@@ -181,7 +249,7 @@ namespace TB_mu2e
                 }
                 if (PP.myRun != null)// && PP.myRun.sw != null)
                 {
-                        if (SaveEnabled && !PP.myRun.SaveAscii) { Save(rec_buf); } //If it should NOT save in a human readable format
+                        if (SaveEnabled && !PP.myRun.SaveAscii) { Save(mem_buff /*sock_buf*/); } //If it should NOT save in a human readable format
                         else if (SaveEnabled && PP.myRun.SaveAscii) { Save(new_spill); } //If it should save in a human readable format
                 }
             }

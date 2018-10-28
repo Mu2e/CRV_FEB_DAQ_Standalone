@@ -56,7 +56,7 @@ namespace TB_mu2e
         private DateTime runStart;
         private bool first_spill_taken;
         private bool waiting_for_data;
-        private double spill_record_delay = 5;
+        private double spill_record_delay = 2;
 
         public void AddConsoleMessage(string msg)
         {
@@ -1644,6 +1644,8 @@ namespace TB_mu2e
 
             if ((PP.FEB1.ClientOpen && chkFEB1.Checked) && (PP.FEB2.ClientOpen && chkFEB2.Checked) && (PP.WC.ClientOpen && chkWC.Checked))
             {
+                btnPrepare.Enabled = false;
+
                 WC_client.check_status(out bool inspill, out string num_trig, out string time);
                 while (inspill) //in case we started prep while we are in a spill
                 {
@@ -1673,6 +1675,8 @@ namespace TB_mu2e
                 PP.FEB2.GetReady(); //Prep the FEB
 
                 SpillTimer.Enabled = true;
+
+                btnStartRun.Enabled = true;
             }
             else
             { SpillTimer.Enabled = false; PP.myRun = null; MessageBox.Show("Are all clients open & checked?");  }
@@ -1739,6 +1743,9 @@ namespace TB_mu2e
         {
             if (PP.myRun != null)
             {
+                btnStartRun.Enabled = false;
+                btnStopRun.Enabled = true;
+                btnPrepare.Enabled = false;
                 waiting_for_data = false;
                 first_spill_taken = false;
                 runStart = DateTime.Now;
@@ -1755,12 +1762,12 @@ namespace TB_mu2e
 
                         foreach (System.Net.Sockets.Socket socket in sockets)
                         {
-                            if (socket.Available > 0)
+                            if (socket.Available > 0) //discard any junk before asking it about the current settings
                             {
                                 buff = new byte[socket.Available];
                                 socket.Receive(buff);
                             }
-                            socket.Send(stab);
+                            socket.Send(stab); //ask it about the current settings for the first two FPGAs
                             System.Threading.Thread.Sleep(10);
                             buff = new byte[socket.Available];
                             socket.Receive(buff);
@@ -1802,6 +1809,8 @@ namespace TB_mu2e
         {
             if (PP.myRun != null)
             {
+                btnStopRun.Enabled = false;
+                btnPrepare.Enabled = true;
                 waiting_for_data = false;
                 first_spill_taken = false;
                 PP.myRun.UpdateStatus("RUN STOPPING");
