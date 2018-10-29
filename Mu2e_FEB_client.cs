@@ -66,8 +66,9 @@ namespace TB_mu2e
             try
             {
                 client = new TcpClient();//_host_name, _TNETsocketNum + 5000);
+                client.NoDelay = true;
                 TNETSocket = client.Client;
-                TNETSocket.ReceiveBufferSize = 65535;//5242880 * 4 - 1;
+                TNETSocket.ReceiveBufferSize = 5242880 * 4 - 1;
                 TNETSocket.SendBufferSize = 32000;
                 TNETSocket.ReceiveTimeout = 500;
                 TNETSocket.SendTimeout = 500;

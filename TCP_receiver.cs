@@ -51,7 +51,6 @@ namespace TB_mu2e
                     sw.WriteLine("--Read took (in ms):" + time_read_done.Subtract(time_start).TotalMilliseconds.ToString(""));
                     sw.WriteLine("--Save took (in ms):" + time_save_done.Subtract(time_read_done).TotalMilliseconds.ToString(""));
 
-                    //close after 30 min
                 }
                 catch { Console.WriteLine("bad break"); }
             }
@@ -128,30 +127,28 @@ namespace TB_mu2e
 
             time_start = DateTime.Now;
             lret = 0;
-            //byte[] b = PP.GetBytes("rdb 8 1\r\n");
-            byte[] b;
-            //b = PP.GetBytes("rd 6A\r\n");
-            //feb_socket.Send(b);
             feb.SendStr("rd 6A");
             Thread.Sleep(10);
             feb.ReadStr(out string word_cnt_byte_uppr_fpga0, out int ret_time);
+            if (word_cnt_byte_uppr_fpga0.Length > 4)
+                word_cnt_byte_uppr_fpga0 = word_cnt_byte_uppr_fpga0.Take(4).ToArray().ToString();
             long word_cnt_uppr_fpga0 = Convert.ToInt64(word_cnt_byte_uppr_fpga0+"0000",16);
 
             feb.SendStr("rd 6B");
             Thread.Sleep(10);
             feb.ReadStr(out string word_cnt_byte_lowr_fpga0, out ret_time);
+            if (word_cnt_byte_lowr_fpga0.Length > 4)
+                word_cnt_byte_lowr_fpga0 = word_cnt_byte_lowr_fpga0.Take(4).ToArray().ToString();
             long word_cnt_lowr_fpga0 = Convert.ToInt64(word_cnt_byte_lowr_fpga0,16);
 
             long expected_word_count = word_cnt_uppr_fpga0 + word_cnt_lowr_fpga0;
-            //byte[] word_cnt_byte_uppr_fpga0 = new byte[feb_socket.Available];
-            //feb_stream.Read(word_cnt_byte_uppr_fpga0, 0, word_cnt_byte_uppr_fpga0.Length);
 
+            byte[] mem_buff = new byte[expected_word_count * 4 + 16 + 32000];
 
-
-
-            b = PP.GetBytes("RDB\r\n");
+            byte[] b = PP.GetBytes("RDB\r\n");
             feb_socket.Send(b);
             //int old_available = 0;
+            Thread.Sleep(10);
 
 
 
@@ -160,22 +157,23 @@ namespace TB_mu2e
             //    old_available = feb_socket.Available;
             //    Thread.Sleep(100);
             //}
-            List<byte[]> cat_buff = new List<byte[]>();
             do
             {
+                //Console.WriteLine(feb_socket.Available);
+                
                 try
                 {
-                    byte[] sock_buf = new byte[65535];//65535];//feb_socket.Available];
-                    int read = feb_stream.Read(sock_buf, 0, sock_buf.Length);//feb_socket.Available);
-                    sock_buf = sock_buf.Take(read).ToArray();
+                    int read = feb_stream.Read(mem_buff, (int)lret, feb_socket.Available);//feb_socket.Available);//feb_socket.Available);
+                    //int read = feb_socket.Receive(mem_buff, (int)lret, 1460, 0);//feb_socket.Available, 0);//, out SocketError err);
                     lret += read;
-                    cat_buff.Add(sock_buf);
+                    //if (err != 0)
+                    //    Console.WriteLine(err);
                 }
-                catch { break; }
-                Thread.Sleep(10);
-            } while (lret < (8 + (expected_word_count * 2))); //(feb_stream.DataAvailable);
+                catch(System.IO.IOException){ break; }
+                //Thread.Sleep(10);
+            } while (lret < (16 + (expected_word_count * 4))); //(feb_stream.DataAvailable);
 
-            byte[] mem_buff = cat_buff.SelectMany(x=>x).ToArray();
+            mem_buff = mem_buff.Take((int)lret).ToArray();
             long SpillWordCount = (mem_buff[0] * 256 * 256 * 256 +
                                    mem_buff[1] * 256 * 256 +
                                    mem_buff[2] * 256 +
@@ -211,10 +209,10 @@ namespace TB_mu2e
             //    Console.WriteLine(source_name + " Got: " + num_words_to_read + " out of: " + SpillWordCount + " words.");
             //}
 
-            int tint = (int)(mem_buff[4] * 256 * 256 * 256 +
-                             mem_buff[5] * 256 * 256 +
-                             mem_buff[6] * 256 +
-                             mem_buff[7]);
+            //int tint = (int)(mem_buff[4] * 256 * 256 * 256 +
+            //                 mem_buff[5] * 256 * 256 +
+            //                 mem_buff[6] * 256 +
+            //                 mem_buff[7]);
 
             //byte[] mem_buf=new byte[5242879*8]; //Currently never used!
             //int mem_ind = 0;
@@ -237,20 +235,20 @@ namespace TB_mu2e
 
             time_read_done = DateTime.Now;
 
-            SpillData new_spill = new SpillData();
-            bool parse_ok = new_spill.ParseInput(mem_buff/*sock_buf*/);
+            //SpillData new_spill = new SpillData();
+            //bool parse_ok = new_spill.ParseInput(mem_buff/*sock_buf*/);
             if (true)//(parse_ok)
             {
-                PP.myRun.Spills.AddLast(new_spill);
-                if (PP.myRun.Spills.Count > 2)
-                {
-                    if (PP.myRun.Spills.First.Value.IsDisplayed) { PP.myRun.Spills.Remove(PP.myRun.Spills.First.Next); }
-                    else { PP.myRun.Spills.RemoveFirst(); }
-                }
+                //PP.myRun.Spills.AddLast(new_spill);
+                //if (PP.myRun.Spills.Count > 2)
+                //{
+                //    if (PP.myRun.Spills.First.Value.IsDisplayed) { PP.myRun.Spills.Remove(PP.myRun.Spills.First.Next); }
+                //    else { PP.myRun.Spills.RemoveFirst(); }
+                //}
                 if (PP.myRun != null)// && PP.myRun.sw != null)
                 {
                         if (SaveEnabled && !PP.myRun.SaveAscii) { Save(mem_buff /*sock_buf*/); } //If it should NOT save in a human readable format
-                        else if (SaveEnabled && PP.myRun.SaveAscii) { Save(new_spill); } //If it should save in a human readable format
+                        //else if (SaveEnabled && PP.myRun.SaveAscii) { Save(new_spill); } //If it should save in a human readable format
                 }
             }
             else

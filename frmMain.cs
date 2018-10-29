@@ -3299,9 +3299,13 @@ namespace TB_mu2e
 
         private void RunLog_TextChanged(object sender, EventArgs e)
         {
-            //Autoscroll to the end of the text box
-            runLog.SelectionStart = runLog.Text.Length;
-            runLog.ScrollToCaret();
+            try
+            {
+                //Autoscroll to the end of the text box
+                runLog.SelectionStart = runLog.Text.Length;
+                runLog.ScrollToCaret();
+            }
+            catch { }
         }
 
         private void QaDiIWarningThresh_TextChanged(object sender, EventArgs e)

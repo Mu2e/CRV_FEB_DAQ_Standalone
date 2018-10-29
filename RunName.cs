@@ -24,11 +24,11 @@ namespace TB_mu2e
                 Mu2e_Register r1;
 
                 Mu2e_Register.FindName("AFE_VGA0", 0, ref feb1.arrReg, out r1);
-                r1.fpga_index = 0;
+                //r1.fpga_index = 0;
                 Mu2e_Register.ReadReg(ref r1, ref feb1.client);
                 this.GainTextBox.Text += r1.val.ToString();
                 Mu2e_Register.FindName("AFE_VGA1", 0, ref feb1.arrReg, out r1);
-                r1.fpga_index = 0;
+                //r1.fpga_index = 0;
                 Mu2e_Register.ReadReg(ref r1, ref feb1.client);
                 this.GainTextBox.Text += "-" + r1.val.ToString();
             }
@@ -39,11 +39,11 @@ namespace TB_mu2e
                 Mu2e_Register r1;
 
                 Mu2e_Register.FindName("AFE_VGA0", 0, ref feb2.arrReg, out r1);
-                r1.fpga_index = 0;
+                //r1.fpga_index = 0;
                 Mu2e_Register.ReadReg(ref r1, ref feb2.client);
                 this.GainTextBox.Text += "-" + r1.val.ToString();
                 Mu2e_Register.FindName("AFE_VGA1", 0, ref feb2.arrReg, out r1);
-                r1.fpga_index = 0;
+                //r1.fpga_index = 0;
                 Mu2e_Register.ReadReg(ref r1, ref feb2.client);
                 this.GainTextBox.Text += "-" + r1.val.ToString();
             }

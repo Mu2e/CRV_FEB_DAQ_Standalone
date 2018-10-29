@@ -986,17 +986,22 @@ namespace TB_mu2e
                     NetworkStream TNETStream = myClient.GetStream();
                     //StreamWriter SW = new StreamWriter(TNETStream);
                     //StreamReader SR = new StreamReader(TNETStream);
-                    if (reg.width <= 16)
+                    while (myClient.Available > 0)
+                    {
+                        byte[] junk = new byte[myClient.Available];
+                        TNETStream.Read(junk, 0, junk.Length);
+                    }
+                        if (reg.width <= 16)
                     {
                         string lin = "rd " + Convert.ToString(addr, 16) + "\r\n";
                         byte[] buf = PP.GetBytes(lin);
                         TNETStream.Write(buf, 0, buf.Length);
 
-                        System.Threading.Thread.Sleep(5);
+                        System.Threading.Thread.Sleep(10);
                         if (myClient.Available > 0)
                         {
                             byte[] rec_buf = new byte[myClient.Available];
-                            Thread.Sleep(1);
+                            //Thread.Sleep(1);
                             int ret_len = TNETStream.Read(rec_buf, 0, rec_buf.Length);
                             reg.prev_val = reg.val;
                             BufVal(rec_buf, out uint t, out double dv);

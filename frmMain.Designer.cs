@@ -387,11 +387,12 @@
             // 
             // runLog
             // 
-            this.runLog.Location = new System.Drawing.Point(7, 460);
+            this.runLog.Dock = System.Windows.Forms.DockStyle.Bottom;
+            this.runLog.Location = new System.Drawing.Point(3, 463);
             this.runLog.Name = "runLog";
             this.runLog.ReadOnly = true;
             this.runLog.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.ForcedBoth;
-            this.runLog.Size = new System.Drawing.Size(1240, 202);
+            this.runLog.Size = new System.Drawing.Size(1249, 202);
             this.runLog.TabIndex = 46;
             this.runLog.Text = "";
             this.runLog.WordWrap = false;
