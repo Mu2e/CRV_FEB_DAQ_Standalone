@@ -730,8 +730,6 @@
             // chkWC
             // 
             this.chkWC.AutoSize = true;
-            this.chkWC.Checked = true;
-            this.chkWC.CheckState = System.Windows.Forms.CheckState.Checked;
             this.chkWC.Location = new System.Drawing.Point(440, 34);
             this.chkWC.Name = "chkWC";
             this.chkWC.Size = new System.Drawing.Size(49, 21);
@@ -772,6 +770,7 @@
             this.chkFakeIt.TabIndex = 27;
             this.chkFakeIt.Text = "FakeIt";
             this.chkFakeIt.UseVisualStyleBackColor = true;
+            this.chkFakeIt.Visible = false;
             this.chkFakeIt.CheckedChanged += new System.EventHandler(this.ChkFakeIt_CheckedChanged);
             // 
             // lblWC_TotTrig
