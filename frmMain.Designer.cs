@@ -1978,7 +1978,7 @@
             this.button2.Tag = "";
             this.button2.Text = "DISCONNECT";
             this.button2.UseVisualStyleBackColor = true;
-            this.button2.Click += new System.EventHandler(this.Button2_Click);
+            this.button2.Click += new System.EventHandler(this.Disconnect_Click);
             // 
             // lblActive
             // 

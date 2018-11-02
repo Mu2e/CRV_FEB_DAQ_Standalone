@@ -57,6 +57,7 @@ namespace TB_mu2e
         public bool fake;
         public bool OneSpill;
         public string[] RunParams;
+        private List<byte[]> data_buffers;
 
         public LinkedList<SpillData> Spills;
 
@@ -233,6 +234,7 @@ namespace TB_mu2e
             ACTIVE = false;
         }
 
+
         public void RecordSpill()
         {
             if (ACTIVE)
@@ -243,14 +245,14 @@ namespace TB_mu2e
                     num_bytes = 0;
                     if (PP.FEB1.client != null)
                     {
-                        TCP_receiver.ReadFeb(PP.FEB1, /*PP.FEB1.client PP.FEB1.TNETSocket_prop,*/ out num_bytes);
+                        TCP_receiver.ReadFeb(ref PP.FEB1, /*PP.FEB1.client PP.FEB1.TNETSocket_prop,*/ out num_bytes);
                         this_bytes_written[0] = num_bytes;
                         total_bytes_written[0] += num_bytes;
                         Application.DoEvents();
                     }
                     if (PP.FEB2.client != null)
                     {
-                        TCP_receiver.ReadFeb(PP.FEB2, /*PP.FEB1.client PP.FEB2.TNETSocket_prop,*/ out num_bytes);
+                        TCP_receiver.ReadFeb(ref PP.FEB2, /*PP.FEB1.client PP.FEB2.TNETSocket_prop,*/ out num_bytes);
                         this_bytes_written[1] = num_bytes;
                         total_bytes_written[1] += num_bytes;
                         Application.DoEvents();
@@ -603,6 +605,8 @@ namespace TB_mu2e
                 //host_name_prop = "128.143.196.54";
                 //host_name_prop = "131.225.52.177";
                 host_name_prop = "crvfeb01.fnal.gov"
+                //host_name_prop = "131.225.176.32"
+                //host_name_prop = "131.225.52.182"
             };
 
             FEB2 = new Mu2e_FEB_client
@@ -610,6 +614,8 @@ namespace TB_mu2e
                 name = "FEB2",
                 //host_name_prop = "DCRC5";
                 host_name_prop = "crvfeb02.fnal.gov"
+                //host_name_prop = "131.225.176.34"
+                //host_name_prop = "131.225.52.181"
             };
 
             //FEC = new Mu2e_FECC_client();

@@ -36,7 +36,7 @@ namespace TB_mu2e
         private bool _ClientBusy = true;
         private string _TNETname;
 
-        public int _TNETsocketNum = 000;
+        public int _TNETsocketNum = 5000;
         public TcpClient client;
         public Socket TNETSocket;
         public NetworkStream stream;
@@ -62,39 +62,50 @@ namespace TB_mu2e
 
         public void Open()
         {
-            _ClientOpen = false;
-            try
+            if (!_ClientOpen)
             {
-                client = new TcpClient();//_host_name, _TNETsocketNum + 5000);
-                client.NoDelay = true;
-                TNETSocket = client.Client;
-                TNETSocket.ReceiveBufferSize = 5242880 * 4 - 1;
-                TNETSocket.SendBufferSize = 32000;
-                TNETSocket.ReceiveTimeout = 500;
-                TNETSocket.SendTimeout = 500;
-                TNETSocket.NoDelay = true;
-                TNETSocket.Connect(_host_name, _TNETsocketNum + 5000);
-                stream = new NetworkStream(TNETSocket, true);
-
-                //Thread.Sleep(100);
-                _ClientOpen = true;
-                m = "connected " + _logical_name + " to " + _host_name + " on port " + (TNETsocketNum + 5000);
-            }
-            catch
-            {
-                _TNETsocketNum++;
-                if (_TNETsocketNum < 2)
+                try
                 {
-                    this.Open();
+                    client = new TcpClient();//_host_name, _TNETsocketNum + 5000);
+                    client.ReceiveBufferSize = 8192 * 8192; //magic number, seems to be maximum receive size with current hardware //5242880 * 4 - 1;
+                    client.NoDelay = true;
+                    TNETSocket = client.Client;
+                    TNETSocket.ReceiveBufferSize = 8192 * 8192; //magic number, seems to be maximum receive size with current hardware //5242880 * 4 - 1;
+                    TNETSocket.SendBufferSize = 32000;
+                    TNETSocket.ReceiveTimeout = 200;
+                    TNETSocket.SendTimeout = 200;
+                    TNETSocket.NoDelay = true;
+                    TNETSocket.Connect(_host_name, _TNETsocketNum);
+                    stream = client.GetStream();
+
+                    _ClientOpen = true;
+                    m = "connected " + _logical_name + " to " + _host_name + " on port " + (TNETsocketNum);
                 }
-                else
+                catch
                 {
                     _ClientOpen = false;
-                    return;
+                    _TNETsocketNum++;
+                    if (_TNETsocketNum < 5002)
+                    {
+                        this.Open();
+                    }
+                    else
+                    {
+                        _ClientOpen = false;
+                        return;
+                    }
                 }
             }
 
         }
+
+        public void Close()
+        {
+            if (stream != null) { stream.Close(); }
+            if (client != null) { client.Close(); }
+            _ClientOpen = false;
+        }
+
 
         //Read the temperatures from all the CMBs on a given FPGA
         public double[] ReadTempFPGA(int fpga = 0)
@@ -274,37 +285,54 @@ namespace TB_mu2e
 
         public bool Arm()
         {
-            return true;
+            bool sent_arm_success = false;
+            string t = "wr 303 32\r\n";
+            try
+            {
+                if (_ClientOpen)
+                {
+                    if (TNETSocket.Available > 0)
+                    {
+                        byte[] buf = new byte[TNETSocket.Available];
+                        TNETSocket.Receive(buf);
+                    }
+                    SendStr(t);
+                    sent_arm_success = true;
+                }
+            }
+            catch { }
+            return sent_arm_success;
+
         }
 
         public bool Disarm()
         {
-            string t = "TRIG 0\r\n";
-            if (_ClientOpen)
+            bool sent_disarm_success = false;
+            string t = "wr 303 40\r\n";
+            try
             {
-
-                if (TNETSocket.Available > 0)
+                if (_ClientOpen)
                 {
-                    Thread.Sleep(1);
-                    byte[] buf = new byte[TNETSocket.Available];
-                    TNETSocket.Receive(buf);
+                    if (TNETSocket.Available > 0)
+                    {
+                        byte[] buf = new byte[TNETSocket.Available];
+                        TNETSocket.Receive(buf);
+                    }
+                    SendStr(t);
+                    sent_disarm_success = true;
                 }
-                SendStr(t);
             }
-            //SW.WriteLine("disarm");
-            //timeout = 0;
-            //while ((SR.ReadLine() != "disarm") && (timeout < max_timeout)) { System.Threading.Thread.Sleep(1); timeout++; }
-            //if (timeout < max_timeout) { return true; } else { return false; }
-            return true;
+            catch { }
+            return sent_disarm_success;
         }
 
-        public bool SoftwareTrig()
-        {
-            SW.WriteLine("trig");
-            timeout = 0;
-            while ((SR.ReadLine() != "trig") && (timeout < max_timeout)) { System.Threading.Thread.Sleep(1); timeout++; }
-            if (timeout < max_timeout) { return true; } else { return false; }
-        }
+        //public bool SoftwareTrig()
+        //{
+        //    SW.WriteLine("trig");
+        //    timeout = 0;
+        //    while ((SR.ReadLine() != "trig") && (timeout < max_timeout)) { System.Threading.Thread.Sleep(1); timeout++; }
+        //    if (timeout < max_timeout) { return true; } else { return false; }
+        //}
 
         public bool CheckStatus(out uint spill_state, out uint spill_num, out uint trig_num)
         {
@@ -408,18 +436,24 @@ namespace TB_mu2e
         {
             if (_ClientOpen)
             {
-
-                if (TNETSocket.Available > 0)
+                try
                 {
-                    Thread.Sleep(1);
-                    byte[] buf = new byte[TNETSocket.Available];
-                    TNETSocket.Receive(buf);
+                    if (TNETSocket.Available > 0)
+                    {
+                        Thread.Sleep(1);
+                        byte[] buf = new byte[TNETSocket.Available];
+                        TNETSocket.Receive(buf);
+                    }
+                    // ? why does this not work? SW.WriteLine(t);
+                    //byte[] b = PP.GetBytes(t + Convert.ToChar((byte)0x0d));
+                    byte[] b = PP.GetBytes(t + "\r\n");
+                    TNETSocket.Send(b);
+                    Thread.Sleep(20);
                 }
-                // ? why does this not work? SW.WriteLine(t);
-                //byte[] b = PP.GetBytes(t + Convert.ToChar((byte)0x0d));
-                byte[] b = PP.GetBytes(t + "\r\n");
-                TNETSocket.Send(b);
-                Thread.Sleep(20);
+                catch(System.IO.IOException)
+                {
+                    _ClientOpen = false;
+                }
             }
         }
 
@@ -522,13 +556,6 @@ namespace TB_mu2e
             }
             else
             { }
-        }
-
-        public void Close()
-        {
-            if (stream != null) { stream.Close(); }
-            if (client != null) { client.Close(); }
-            _ClientOpen = false;
         }
 
         public static int Count_bits(int val)

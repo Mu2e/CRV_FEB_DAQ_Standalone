@@ -1,13 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.IO.Ports;
 using System.Linq;
-using System.Reflection;
 using System.Text;
 //using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -56,7 +52,7 @@ namespace TB_mu2e
         private DateTime runStart;
         private bool first_spill_taken;
         private bool waiting_for_data;
-        private double spill_record_delay = 2;
+        private double spill_record_delay = 1;
 
         public void AddConsoleMessage(string msg)
         {
@@ -70,12 +66,12 @@ namespace TB_mu2e
             btnFEB1.BackColor = SystemColors.Control;
             lblMessage.Text = msg1Conn + "\n" + msg2Conn;
 
-            btnFEB1.Click += new System.EventHandler(this.Button1_Click);
+            btnFEB1.Click += new System.EventHandler(this.Connect_Click);
             btnFEB1.Tag = PP.FEB1; btnFEB1.Text = PP.FEB1.host_name_prop;
-            btnFEB2.Click += new System.EventHandler(this.Button1_Click);
+            btnFEB2.Click += new System.EventHandler(this.Connect_Click);
             btnFEB2.Tag = PP.FEB2; btnFEB2.Text = PP.FEB2.host_name_prop;
 
-            btnWC.Click += new System.EventHandler(this.Button1_Click);
+            btnWC.Click += new System.EventHandler(this.Connect_Click);
             btnWC.Tag = PP.WC; btnWC.Text = PP.WC.host_name_prop;
 
             console = new uConsole();
@@ -215,7 +211,7 @@ namespace TB_mu2e
             #endregion
         }
 
-        private void Button1_Click(object sender, EventArgs e)
+        private void Connect_Click(object sender, EventArgs e)
         {
             Button mySender = (Button)sender;
             string myName = mySender.Text;
@@ -479,17 +475,17 @@ namespace TB_mu2e
             string myName = mySender.Text;
             if (myName.Contains("FEB1"))
             {
-                Button1_Click((object)btnFEB1, e);
+                Connect_Click((object)btnFEB1, e);
                 console_Disp.Text = console.Add_messg("---- FEB1 ----\r\n");
             }
             if (myName.Contains("FEB2"))
             {
-                Button1_Click((object)btnFEB2, e);
+                Connect_Click((object)btnFEB2, e);
                 console_Disp.Text = console.Add_messg("---- FEB2 ----\r\n");
             }
             if (myName.Contains("WC"))
             {
-                Button1_Click((object)btnWC, e);
+                Connect_Click((object)btnWC, e);
                 console_Disp.Text = console.Add_messg("----  WC  ----\r\n");
             }
             if (myName.Contains("FECC")) { }
@@ -1259,7 +1255,7 @@ namespace TB_mu2e
             }
         }
 
-        private void Button2_Click(object sender, EventArgs e)
+        private void Disconnect_Click(object sender, EventArgs e)
         {
             if (PP.FEB1.ClientOpen) { PP.FEB1.Close(); dbgFEB1.BackColor = Color.LightGray; btnFEB1.BackColor = Color.LightGray; }
             if (PP.FEB2.ClientOpen) { PP.FEB2.Close(); dbgFEB2.BackColor = Color.LightGray; btnFEB2.BackColor = Color.LightGray; }
@@ -1315,20 +1311,13 @@ namespace TB_mu2e
         {
             Application.DoEvents();
             if (chkWC.Checked)
-            { Button1_Click((object)btnWC, e); }
+            { Connect_Click((object)btnWC, e); }
             Application.DoEvents();
             if (chkFEB1.Checked)
-            { Button1_Click((object)btnFEB1, e); }
+            { Connect_Click((object)btnFEB1, e); }
             Application.DoEvents();
             if (chkFEB2.Checked)
-            { Button1_Click((object)btnFEB2, e); }
-            Application.DoEvents();
-
-
-            //-------------------------------------------------------
-            ChkFakeIt_CheckedChanged(null, null);
-            chkFakeIt.Visible = false;
-            //------DANGER: Fake always off--------------
+            { Connect_Click((object)btnFEB2, e); }
             Application.DoEvents();
         }
 
@@ -1366,9 +1355,12 @@ namespace TB_mu2e
             {
                 if (PP.myRun.ACTIVE) //If we are actively looking for spills
                 {
+                    bool[] in_spill_febs = { false, false };
                     if (PP.FEB1.ClientOpen)
                     {
                         PP.FEB1.CheckStatus(out uint spill_status, out uint spill_num, out uint trig_num);
+                        if (spill_status == 4)
+                            in_spill_febs[0] = true;
                         lblSpillFEB1.Text = spill_status.ToString();
                         lblFEB1TrigNum.Text = trig_num.ToString();
                         spill_trig_num[0] = (int)trig_num;
@@ -1377,12 +1369,32 @@ namespace TB_mu2e
                     if (PP.FEB2.ClientOpen)
                     {
                         PP.FEB2.CheckStatus(out uint spill_status, out uint spill_num, out uint trig_num);
+                        if (spill_status == 4)
+                            in_spill_febs[1] = true;
                         lblSpillFEB2.Text = spill_status.ToString();
                         lblFEB2TrigNum.Text = trig_num.ToString();
                         spill_trig_num[1] = (int)trig_num;
                     }
 
-                    if (PP.WC.ClientOpen)
+                    if (in_spill_febs[0] || in_spill_febs[1])
+                    {
+                        if (first_spill_taken == false)
+                        {
+                            first_spill_taken = true;
+                            PP.myRun.UpdateStatus("First Spill Synchronization");
+                        }
+                        PP.myRun.timeLastSpill = DateTime.Now;
+                        PP.myRun.UpdateStatus("Detected spill. Run file is " + PP.myRun.OutFileName);
+                        PP.myRun.spill_complete = false;
+                        waiting_for_data = true;
+                    }
+                    else
+                    {
+                        PP.myRun.spill_complete = true;
+                    }
+
+
+                    if (false)//(PP.WC.ClientOpen)
                     {
 
                         WC_client.check_status(out bool in_spill, out string num_trig, out string mytime);
@@ -1642,17 +1654,17 @@ namespace TB_mu2e
             if (PP.myRun != null) //If a run already exists, orphan it so it gets garbage collected
                 PP.myRun = null;
 
-            if ((PP.FEB1.ClientOpen && chkFEB1.Checked) && (PP.FEB2.ClientOpen && chkFEB2.Checked) && (PP.WC.ClientOpen && chkWC.Checked))
+            if ((PP.FEB1.ClientOpen && chkFEB1.Checked) || (PP.FEB2.ClientOpen && chkFEB2.Checked))// && (PP.WC.ClientOpen && chkWC.Checked))
             {
                 btnPrepare.Enabled = false;
 
-                WC_client.check_status(out bool inspill, out string num_trig, out string time);
-                while (inspill) //in case we started prep while we are in a spill
-                {
-                    System.Threading.Thread.Sleep(250);
-                    WC_client.check_status(out inspill, out num_trig, out time);
-                    Application.DoEvents();
-                }
+                //WC_client.check_status(out bool inspill, out string num_trig, out string time);
+                //while (inspill) //in case we started prep while we are in a spill
+                //{
+                //    System.Threading.Thread.Sleep(250);
+                //    WC_client.check_status(out inspill, out num_trig, out time);
+                //    Application.DoEvents();
+                //}
 
                 PP.myRun = new Run();
 
