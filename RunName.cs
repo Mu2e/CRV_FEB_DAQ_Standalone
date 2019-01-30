@@ -66,7 +66,7 @@ namespace TB_mu2e
                 this.textAngle.Text = PP.myRun.RunParams[6];
                 this.textXpos.Text = PP.myRun.RunParams[7];
                 this.textZpos.Text = PP.myRun.RunParams[8];
-                this.textPressure.Text = PP.myRun.RunParams[9];
+                this.textTemp.Text = PP.myRun.RunParams[9];
             }
 
         }
@@ -95,8 +95,8 @@ namespace TB_mu2e
             PP.myRun.run_name += "_z";
             PP.myRun.run_name += textZpos.Text;
             PP.myRun.run_name += "_";
-            PP.myRun.run_name += textPressure.Text;
-            PP.myRun.run_name += "psi";
+            PP.myRun.run_name += textTemp.Text;
+            PP.myRun.run_name += "degF";
 
             this.textBox1.Text = PP.myRun.run_name;
 

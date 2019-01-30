@@ -259,6 +259,7 @@
             this.moduleQAMeasurementTimer = new System.Windows.Forms.Timer(this.components);
             this.ModuleQAStepTimer = new System.Windows.Forms.Timer(this.components);
             this.qaDiCounterMeasurementTimer = new System.Windows.Forms.Timer(this.components);
+            this.validateParseChkBox = new System.Windows.Forms.CheckBox();
             this.statusStrip1.SuspendLayout();
             this.tabControl.SuspendLayout();
             this.tabRUN.SuspendLayout();
@@ -608,6 +609,7 @@
             // 
             // groupBox1
             // 
+            this.groupBox1.Controls.Add(this.validateParseChkBox);
             this.groupBox1.Controls.Add(this.saveAsciiBox);
             this.groupBox1.Controls.Add(this.btnTimerFix);
             this.groupBox1.Controls.Add(this.label5);
@@ -878,9 +880,9 @@
             this.label8.AutoSize = true;
             this.label8.Location = new System.Drawing.Point(278, 242);
             this.label8.Name = "label8";
-            this.label8.Size = new System.Drawing.Size(110, 17);
+            this.label8.Size = new System.Drawing.Size(74, 17);
             this.label8.TabIndex = 13;
-            this.label8.Text = "Total Num Spills";
+            this.label8.Text = "Num Spills";
             // 
             // lblRunTime
             // 
@@ -2969,6 +2971,17 @@
             this.qaDiCounterMeasurementTimer.Interval = 1000;
             this.qaDiCounterMeasurementTimer.Tick += new System.EventHandler(this.QaDiCounterMeasurementTimer_Tick);
             // 
+            // validateParseChkBox
+            // 
+            this.validateParseChkBox.AutoSize = true;
+            this.validateParseChkBox.Location = new System.Drawing.Point(500, 156);
+            this.validateParseChkBox.Name = "validateParseChkBox";
+            this.validateParseChkBox.Size = new System.Drawing.Size(78, 21);
+            this.validateParseChkBox.TabIndex = 37;
+            this.validateParseChkBox.Text = "Validate";
+            this.validateParseChkBox.UseVisualStyleBackColor = true;
+            this.validateParseChkBox.CheckedChanged += new System.EventHandler(this.ValidateParseChkBox_CheckedChanged);
+            // 
             // frmMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 17F);
@@ -3285,5 +3298,6 @@
         private System.Windows.Forms.Timer ModuleQAStepTimer;
         private System.Windows.Forms.Button ModuleQAHomeResetBtn;
         private System.Windows.Forms.Timer qaDiCounterMeasurementTimer;
+        private System.Windows.Forms.CheckBox validateParseChkBox;
     }
 }

@@ -60,6 +60,7 @@ namespace TB_mu2e
         private List<byte[]> data_buffers;
 
         public LinkedList<SpillData> Spills;
+        internal bool validateParse;
 
         public bool SaveAscii { get; internal set; }
 
@@ -197,7 +198,7 @@ namespace TB_mu2e
 
                     using (StreamWriter sw2 = File.AppendText("c:\\data\\run_param.txt"))
                     {
-                        sw2.WriteLine(this.num.ToString() + " " + rn.textEbeam.Text + " " + rn.textIbeam.Text + " " + rn.BIASVtextBox.Text + " " + rn.GainTextBox.Text + " " + rn.comboPID.Text + " " + rn.textAngle.Text + " " + rn.textXpos.Text + " " + rn.textZpos.Text + " " + rn.textPressure.Text);
+                        sw2.WriteLine(this.num.ToString() + " " + rn.textEbeam.Text + " " + rn.textIbeam.Text + " " + rn.BIASVtextBox.Text + " " + rn.GainTextBox.Text + " " + rn.comboPID.Text + " " + rn.textAngle.Text + " " + rn.textXpos.Text + " " + rn.textZpos.Text + " " + rn.textTemp.Text);
                     }
 
                     //If all goes well above, we are good to go for taking data.
@@ -222,12 +223,14 @@ namespace TB_mu2e
                     sw.WriteLine("-- END OF RUN -- " + DateTime.Now.ToString());
                 }
 
-                using (StreamWriter sw1 = File.AppendText("c:\\data\\run_list.txt"))
-                {
-                    sw1.WriteLine(this.num.ToString() + " STOPPED at: " + DateTime.Now);
-                }
             }
             catch { }
+
+            using (StreamWriter sw1 = File.AppendText("c:\\data\\run_list.txt"))
+            {
+                sw1.WriteLine(this.num.ToString() + " STOPPED at: " + DateTime.Now);
+            }
+
 
             UpdateStatus("RUN STOPPED");
             TCP_receiver.SaveEnabled = false;

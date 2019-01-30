@@ -21,7 +21,7 @@ namespace TB_mu2e
         public static string source_name;
 
         //To save data in "binary"
-        private static void Save(byte[] buf)
+        private static void Save(byte[] buf, string source)
         {
             ReaderWriterLock locker = new ReaderWriterLock();
             try
@@ -34,7 +34,7 @@ namespace TB_mu2e
                         int i = 0;
 
                         bw.Write("--Begin of spill\r\n");
-                        bw.Write("--** SOURCE = " + source_name + "\r\n");
+                        bw.Write("--** SOURCE = " + source + "\r\n");
                         foreach (byte b in buf)
                         {
                             bw.Write(b);//.ToString());
@@ -45,8 +45,8 @@ namespace TB_mu2e
                         time_save_done = DateTime.Now;
 
                         bw.Write("--wrote " + buf.Length.ToString() + " bytes\r\n");
-                        bw.Write("--Read took (in ms):" + time_read_done.Subtract(time_start).TotalMilliseconds.ToString("") + "\r\n");
-                        bw.Write("--Save took (in ms):" + time_save_done.Subtract(time_read_done).TotalMilliseconds.ToString("")+ "\r\n");
+                        //bw.Write("--Read took (in ms):" + time_read_done.Subtract(time_start).TotalMilliseconds.ToString("") + "\r\n");
+                        //bw.Write("--Save took (in ms):" + time_save_done.Subtract(time_read_done).TotalMilliseconds.ToString("")+ "\r\n");
                         bw.Write("--End of spill\r\n");
 
                         //sw.WriteLine("--wrote " + buf.Length.ToString() + " bytes");
@@ -76,7 +76,7 @@ namespace TB_mu2e
                     try
                     {
                         sw.WriteLine("--Begin of spill (ascii)");
-                        sw.WriteLine("--** Source = " + source_name);
+                        sw.WriteLine("--** Source = " + spill.Source);
                         sw.WriteLine("--SpillHeader");
                         sw.Write(spill.SpillWordCount + " "); //Word counts in spill
                         sw.Write(spill.SpillTrigCount + " "); //Number of triggers in spill
@@ -165,7 +165,7 @@ namespace TB_mu2e
                         bytesread += bytes_now;
                         bytesleft -= bytes_now;
                         //Console.WriteLine(source_name + " got " + bytesread + " / " + spillwrdcnt * 2);
-                        Thread.Sleep(10);
+                        Thread.Sleep(100);
                     } while (feb.stream.DataAvailable);
 
                     lret = bytesread;
@@ -182,11 +182,50 @@ namespace TB_mu2e
 
                 PP.myRun.ACTIVE = true;
 
-                if (PP.myRun != null)// && PP.myRun.sw != null)
+                if (PP.myRun.validateParse)
                 {
-                    //Spawn a thread that will take care of writing the data to file
-                    Thread save = new Thread(() => Save(mem_buff));
-                    save.Start();
+                    SpillData new_spill = new SpillData();
+                    bool parse_ok = new_spill.ParseInput(mem_buff);
+                    if (parse_ok)
+                    {
+                        if (PP.myRun != null)
+                        {
+                            if (PP.myRun.SaveAscii)
+                            {
+                                Thread save = new Thread(() => Save(new_spill));
+                                save.Start();
+                            }
+                            else
+                            {
+                                string savename = feb.name;
+                                Thread save = new Thread(() => Save(mem_buff, savename)); //Spawn a thread that will take care of writing the data to file
+                                save.Start();
+                            }
+
+                        }
+                    }
+                    else //if it fails to parse, don't bother trying to save the spill, but notify the user
+                        PP.myRun.UpdateStatus(source_name + " failed to parse! Skipping save!");
+                }
+                else
+                {
+                    if (PP.myRun != null)
+                    {
+                        if (PP.myRun.SaveAscii)
+                        {
+                            SpillData new_spill = new SpillData();
+                            bool parse_ok = new_spill.ParseInput(mem_buff);
+                            Thread save = new Thread(() => Save(new_spill));
+                            save.Start();
+                        }
+                        else
+                        {
+                            string savename = feb.name;
+                            Thread save = new Thread(() => Save(mem_buff, savename)); //Spawn a thread that will take care of writing the data to file
+                            save.Start();
+                        }
+
+                    }
                 }
 
             }

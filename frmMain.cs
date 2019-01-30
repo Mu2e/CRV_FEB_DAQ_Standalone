@@ -5,6 +5,7 @@ using System.IO;
 using System.IO.Ports;
 using System.Linq;
 using System.Text;
+using System.Threading;
 //using System.Threading.Tasks;
 using System.Windows.Forms;
 using ZedGraph;
@@ -1428,7 +1429,8 @@ namespace TB_mu2e
                             if ((time_past_spill > spill_record_delay) && waiting_for_data) //If we have waited a sufficient amount of time and we are expecting data, save the data
                             {
                                 waiting_for_data = false;
-                                PP.myRun.RecordSpill();
+                                Thread recorder = new Thread(()=>PP.myRun.RecordSpill());
+                                recorder.Start();
                                 spill_num++;
                                 //Update the total number of triggers
                                 lblFEB1_TotTrig.Text = (Convert.ToUInt64(lblFEB1_TotTrig.Text) + (ulong)spill_trig_num[0]).ToString("0");
@@ -1656,7 +1658,7 @@ namespace TB_mu2e
 
             if ((PP.FEB1.ClientOpen && chkFEB1.Checked) || (PP.FEB2.ClientOpen && chkFEB2.Checked))// && (PP.WC.ClientOpen && chkWC.Checked))
             {
-                btnPrepare.Enabled = false;
+                //btnPrepare.Enabled = false;
 
                 //WC_client.check_status(out bool inspill, out string num_trig, out string time);
                 //while (inspill) //in case we started prep while we are in a spill
@@ -2199,25 +2201,45 @@ namespace TB_mu2e
         {
             if (PP.FEB1.client != null && qaDiCounterMeasurementTimer.Enabled == false) //If the FEB is connected and we aren't currently taking measurements, then proceed.
             {
-                //qaStartButton.Enabled = false;  //prevents multiple clicks of the buttons
-                autoThreshBtn.Enabled = false;
-                lightCheckResetThresh.Enabled = false;
-                lightCheckBtn.Enabled = false;
-                string[] chanOuts = new string[qaDiButtons.Length];
-                autoDataProgress.Maximum = qaDiButtons.Length; //set the max of the progress bar
 
-                if (PP.qaDicounterMeasurements == null)
-                    PP.qaDicounterMeasurements = new CurrentMeasurements(PP.FEB1, "C:\\Users\\Boi\\Desktop\\DiCounterQA_Test.txt");
-                else
+                if (qaDiCounterMeasurementTimer.Enabled)
+                {
+                    qaDiCounterMeasurementTimer.Enabled = false;
                     PP.qaDicounterMeasurements.Purge();
+                    qaStartButton.Text = "Auto Data";
+                    qaStartButton.BackColor = SystemColors.Control;
+                    qaStartButton.Update();
+                }
+                else
+                {
+                    //qaStartButton.Enabled = false;  //prevents multiple clicks of the buttons
+                    qaStartButton.Text = "STOP";
+                    qaStartButton.BackColor = Color.Red;
+                    qaStartButton.Update();
+                    using (System.Media.SoundPlayer soundPlayer = new System.Media.SoundPlayer("C:\\Windows\\media\\Windows Proximity Connection.wav"))
+                    {
+                        soundPlayer.Play();
+                    }
 
-                foreach (var btn in qaDiButtons) { if (!btn.Checked) { btn.BackColor = Color.Green; btn.Update(); } } //Reset all active channel indicators to green
+                    autoThreshBtn.Enabled = false;
+                    lightCheckResetThresh.Enabled = false;
+                    lightCheckBtn.Enabled = false;
+                    string[] chanOuts = new string[qaDiButtons.Length];
+                    autoDataProgress.Maximum = qaDiButtons.Length; //set the max of the progress bar
 
-                PP.FEB1.SetV(Convert.ToDouble(qaBias.Text)); //Turn on the bias
+                    if (PP.qaDicounterMeasurements == null)
+                        PP.qaDicounterMeasurements = new CurrentMeasurements(PP.FEB1, "C:\\Users\\Boi\\Desktop\\DiCounterQA_Test.txt");
+                    else
+                        PP.qaDicounterMeasurements.Purge();
 
-                currentChannel = 0; //Set the current channel being measured to 0
-                dicounterNumberTextBox.Enabled = false;
-                qaDiCounterMeasurementTimer.Enabled = true;
+                    foreach (var btn in qaDiButtons) { if (!btn.Checked) { btn.BackColor = Color.Green; btn.Update(); } } //Reset all active channel indicators to green
+
+                    PP.FEB1.SetV(Convert.ToDouble(qaBias.Text)); //Turn on the bias
+
+                    currentChannel = 0; //Set the current channel being measured to 0
+                    dicounterNumberTextBox.Enabled = false;
+                    qaDiCounterMeasurementTimer.Enabled = true;
+                }
 
                 ////Data are written to the Google Drive, CRV Fabrication Documents folder ScanningData, subfolder DicounterQA
                 ////'using' will ensure the writer is closed/destroyed if the scope of the structure is left due to code-completion or a thrown exception
@@ -3823,8 +3845,20 @@ namespace TB_mu2e
                 currentChannel = 0;
                 autoDataProgress.Value = 0;
                 autoDataProgress.Update();
+                using (System.Media.SoundPlayer soundPlayer = new System.Media.SoundPlayer("C:\\Windows\\media\\Windows Proximity Notification.wav"))
+                {
+                    soundPlayer.Play();
+                }
                 qaDiCounterMeasurementTimer.Enabled = false;
             }
+        }
+
+        private void ValidateParseChkBox_CheckedChanged(object sender, EventArgs e)
+        {
+            if (!validateParseChkBox.Checked)
+                PP.myRun.validateParse = true;
+            else if (validateParseChkBox.Checked)
+                PP.myRun.validateParse = false;
         }
     }
 

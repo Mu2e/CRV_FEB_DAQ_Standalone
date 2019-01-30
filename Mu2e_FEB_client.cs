@@ -267,18 +267,19 @@ namespace TB_mu2e
                 //SendStr(t);
                 //t = "WR 0 3C\r\n";
                 //SendStr(t);
-                t = "WR 0 4\r\n"; //reset the trigger counter and whatnot
+                t = "WR 0 4\r\n"; //reset the AFE seserializer logic
                 SendStr(t);
-                Thread.Sleep(100);
-                t = "WR 400 4\r\n"; //reset the trigger counter and whatnot
+                Thread.Sleep(1);
+                t = "WR 400 4\r\n"; //reset the AFE seserializer logic
                 SendStr(t);
-                Thread.Sleep(100);
+                Thread.Sleep(1);
                 t = "WR 0 20\r\n"; //reset the trigger counter and whatnot
                 SendStr(t);
-                Thread.Sleep(100);
+                Thread.Sleep(1);
                 t = "WR 400 20\r\n"; //reset the trigger counter and whatnot
                 SendStr(t);
-                Thread.Sleep(100);
+                Thread.Sleep(1);
+
             }
             return true;
         }

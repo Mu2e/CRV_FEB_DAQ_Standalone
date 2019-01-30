@@ -39,7 +39,7 @@
             this.label6 = new System.Windows.Forms.Label();
             this.txtRunNum = new System.Windows.Forms.TextBox();
             this.label4 = new System.Windows.Forms.Label();
-            this.textPressure = new System.Windows.Forms.TextBox();
+            this.textTemp = new System.Windows.Forms.TextBox();
             this.label14 = new System.Windows.Forms.Label();
             this.textAngle = new System.Windows.Forms.TextBox();
             this.label13 = new System.Windows.Forms.Label();
@@ -171,12 +171,12 @@
             // 
             // textPressure
             // 
-            this.textPressure.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(192)))));
-            this.textPressure.Location = new System.Drawing.Point(312, 78);
-            this.textPressure.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.textPressure.Name = "textPressure";
-            this.textPressure.Size = new System.Drawing.Size(80, 20);
-            this.textPressure.TabIndex = 629;
+            this.textTemp.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(192)))));
+            this.textTemp.Location = new System.Drawing.Point(312, 78);
+            this.textTemp.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.textTemp.Name = "textPressure";
+            this.textTemp.Size = new System.Drawing.Size(80, 20);
+            this.textTemp.TabIndex = 629;
             // 
             // label14
             // 
@@ -185,9 +185,9 @@
             this.label14.Location = new System.Drawing.Point(322, 55);
             this.label14.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label14.Name = "label14";
-            this.label14.Size = new System.Drawing.Size(50, 20);
+            this.label14.Size = new System.Drawing.Size(53, 20);
             this.label14.TabIndex = 645;
-            this.label14.Text = "PSIA";
+            this.label14.Text = "Temp";
             // 
             // textAngle
             // 
@@ -353,7 +353,7 @@
             this.Controls.Add(this.label6);
             this.Controls.Add(this.txtRunNum);
             this.Controls.Add(this.label4);
-            this.Controls.Add(this.textPressure);
+            this.Controls.Add(this.textTemp);
             this.Controls.Add(this.label14);
             this.Controls.Add(this.textAngle);
             this.Controls.Add(this.label13);
@@ -391,7 +391,7 @@
         private System.Windows.Forms.Label label6;
         public System.Windows.Forms.TextBox txtRunNum;
         private System.Windows.Forms.Label label4;
-        public System.Windows.Forms.TextBox textPressure;
+        public System.Windows.Forms.TextBox textTemp;
         private System.Windows.Forms.Label label14;
         public System.Windows.Forms.TextBox textAngle;
         private System.Windows.Forms.Label label13;

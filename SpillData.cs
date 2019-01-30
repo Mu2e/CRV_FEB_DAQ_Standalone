@@ -110,8 +110,10 @@ namespace TB_mu2e
                 }
                 #endregion SpillHeader
 
-                //i = 17; //skip the 0x3e spacer between the spill header and event header. Obsolete: i = 16;
-                i = 16; //This is for the prototype FEBs. The pre-production FEBs (not proto) will send a '>' (0x3e) between event and spill header
+                i = 16;
+                if (pack[i] == 0x3e) //detect if a '>' has been sent between the spill header and event header, if it has then we must skip it
+                    i = 17;
+
                 DateTime start_parsing = DateTime.Now; //used to determine how much time is spent parsing the incoming data
                 Mu2e_Event this_event = null; //create reference to mu2e_Event objects
 
