@@ -2205,6 +2205,7 @@ namespace TB_mu2e
                 if (qaDiCounterMeasurementTimer.Enabled)
                 {
                     qaDiCounterMeasurementTimer.Enabled = false;
+                    PP.qaDicounterMeasurements.TurnOffBias();
                     PP.qaDicounterMeasurements.Purge();
                     qaStartButton.Text = "Auto Data";
                     qaStartButton.BackColor = SystemColors.Control;
@@ -3849,6 +3850,9 @@ namespace TB_mu2e
                 {
                     soundPlayer.Play();
                 }
+                qaStartButton.Text = "Auto Data";
+                qaStartButton.BackColor = SystemColors.Control;
+                qaStartButton.Update();
                 qaDiCounterMeasurementTimer.Enabled = false;
             }
         }

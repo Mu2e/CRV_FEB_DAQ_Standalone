@@ -116,7 +116,7 @@ namespace TB_mu2e
 
             SendStr("cmb");//SendStr("STAB" );
             ReadStr(out string a, out int r);
-            if (a.Length > 400) //If it got 'all' the info
+            if (a.Length > 40) //If it got 'all' the info
             {
                 string[] tok = a.Split(new string[] { " ", Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
                 if (String.Equals(tok[1], "DegC")) //Preproduction FEB 'cmb' format
