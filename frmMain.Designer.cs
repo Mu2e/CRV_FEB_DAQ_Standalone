@@ -58,6 +58,7 @@
             this.ud_VertMin = new System.Windows.Forms.NumericUpDown();
             this.ud_VertMax = new System.Windows.Forms.NumericUpDown();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.validateParseChkBox = new System.Windows.Forms.CheckBox();
             this.saveAsciiBox = new System.Windows.Forms.CheckBox();
             this.btnTimerFix = new System.Windows.Forms.Button();
             this.label5 = new System.Windows.Forms.Label();
@@ -194,7 +195,7 @@
             this.lightCheckFPGApanel = new System.Windows.Forms.TableLayoutPanel();
             this.label16 = new System.Windows.Forms.Label();
             this.lightCheckResetThresh = new System.Windows.Forms.Button();
-            this.lightAutoThreshProgress = new System.Windows.Forms.ProgressBar();
+            this.lightCheckProgress = new System.Windows.Forms.ProgressBar();
             this.lightCheckChanThreshBtn = new System.Windows.Forms.Button();
             this.lightCheckChanThreshLbl = new System.Windows.Forms.Label();
             this.lightCheckChanThresh = new System.Windows.Forms.TextBox();
@@ -209,9 +210,9 @@
             this.qaOutputFileName = new System.Windows.Forms.TextBox();
             this.qaOutputFileNameLabel = new System.Windows.Forms.Label();
             this.oneReadout = new System.Windows.Forms.CheckBox();
-            this.qaDiNumAvg = new System.Windows.Forms.NumericUpDown();
             this.qaDiNumAvgLabel = new System.Windows.Forms.Label();
             this.qaDiIWarningThreshLabel = new System.Windows.Forms.Label();
+            this.qaDiNumAvg = new System.Windows.Forms.NumericUpDown();
             this.qaDiIWarningThresh = new System.Windows.Forms.TextBox();
             this.autoDataProgress = new System.Windows.Forms.ProgressBar();
             this.qaStartButton = new System.Windows.Forms.Button();
@@ -235,6 +236,9 @@
             this.cmbBiasOverride = new System.Windows.Forms.CheckBox();
             this.cmbTestBtn = new System.Windows.Forms.Button();
             this.tabModuleQA = new System.Windows.Forms.TabPage();
+            this.ModuleQA_OffsetLbl = new System.Windows.Forms.Label();
+            this.ModuleQA_Offset = new System.Windows.Forms.NumericUpDown();
+            this.ModuleQA_flipped_Chkbox = new System.Windows.Forms.CheckBox();
             this.ModuleQAHomeResetBtn = new System.Windows.Forms.Button();
             this.ModuleQADarkCurrentBtn = new System.Windows.Forms.Button();
             this.ModuleQAHaltBtn = new System.Windows.Forms.Button();
@@ -258,8 +262,8 @@
             this.moduleQAHomingTimer = new System.Windows.Forms.Timer(this.components);
             this.moduleQAMeasurementTimer = new System.Windows.Forms.Timer(this.components);
             this.ModuleQAStepTimer = new System.Windows.Forms.Timer(this.components);
+            this.LightCheckMeasurementTimer = new System.Windows.Forms.Timer(this.components);
             this.qaDiCounterMeasurementTimer = new System.Windows.Forms.Timer(this.components);
-            this.validateParseChkBox = new System.Windows.Forms.CheckBox();
             this.statusStrip1.SuspendLayout();
             this.tabControl.SuspendLayout();
             this.tabRUN.SuspendLayout();
@@ -297,6 +301,7 @@
             this.cmbTestControl.SuspendLayout();
             this.sipmControl.SuspendLayout();
             this.tabModuleQA.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.ModuleQA_Offset)).BeginInit();
             this.ModuleQAFEB2Box.SuspendLayout();
             this.ModuleQAFEB1Box.SuspendLayout();
             this.SuspendLayout();
@@ -651,6 +656,17 @@
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "RUN CONTROL";
             // 
+            // validateParseChkBox
+            // 
+            this.validateParseChkBox.AutoSize = true;
+            this.validateParseChkBox.Location = new System.Drawing.Point(500, 156);
+            this.validateParseChkBox.Name = "validateParseChkBox";
+            this.validateParseChkBox.Size = new System.Drawing.Size(78, 21);
+            this.validateParseChkBox.TabIndex = 37;
+            this.validateParseChkBox.Text = "Validate";
+            this.validateParseChkBox.UseVisualStyleBackColor = true;
+            this.validateParseChkBox.CheckedChanged += new System.EventHandler(this.ValidateParseChkBox_CheckedChanged);
+            // 
             // saveAsciiBox
             // 
             this.saveAsciiBox.AutoSize = true;
@@ -742,8 +758,6 @@
             // chkFEB2
             // 
             this.chkFEB2.AutoSize = true;
-            this.chkFEB2.Checked = true;
-            this.chkFEB2.CheckState = System.Windows.Forms.CheckState.Checked;
             this.chkFEB2.Location = new System.Drawing.Point(365, 34);
             this.chkFEB2.Name = "chkFEB2";
             this.chkFEB2.Size = new System.Drawing.Size(61, 21);
@@ -2076,7 +2090,7 @@
             this.lightCheckGroup.Controls.Add(this.lightCheckFPGApanel);
             this.lightCheckGroup.Controls.Add(this.label16);
             this.lightCheckGroup.Controls.Add(this.lightCheckResetThresh);
-            this.lightCheckGroup.Controls.Add(this.lightAutoThreshProgress);
+            this.lightCheckGroup.Controls.Add(this.lightCheckProgress);
             this.lightCheckGroup.Controls.Add(this.lightCheckChanThreshBtn);
             this.lightCheckGroup.Controls.Add(this.lightCheckChanThreshLbl);
             this.lightCheckGroup.Controls.Add(this.lightCheckChanThresh);
@@ -2117,6 +2131,7 @@
             0,
             0,
             0});
+            this.lightNumChecks.Visible = false;
             // 
             // lightModuleSideLabel
             // 
@@ -2226,6 +2241,7 @@
             this.label16.Size = new System.Drawing.Size(168, 17);
             this.label16.TabIndex = 191;
             this.label16.Text = "Number of times to check";
+            this.label16.Visible = false;
             // 
             // lightCheckResetThresh
             // 
@@ -2237,14 +2253,14 @@
             this.lightCheckResetThresh.UseVisualStyleBackColor = true;
             this.lightCheckResetThresh.Click += new System.EventHandler(this.LightCheckResetThresh_Click);
             // 
-            // lightAutoThreshProgress
+            // lightCheckProgress
             // 
-            this.lightAutoThreshProgress.Location = new System.Drawing.Point(24, 301);
-            this.lightAutoThreshProgress.Maximum = 64;
-            this.lightAutoThreshProgress.Name = "lightAutoThreshProgress";
-            this.lightAutoThreshProgress.Size = new System.Drawing.Size(239, 23);
-            this.lightAutoThreshProgress.Step = 1;
-            this.lightAutoThreshProgress.TabIndex = 180;
+            this.lightCheckProgress.Location = new System.Drawing.Point(24, 301);
+            this.lightCheckProgress.Maximum = 64;
+            this.lightCheckProgress.Name = "lightCheckProgress";
+            this.lightCheckProgress.Size = new System.Drawing.Size(239, 23);
+            this.lightCheckProgress.Step = 1;
+            this.lightCheckProgress.TabIndex = 180;
             // 
             // lightCheckChanThreshBtn
             // 
@@ -2287,7 +2303,7 @@
             // 
             this.lightCheckChanSelec.Location = new System.Drawing.Point(48, 167);
             this.lightCheckChanSelec.Maximum = new decimal(new int[] {
-            31,
+            63,
             0,
             0,
             0});
@@ -2352,9 +2368,9 @@
             this.dicounterQAGroup.Controls.Add(this.qaOutputFileName);
             this.dicounterQAGroup.Controls.Add(this.qaOutputFileNameLabel);
             this.dicounterQAGroup.Controls.Add(this.oneReadout);
-            this.dicounterQAGroup.Controls.Add(this.qaDiNumAvg);
             this.dicounterQAGroup.Controls.Add(this.qaDiNumAvgLabel);
             this.dicounterQAGroup.Controls.Add(this.qaDiIWarningThreshLabel);
+            this.dicounterQAGroup.Controls.Add(this.qaDiNumAvg);
             this.dicounterQAGroup.Controls.Add(this.qaDiIWarningThresh);
             this.dicounterQAGroup.Controls.Add(this.autoDataProgress);
             this.dicounterQAGroup.Controls.Add(this.qaStartButton);
@@ -2394,10 +2410,29 @@
             this.oneReadout.UseVisualStyleBackColor = true;
             this.oneReadout.CheckedChanged += new System.EventHandler(this.OneReadout_CheckedChanged);
             // 
+            // qaDiNumAvgLabel
+            // 
+            this.qaDiNumAvgLabel.AutoSize = true;
+            this.qaDiNumAvgLabel.Enabled = false;
+            this.qaDiNumAvgLabel.Location = new System.Drawing.Point(253, 30);
+            this.qaDiNumAvgLabel.Name = "qaDiNumAvgLabel";
+            this.qaDiNumAvgLabel.Size = new System.Drawing.Size(61, 17);
+            this.qaDiNumAvgLabel.TabIndex = 114;
+            this.qaDiNumAvgLabel.Text = "NumAvg";
+            // 
+            // qaDiIWarningThreshLabel
+            // 
+            this.qaDiIWarningThreshLabel.AutoSize = true;
+            this.qaDiIWarningThreshLabel.Location = new System.Drawing.Point(320, 31);
+            this.qaDiIWarningThreshLabel.Name = "qaDiIWarningThreshLabel";
+            this.qaDiIWarningThreshLabel.Size = new System.Drawing.Size(59, 17);
+            this.qaDiIWarningThreshLabel.TabIndex = 105;
+            this.qaDiIWarningThreshLabel.Text = "I_thresh";
+            // 
             // qaDiNumAvg
             // 
             this.qaDiNumAvg.Enabled = false;
-            this.qaDiNumAvg.Location = new System.Drawing.Point(251, 54);
+            this.qaDiNumAvg.Location = new System.Drawing.Point(254, 53);
             this.qaDiNumAvg.Maximum = new decimal(new int[] {
             1000,
             0,
@@ -2417,25 +2452,6 @@
             0,
             0,
             0});
-            // 
-            // qaDiNumAvgLabel
-            // 
-            this.qaDiNumAvgLabel.AutoSize = true;
-            this.qaDiNumAvgLabel.Enabled = false;
-            this.qaDiNumAvgLabel.Location = new System.Drawing.Point(249, 31);
-            this.qaDiNumAvgLabel.Name = "qaDiNumAvgLabel";
-            this.qaDiNumAvgLabel.Size = new System.Drawing.Size(61, 17);
-            this.qaDiNumAvgLabel.TabIndex = 114;
-            this.qaDiNumAvgLabel.Text = "NumAvg";
-            // 
-            // qaDiIWarningThreshLabel
-            // 
-            this.qaDiIWarningThreshLabel.AutoSize = true;
-            this.qaDiIWarningThreshLabel.Location = new System.Drawing.Point(320, 31);
-            this.qaDiIWarningThreshLabel.Name = "qaDiIWarningThreshLabel";
-            this.qaDiIWarningThreshLabel.Size = new System.Drawing.Size(59, 17);
-            this.qaDiIWarningThreshLabel.TabIndex = 105;
-            this.qaDiIWarningThreshLabel.Text = "I_thresh";
             // 
             // qaDiIWarningThresh
             // 
@@ -2692,6 +2708,9 @@
             // 
             // tabModuleQA
             // 
+            this.tabModuleQA.Controls.Add(this.ModuleQA_OffsetLbl);
+            this.tabModuleQA.Controls.Add(this.ModuleQA_Offset);
+            this.tabModuleQA.Controls.Add(this.ModuleQA_flipped_Chkbox);
             this.tabModuleQA.Controls.Add(this.ModuleQAHomeResetBtn);
             this.tabModuleQA.Controls.Add(this.ModuleQADarkCurrentBtn);
             this.tabModuleQA.Controls.Add(this.ModuleQAHaltBtn);
@@ -2716,6 +2735,37 @@
             this.tabModuleQA.TabIndex = 9;
             this.tabModuleQA.Text = "Module QA";
             this.tabModuleQA.UseVisualStyleBackColor = true;
+            // 
+            // ModuleQA_OffsetLbl
+            // 
+            this.ModuleQA_OffsetLbl.AutoSize = true;
+            this.ModuleQA_OffsetLbl.Location = new System.Drawing.Point(1074, 31);
+            this.ModuleQA_OffsetLbl.Name = "ModuleQA_OffsetLbl";
+            this.ModuleQA_OffsetLbl.Size = new System.Drawing.Size(100, 17);
+            this.ModuleQA_OffsetLbl.TabIndex = 21;
+            this.ModuleQA_OffsetLbl.Text = "Position Offset";
+            // 
+            // ModuleQA_Offset
+            // 
+            this.ModuleQA_Offset.Location = new System.Drawing.Point(1077, 55);
+            this.ModuleQA_Offset.Maximum = new decimal(new int[] {
+            53,
+            0,
+            0,
+            0});
+            this.ModuleQA_Offset.Name = "ModuleQA_Offset";
+            this.ModuleQA_Offset.Size = new System.Drawing.Size(54, 23);
+            this.ModuleQA_Offset.TabIndex = 20;
+            // 
+            // ModuleQA_flipped_Chkbox
+            // 
+            this.ModuleQA_flipped_Chkbox.AutoSize = true;
+            this.ModuleQA_flipped_Chkbox.Location = new System.Drawing.Point(263, 66);
+            this.ModuleQA_flipped_Chkbox.Name = "ModuleQA_flipped_Chkbox";
+            this.ModuleQA_flipped_Chkbox.Size = new System.Drawing.Size(81, 21);
+            this.ModuleQA_flipped_Chkbox.TabIndex = 19;
+            this.ModuleQA_flipped_Chkbox.Text = "Flipped?";
+            this.ModuleQA_flipped_Chkbox.UseVisualStyleBackColor = true;
             // 
             // ModuleQAHomeResetBtn
             // 
@@ -2953,34 +3003,27 @@
             // 
             // moduleQAHomingTimer
             // 
-            this.moduleQAHomingTimer.Interval = 1000;
+            this.moduleQAHomingTimer.Interval = 200;
             this.moduleQAHomingTimer.Tick += new System.EventHandler(this.ModuleQAHomingTimer_Tick);
             // 
             // moduleQAMeasurementTimer
             // 
-            this.moduleQAMeasurementTimer.Interval = 2000;
+            this.moduleQAMeasurementTimer.Interval = 10;
             this.moduleQAMeasurementTimer.Tick += new System.EventHandler(this.ModuleQAMeasurementTimer_Tick);
             // 
             // ModuleQAStepTimer
             // 
-            this.ModuleQAStepTimer.Interval = 1000;
+            this.ModuleQAStepTimer.Interval = 10;
             this.ModuleQAStepTimer.Tick += new System.EventHandler(this.ModuleQAStepTimer_Tick);
+            // 
+            // LightCheckMeasurementTimer
+            // 
+            this.LightCheckMeasurementTimer.Interval = 50;
+            this.LightCheckMeasurementTimer.Tick += new System.EventHandler(this.LightCheckMeasurementTimer_Tick);
             // 
             // qaDiCounterMeasurementTimer
             // 
-            this.qaDiCounterMeasurementTimer.Interval = 1000;
             this.qaDiCounterMeasurementTimer.Tick += new System.EventHandler(this.QaDiCounterMeasurementTimer_Tick);
-            // 
-            // validateParseChkBox
-            // 
-            this.validateParseChkBox.AutoSize = true;
-            this.validateParseChkBox.Location = new System.Drawing.Point(500, 156);
-            this.validateParseChkBox.Name = "validateParseChkBox";
-            this.validateParseChkBox.Size = new System.Drawing.Size(78, 21);
-            this.validateParseChkBox.TabIndex = 37;
-            this.validateParseChkBox.Text = "Validate";
-            this.validateParseChkBox.UseVisualStyleBackColor = true;
-            this.validateParseChkBox.CheckedChanged += new System.EventHandler(this.ValidateParseChkBox_CheckedChanged);
             // 
             // frmMain
             // 
@@ -3053,6 +3096,7 @@
             this.sipmControl.PerformLayout();
             this.tabModuleQA.ResumeLayout(false);
             this.tabModuleQA.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.ModuleQA_Offset)).EndInit();
             this.ModuleQAFEB2Box.ResumeLayout(false);
             this.ModuleQAFEB1Box.ResumeLayout(false);
             this.ResumeLayout(false);
@@ -3217,7 +3261,7 @@
         private System.Windows.Forms.Label lightCheckChanSelecLbl;
         private System.Windows.Forms.NumericUpDown lightCheckChanSelec;
         private System.Windows.Forms.Button autoThreshBtn;
-        private System.Windows.Forms.ProgressBar lightAutoThreshProgress;
+        private System.Windows.Forms.ProgressBar lightCheckProgress;
         private System.Windows.Forms.Button lightCheckResetThresh;
         private System.Windows.Forms.Label[] lightCMBlabels;
         private System.Windows.Forms.Label[] qaFPGALabels;
@@ -3297,7 +3341,11 @@
         private System.Windows.Forms.Button ModuleQADarkCurrentBtn;
         private System.Windows.Forms.Timer ModuleQAStepTimer;
         private System.Windows.Forms.Button ModuleQAHomeResetBtn;
-        private System.Windows.Forms.Timer qaDiCounterMeasurementTimer;
         private System.Windows.Forms.CheckBox validateParseChkBox;
+        private System.Windows.Forms.Timer LightCheckMeasurementTimer;
+        private System.Windows.Forms.Timer qaDiCounterMeasurementTimer;
+        private System.Windows.Forms.CheckBox ModuleQA_flipped_Chkbox;
+        private System.Windows.Forms.Label ModuleQA_OffsetLbl;
+        private System.Windows.Forms.NumericUpDown ModuleQA_Offset;
     }
 }

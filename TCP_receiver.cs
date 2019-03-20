@@ -121,6 +121,7 @@ namespace TB_mu2e
             }
         }
 
+        //To save trace data (from test beam spills) to file
         public static void ReadFeb(ref Mu2e_FEB_client feb, /*TcpClient feb_client Socket feb_socket,*/ out long lret) //out List<byte> buf,
         {
             //Socket feb_socket = feb.TNETSocket;
@@ -246,6 +247,63 @@ namespace TB_mu2e
 
             //PP.myMain.SpillTimer.Enabled = true;
 
+        }
+
+        //To just read trace data from the FEB and work only in memory, returns true if able to parse, false if not
+        public static bool ReadFeb(ref Mu2e_FEB_client feb, ref SpillData spill, out long lret) 
+        {
+            source_name = feb.name;
+            if (feb.TNETSocket.Available > 0)
+            {
+                byte[] junk = new byte[feb.TNETSocket.Available];
+                feb.stream.Read(junk, 0, feb.TNETSocket.Available);
+            }
+
+            lret = 0;
+            byte[] mem_buff;
+            byte[] b = PP.GetBytes("RDB 1\r\n"); //get the spill header (and 1 word) & reset read pointers
+            byte[] hdr_buf = new byte[18];
+            long spillwrdcnt = 0; //spill word count will be the total spill count for the FEB (which means BOTH FPGAs)
+            feb.TNETSocket.Send(b);
+            Thread.Sleep(10);
+            if (feb.TNETSocket.Available > 0) //if we can snag the wordcount from the spill header, then we know how much we should be reading
+            {
+                feb.TNETSocket.Receive(hdr_buf);
+                spillwrdcnt = (hdr_buf[0] * 256 * 256 * 256 + //spillwrdcnt is how many words there are for ALL fpgas in a given spill
+                               hdr_buf[1] * 256 * 256 +
+                               hdr_buf[2] * 256 +
+                               hdr_buf[3]);
+
+                mem_buff = new byte[spillwrdcnt * 2]; //each word = 2 bytes, we are going to allocate a buffer in memory to read the FEB data into that is the correct size.
+                int bytesread = 0;
+                int bytesleft = (int)spillwrdcnt * 2;
+                try
+                {
+                    b = PP.GetBytes("RDB\r\n");
+                    feb.TNETSocket.Send(b);
+                    Thread.Sleep(10);
+
+                    do
+                    {
+                        int bytes_now = feb.stream.Read(mem_buff, bytesread, feb.TNETSocket.Available);
+                        bytesread += bytes_now;
+                        bytesleft -= bytes_now;
+                        Thread.Sleep(100);
+                    } while (feb.stream.DataAvailable);
+
+                    lret = bytesread;
+                }
+                catch (System.IO.IOException)
+                {
+                    feb.Close(); //IO exception thrown if socket was forcibly closed by FEB, so lets tell the C# FEB client it is closed
+                } //something went wrong skip spill
+
+                spill = new SpillData();
+                bool parse_ok = spill.ParseInput(mem_buff);
+                return parse_ok;
+            }
+            else
+                return false;
         }
     }
 }

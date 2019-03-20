@@ -110,19 +110,23 @@ namespace TB_mu2e
         //Read the temperatures from all the CMBs on a given FPGA
         public double[] ReadTempFPGA(int fpga = 0)
         {
-            double[] cmb_temps = new double[4];
+            double[] cmb_temps = { 0, 0, 0, 0 }; //new double[4];
 
-            ReadStr(out string junk, out int junkL);
+            //ReadStr(out string junk, out int junkL);
 
-            SendStr("cmb");//SendStr("STAB" );
+            SendStr("cmb");
             ReadStr(out string a, out int r);
-            if (a.Length > 40) //If it got 'all' the info
+            if (a.Length > 32) //If it got 'all' the info (32 is just the header: "Ch    DegC     ROM_ID  (Errs=0)")
             {
                 string[] tok = a.Split(new string[] { " ", Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
                 if (String.Equals(tok[1], "DegC")) //Preproduction FEB 'cmb' format
                 {
-                    for (int cmb = 0; cmb < 4; cmb++)
-                        cmb_temps[cmb] = Convert.ToDouble(tok[(cmb * 3) + (12 * fpga) + 5]); //Starting at index 5, every 3rd string is the cmb temperature
+                    for (int i = 4; i < tok.Length; i += 3)
+                    {
+                        int cmb = Convert.ToInt16(tok[i]) - 1; //start numbering at 0 instead of 1
+                        if (cmb / 4 == fpga)
+                            cmb_temps[cmb % 4] = Convert.ToDouble(tok[i + 1]);
+                    }
                 }
                 else if (String.Equals(tok[1], "Cnts_TEMP_DegC")) //Prototype FEB 'cmb' format
                 {
@@ -146,16 +150,21 @@ namespace TB_mu2e
                 return cmb_temp;
             //Else we can assume the user has given a cmb # between 0 and 3, and provided the FPGA number
 
-            SendStr("cmb");//SendStr("STAB" );
+            SendStr("cmb");
             ReadStr(out string a, out int r);
-            if (a.Length > 400)//If it got 'all' the info
+            if (a.Length > 32) //If it got 'all' the info (32 is just the header: "Ch    DegC     ROM_ID  (Errs=0)")
             {
                 string[] tok = a.Split(new string[] { " ", Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
                 try
                 {
                     if (String.Equals(tok[1], "DegC")) //Preproduction FEB 'cmb' format
                     {
-                        cmb_temp = Convert.ToDouble(tok[(cmb * 3) + (12 * fpga) + 5]); //Starting at index 5, every 3rd string is the cmb temperature
+                        for (int i = 4; i < tok.Length; i += 3) //Scan through the returned list for the CMB we are interested in
+                        {
+                            int cmb_num = Convert.ToInt16(tok[i]) - 1; //start numbering at 0 instead of 1
+                            if ((cmb_num/4 == fpga) && (cmb_num % 4 == cmb)) //If the cmb number is on the correct fpga and the one that was requested (0-3), then return the temperature
+                                cmb_temp = Convert.ToDouble(tok[i + 1]);
+                        }
                     }
                     else if (String.Equals(tok[1], "Cnts_TEMP_DegC")) //Prototype FEB 'cmb' format
                     {
@@ -441,7 +450,6 @@ namespace TB_mu2e
                 {
                     if (TNETSocket.Available > 0)
                     {
-                        Thread.Sleep(1);
                         byte[] buf = new byte[TNETSocket.Available];
                         TNETSocket.Receive(buf);
                     }

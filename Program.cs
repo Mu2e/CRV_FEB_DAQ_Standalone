@@ -320,7 +320,7 @@ namespace TB_mu2e
     {
         private ConcurrentDictionary<int, double> currentMeasurements; //concurrent dictionary is thread-safe
         private Mu2e_FEB_client feb;
-        private string filename;
+        private readonly string filename;
 
         public CurrentMeasurements(Mu2e_FEB_client feb_client, string _filename)
         {
@@ -415,12 +415,17 @@ namespace TB_mu2e
             side = side_in;
         }
 
-        public void TakeMeasurement(int channel) //takes a current measurement for the same channel on all FEBs
+        public double[] TakeMeasurement(int channel) //takes a current measurement for the same channel on all FEBs
         {
+            double[] currents = new double[febs.Count];
             int fpga = channel / 16;
             int chan_fpga = channel % 16;
-            for(int i = 0; i < febs.Count; i++)
+            for (int i = 0; i < febs.Count; i++)
+            {
                 currentMeasurements[i].TryAdd(channel, Convert.ToDouble(febs[i].ReadA0(fpga, chan_fpga)));
+                currents[i] = currentMeasurements[i][channel];
+            }
+            return currents;
         }
 
         public void WriteMeasurements(string filename, double temperature, int dicounter)
@@ -441,10 +446,10 @@ namespace TB_mu2e
             }
         }
 
-        public string GetgCodeDicounterPosition(int dicounter, int feedrate)
+        public string GetgCodeDicounterPosition(int dicounter, int feedrate, int pos_offset)
         {
             int feed = feedrate;
-            if (dicounter > 100 || dicounter < 0)
+            if (dicounter > 8/*100*/ || dicounter < 0)
                 return "G1 X0 F1000";
             if (feedrate <= 0 || feedrate > 3000)
                 feed = 1000;
@@ -452,22 +457,23 @@ namespace TB_mu2e
                          width_bar = 51.33,
                          offset = 42.00;
             const string basegCode = "G1 X";
-            int layer = dicounter / 8, pos_layer = dicounter % 8;
+            //int layer = dicounter / 8, pos_layer = dicounter % 8;
             //double position = (pos_layer * width_dicounter) + (layer * offset);
-            double position = dicounter * 5.0; //5mm
-            string dicounterPositionCommand = basegCode + position + " F" + Convert.ToString(feed);
+            //double position = dicounter * 5.0; //5mm
+            double position = pos_offset + (dicounter * width_dicounter);
+            string dicounterPositionCommand = basegCode + position + " F" + feed;
             return dicounterPositionCommand;
         }
-
 
     }
 
     static class PP
     {
-        public static bool glbDebug=false;
+        public static bool glbDebug = false;
         public static Run myRun;
         public static CurrentMeasurements qaDicounterMeasurements;
         public static ModuleQACurrentMeasurements moduleQACurrentMeasurements;
+        public static CurrentMeasurements lightCheckMeasurements;
         //        public static frmTelnet myTelnet;
         //        public static Plot0 myPlot;
         public static frmMain myMain;
@@ -605,9 +611,9 @@ namespace TB_mu2e
                 name = "FEB1",
                 //host_name_prop = "131.225.52.181";
                 //host_name_prop = "128.143.196.218";
-                //host_name_prop = "128.143.196.54";
+                host_name_prop = "128.143.196.54"
                 //host_name_prop = "131.225.52.177";
-                host_name_prop = "crvfeb01.fnal.gov"
+                //host_name_prop = "crvfeb01.fnal.gov"
                 //host_name_prop = "131.225.176.32"
                 //host_name_prop = "131.225.52.182"
             };

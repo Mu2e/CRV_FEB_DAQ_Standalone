@@ -42,6 +42,10 @@ namespace TB_mu2e
         private const int num_chans = 16;
         private System.Windows.Forms.Label[] BDVoltLabels = new System.Windows.Forms.Label[num_chans];
 
+        private const double NO_CURRENT_THRESH = 0.025;
+        private const double AUTO_THRESH_MULTIPLIER = 1.10; //10% higher
+        private bool auto_thresh_enabled = false;
+
         private SerialPort comPort;
         private string[] portList;
         private bool zerod;
@@ -598,19 +602,22 @@ namespace TB_mu2e
                         txtV.Text = PP.FEB1.ReadV((int)udFPGA.Value).ToString("0.000");
                         txtI.Text = PP.FEB1.ReadA0((int)udFPGA.Value, (int)udChan.Value).ToString("0.0000");
 
-                        double I1 = 0;
-                        int nGoodReads = 0;
-                        for (int i = 0; i < nreads.Value; i++)
-                        {
-                            double I1now = PP.FEB1.ReadA0((int)udFPGA.Value, (int)udChan.Value);
-                            if (I1now > 0)
-                            {
-                                I1 = I1 + I1now;
-                                nGoodReads++;
-                            }
-                            //                            Console.WriteLine(PP.FEB1.ReadA0((int)udFPGA.Value, (int)udChan.Value));
-                        }
-                        txtI.Text = (I1 / (double)(nGoodReads)).ToString("0.0000");
+                        //
+                        // Who knows why this junk is here...
+                        //
+                        //double I1 = 0;
+                        //int nGoodReads = 0;
+                        //for (int i = 0; i < nreads.Value; i++)
+                        //{
+                        //    double I1now = PP.FEB1.ReadA0((int)udFPGA.Value, (int)udChan.Value);
+                        //    if (I1now > 0)
+                        //    {
+                        //        I1 = I1 + I1now;
+                        //        nGoodReads++;
+                        //    }
+                        //    //                            Console.WriteLine(PP.FEB1.ReadA0((int)udFPGA.Value, (int)udChan.Value));
+                        //}
+                        //txtI.Text = (I1 / (double)(nGoodReads)).ToString("0.0000");
 
                         cmb_temp = PP.FEB1.ReadTempFPGA((int)udFPGA.Value);
                         break;
@@ -2152,32 +2159,41 @@ namespace TB_mu2e
 
         private void InitializeModuleQATab()
         {
-            //Create labels for the Module QA Tab
-            ModuleQALabels = new System.Windows.Forms.Label[2][]; //One collection of 64 labels for each FEB
+            if(ModuleQALabels == null)             //Create labels for the Module QA Tab
+                ModuleQALabels = new System.Windows.Forms.Label[2][]; //One collection of 64 labels for each FEB
             for (uint feb = 0; feb < 2; feb++)
             {
-                ModuleQALabels[feb] = new System.Windows.Forms.Label[64]; //64 channels on an FEB
+                if(ModuleQALabels[feb] == null)
+                    ModuleQALabels[feb] = new System.Windows.Forms.Label[64]; //64 channels on an FEB
                 for (uint channel = 0; channel < 64; channel++)
                 {
-                    ModuleQALabels[feb][channel] = new System.Windows.Forms.Label
+                    if (ModuleQALabels[feb][channel] == null)
                     {
-                        Name = "moduleQAChannelLbl_FEB" + (feb).ToString() + "_ch" + (channel).ToString(),
-                        Text = (channel).ToString() + ":\n",
-                        Margin = new System.Windows.Forms.Padding(0, 3, 0, 3),
-                        TextAlign = System.Drawing.ContentAlignment.MiddleLeft,
-                        Dock = System.Windows.Forms.DockStyle.Fill
-                    };
-                    switch (feb) //Put the info into the table
+                        ModuleQALabels[feb][channel] = new System.Windows.Forms.Label
+                        {
+                            Name = "moduleQAChannelLbl_FEB" + (feb).ToString() + "_ch" + (channel).ToString(),
+                            Text = (channel).ToString() + ":\n",
+                            Margin = new System.Windows.Forms.Padding(0, 3, 0, 3),
+                            TextAlign = System.Drawing.ContentAlignment.MiddleLeft,
+                            Dock = System.Windows.Forms.DockStyle.Fill
+                        };
+                        switch (feb) //Put the info into the table
+                        {
+                            case 0:
+                                ModuleQATableFEB1.Controls.Add(ModuleQALabels[feb][channel]);
+                                break;
+                            case 1:
+                                ModuleQATableFEB2.Controls.Add(ModuleQALabels[feb][channel]);
+                                break;
+                            default:
+                                break;
+                        };
+                    }
+                    else //reset the label text
                     {
-                        case 0:
-                            ModuleQATableFEB1.Controls.Add(ModuleQALabels[feb][channel]);
-                            break;
-                        case 1:
-                            ModuleQATableFEB2.Controls.Add(ModuleQALabels[feb][channel]);
-                            break;
-                        default:
-                            break;
-                    };
+                        ModuleQALabels[feb][channel].Text = (channel).ToString() + ":\n";
+                        ModuleQALabels[feb][channel].Refresh();
+                    }
                 }
             }
 
@@ -2199,7 +2215,7 @@ namespace TB_mu2e
 
         private void QaStartButton_Click(object sender, EventArgs e)
         {
-            if (PP.FEB1.client != null && qaDiCounterMeasurementTimer.Enabled == false) //If the FEB is connected and we aren't currently taking measurements, then proceed.
+            if (PP.FEB1.client != null)// && qaDiCounterMeasurementTimer.Enabled == false) //If the FEB is connected and we aren't currently taking measurements, then proceed.
             {
 
                 if (qaDiCounterMeasurementTimer.Enabled)
@@ -2210,6 +2226,7 @@ namespace TB_mu2e
                     qaStartButton.Text = "Auto Data";
                     qaStartButton.BackColor = SystemColors.Control;
                     qaStartButton.Update();
+                    lightCheckGroup.Enabled = true;
                 }
                 else
                 {
@@ -2225,7 +2242,7 @@ namespace TB_mu2e
                     autoThreshBtn.Enabled = false;
                     lightCheckResetThresh.Enabled = false;
                     lightCheckBtn.Enabled = false;
-                    string[] chanOuts = new string[qaDiButtons.Length];
+                    //string[] chanOuts = new string[qaDiButtons.Length];
                     autoDataProgress.Maximum = qaDiButtons.Length; //set the max of the progress bar
 
                     if (PP.qaDicounterMeasurements == null)
@@ -2235,64 +2252,19 @@ namespace TB_mu2e
 
                     foreach (var btn in qaDiButtons) { if (!btn.Checked) { btn.BackColor = Color.Green; btn.Update(); } } //Reset all active channel indicators to green
 
-                    PP.FEB1.SetV(Convert.ToDouble(qaBias.Text)); //Turn on the bias
 
                     currentChannel = 0; //Set the current channel being measured to 0
                     dicounterNumberTextBox.Enabled = false;
+                    lightCheckGroup.Enabled = false;
+
+                    PP.FEB1.SetV(Convert.ToDouble(qaBias.Text)); //Turn on the bias
+
                     qaDiCounterMeasurementTimer.Enabled = true;
                 }
 
                 ////Data are written to the Google Drive, CRV Fabrication Documents folder ScanningData, subfolder DicounterQA
                 ////'using' will ensure the writer is closed/destroyed if the scope of the structure is left due to code-completion or a thrown exception
                 //using (StreamWriter writer = File.AppendText("C:\\Users\\Boi\\Desktop\\ScanningData_test.txt"))//"C:\\Users\\FEB-Laptop-1\\Google Drive\\CRV Fabrication Documents\\Data\\QA\\Dicounter Source Testing\\ScanningData_" + qaOutputFileName.Text + ".txt")) //The output file
-                //{
-                //    writer.Write("{0}\t", numTextBox.Text); //Write dicounter number to file
-
-                //    //Write temp to file
-                //    double[] temp = { 0, 0, 0, 0 };
-                //    for (int numTries = 0; numTries < 10; numTries++) //Try and read the temperature 10 times
-                //        temp = PP.FEB1.ReadTempFPGA();                    //read the temperatures on FPGA 0
-                //    writer.Write("{0}\t", temp[0].ToString("0.00"));  //Write the temperature, in degrees C, as measured by the first CMB
-
-                //    //Write date to file
-                //    writer.Write("{0}\t", DateTime.Now.ToString("MM/dd/yy HH:mm\t")); //Changed to 24 hour time format to match database storage format
-
-                //    PP.FEB1.SetV(Convert.ToDouble(qaBias.Text)); //Turn on bias for the first FPGA (since this is the only one used for dicounter QA)
-
-                //    foreach (var btn in qaDiButtons) { if (!btn.Checked) { btn.BackColor = Color.Green; btn.Update(); } } //Reset all active channel indicators to green
-
-                //    foreach (var btn in qaDiButtons)
-                //    {
-                //        double averageCurrent = 0;
-                //        int channel = Convert.ToInt16(btn.Name.Substring(10)); //Gets the channel number from the name "qaDiButton##"
-                //        if (!btn.Checked)
-                //        {
-                //            for (int measI = 0; measI < Convert.ToInt16(qaDiNumAvg.Value); measI++)
-                //                averageCurrent += Convert.ToDouble(PP.FEB1.ReadA0(0, channel)); //read the current for the specified channel on FPGA 0
-                //            averageCurrent /= Convert.ToDouble(qaDiNumAvg.Value);
-                //            if (averageCurrent < Convert.ToDouble(qaDiIWarningThresh.Text)) //if the current was less than warning thresh && we still have current, update the color of the lamp
-                //                qaDiButtons[channel].BackColor = Color.Red;
-                //            if (averageCurrent < 0.025) //if there was no current then
-                //                qaDiButtons[channel].BackColor = Color.Blue; //set indicator color to blue: "cold-no-current"
-                //            qaDiButtons[channel].Update();
-                //        }
-
-                //        chanOuts[channel] = averageCurrent.ToString("0.0000");
-                //        Console.WriteLine("Channel {0}: {1}", channel, chanOuts[channel]);
-                //        writer.Write("{0}\t", chanOuts[channel]); //write out the current for the channel
-                //        autoDataProgress.Increment(1);
-                //    }
-                //    writer.WriteLine(); //write a 'return' to file
-
-                //    PP.FEB1.SetV(0.0); //Turn off the bias
-                //    autoDataProgress.Value = 0; //Set the progress bar back to 0
-                //    autoDataProgress.Update();
-                //}
-
-                //qaStartButton.Enabled = true;
-                //autoThreshBtn.Enabled = true;
-                //lightCheckResetThresh.Enabled = true;
-                //lightCheckBtn.Enabled = true;
             }
         }
 
@@ -2300,52 +2272,51 @@ namespace TB_mu2e
         {
             if (PP.FEB1.client != null) //If the FEB is connected, then proceed
             {
-                autoThreshBtn.Enabled = false;  //prevents multiple clicks of the buttons
-                qaStartButton.Enabled = false;
-                lightCheckResetThresh.Enabled = false;
-                lightCheckBtn.Enabled = false;
-
-                PP.FEB1.SetVAll(Convert.ToDouble(qaBias.Text)); //Turn on the bias for ALL FPGAs
-
-                foreach (var btn in lightButtons)
+                if (LightCheckMeasurementTimer.Enabled)
                 {
-                    if (!btn.Checked)
-                    {
-                        btn.BackColor = Color.Green;
-                        btn.Update();
-                    }
-                } //Reset all active channel indicators to green
+                    LightCheckMeasurementTimer.Enabled = false;
+                    PP.lightCheckMeasurements.TurnOffBias();
+                    PP.lightCheckMeasurements.Purge();
+                    autoThreshBtn.Text = "Auto Thresh";
+                    autoThreshBtn.BackColor = SystemColors.Control;
+                    autoThreshBtn.Update();
+                    auto_thresh_enabled = false;
+                    lightModuleLabel.Enabled = true;
+                    lightModuleLayer.Enabled = true;
+                    lightModuleSide.Enabled = true;
+                    dicounterQAGroup.Enabled = true;
+                    lightCheckResetThresh.Enabled = true;
+                    lightCheckBtn.Enabled = true;
 
-                foreach (var btn in lightButtons)
-                {
-                    if (!btn.Checked)
-                    {
-                        int channel = Convert.ToInt16(btn.Text);
-                        double average = PP.FEB1.ReadA0(channel / 16, channel % 16); //read the current for the specified channel on the correct FPGA
-
-                        if (average < 0.025) //If no current update the color of the lamp
-                        {
-                            btn.BackColor = Color.Blue; //set lamp color to blue "cold-no-current"
-                            btn.Update();
-                        }
-                        else
-                        {
-                            PP.lightCheckChanThreshs[channel] = average * 1.10; //set the threshold to 10% higher than dark-current
-                        }
-                    }
-                    lightAutoThreshProgress.Increment(1);
                 }
+                else
+                {
+                    //Allow the button to switch to being a stop for the threshold finding
+                    autoThreshBtn.Text = "STOP";
+                    autoThreshBtn.BackColor = Color.Red;
+                    autoThreshBtn.Update();
 
-                PP.FEB1.SetVAll(0.0);//Turn off the bias
-                lightAutoThreshProgress.Value = 0;
-                lightAutoThreshProgress.Update();
+                    if (PP.lightCheckMeasurements == null) //If the measurement object is not yet created, create it now
+                        PP.lightCheckMeasurements = new CurrentMeasurements(PP.FEB1, "C:\\Users\\Boi\\Desktop\\Module.txt");
+                    else //Otherwise, purge any data that was present
+                        PP.lightCheckMeasurements.Purge();
 
-                lightCheckChanThresh.Text = PP.lightCheckChanThreshs[Convert.ToUInt16(lightCheckChanSelec.Value)].ToString("0.0000"); //update the current channel to display the new thresh
+                    foreach (var btn in lightButtons) { if (!btn.Checked) { btn.BackColor = Color.Green; btn.Update(); } } //Reset all active channels
 
-                autoThreshBtn.Enabled = true;
-                qaStartButton.Enabled = true;
-                lightCheckResetThresh.Enabled = true;
-                lightCheckBtn.Enabled = true;
+
+                    currentChannel = 0;
+                    lightModuleLabel.Enabled = false;
+                    lightModuleLayer.Enabled = false;
+                    lightModuleSide.Enabled = false;
+                    dicounterQAGroup.Enabled = false;
+                    lightCheckResetThresh.Enabled = false;
+                    lightCheckBtn.Enabled = false;
+                    auto_thresh_enabled = true;
+
+                    PP.FEB1.SetVAll(Convert.ToDouble(qaBias.Text));
+
+                    LightCheckMeasurementTimer.Enabled = true;
+                }
             }
         }
 
@@ -2370,159 +2341,50 @@ namespace TB_mu2e
         {
             if (PP.FEB1.client != null)
             {
-                lightCheckBtn.Enabled = false;  //prevents multiple clicks on the button
-                autoThreshBtn.Enabled = false;
-                qaStartButton.Enabled = false;
-                lightCheckResetThresh.Enabled = false;
-
-                //Writes the file to the CRV Fabrication Documents, ScanningData folder on the Google Drive, subfolder ModuleLightCheck
-                //'using' will ensure the writer is closed/destroyed if the scope of the structure is left due to code-completion or a thrown exception
-                using (StreamWriter writer = File.AppendText("C:\\Users\\Boi\\Desktop\\Module.txt"))// "C:\\Users\\FEB-Laptop-1\\Google Drive\\CRV Fabrication Documents\\Data\\QA\\Module Light Leak Testing\\LightCheck.txt")) //Path for file output of lightcheck
+                if(LightCheckMeasurementTimer.Enabled)
                 {
-                    if (lightWriteToFileBox.Checked)
-                    {
-                        writer.Write("{0}\t", lightModuleLabel.Text); //write out the module name
-                        writer.Write("{0}\t", lightModuleSide.Text); //write out the module side
-                        writer.Write("{0}\t", lightModuleLayer.Value.ToString()); //write out the module layer
-                        writer.Write("{0}", DateTime.Now.ToString("g")); // write out the timestamp
-                    }
+                    LightCheckMeasurementTimer.Enabled = false;
+                    PP.lightCheckMeasurements.TurnOffBias();
+                    PP.lightCheckMeasurements.Purge();
+                    lightCheckBtn.Text = "Light Check";
+                    lightCheckBtn.BackColor = SystemColors.Control;
+                    lightCheckBtn.Update();
+                    lightModuleLabel.Enabled = true;
+                    lightModuleLayer.Enabled = true;
+                    lightModuleSide.Enabled = true;
+                    dicounterQAGroup.Enabled = true;
+                    lightCheckResetThresh.Enabled = true;
+                    autoThreshBtn.Enabled = true;
+                    lightWriteToFileBox.Enabled = true;
 
-                    PP.FEB1.SetVAll(Convert.ToDouble(qaBias.Text)); //Turn on the bias
-
-                    //initially set to green
-                    for (int btn = 0; btn < lightButtons.Length; btn++)
-                    {
-                        if (!lightButtons[btn].Checked)
-                        {
-                            lightButtons[btn].BackColor = Color.Green;
-                            lightButtons[btn].Text = btn.ToString();
-                            lightButtons[btn].Update();
-                        }
-
-                    }
-                    int numChecked = 0;
-                    foreach (RadioButton r in lightButtons)
-                    {
-                        if (!r.Checked) numChecked++;
-                    }
-                    int numAverages = numChecked;
-                    //double[] averages = new double[numAverages];
-
-                    //for (int i = 0; i < numAverages; i++)
-                    //{
-                    //    averages[i] = 0;
-                    //}
-                    int numTimesToCheck = 1;
-                    if (!lightWriteToFileBox.Checked)
-                        numTimesToCheck = (int)lightNumChecks.Value;
-                    for (int j = 0; j < numTimesToCheck; j++)
-                    {
-                        double total_avg_I = 0;
-                        for (int chan = 0; chan < lightButtons.Length; chan++)
-                        {
-                            if (!lightButtons[chan].Checked)
-                            {
-                                double average = PP.FEB1.ReadA0(chan / 16, chan % 16);
-                                //averages[i] = average;
-                                if (average > 0)
-                                    total_avg_I += average / numAverages;
-
-                                if (!globalThreshChkBox.Checked) // if the global thresh box is not checked, then use individual channels thresh
-                                {
-                                    if (average > PP.lightCheckChanThreshs[chan]) //If the current is above the thresh, light leak!
-                                        lightButtons[chan].BackColor = Color.Red; //flag the channel
-                                    else if (average < 0.025) //if it died or bias is lost, set "cold-no-current"
-                                        lightButtons[chan].BackColor = Color.Blue;
-
-                                    lightButtons[chan].Text = "" + Math.Round(average, 2);
-                                    lightButtons[chan].Update();
-                                    if (j == 0 && lightWriteToFileBox.Checked && lightWriteToFileBox.Enabled)
-                                    {
-                                        writer.WriteLine("");
-                                        writer.Write("\t{0}\t", chan.ToString());
-                                        writer.Write("{0}\t", ((double)PP.lightCheckChanThreshs[chan] / 1.1).ToString("0.0000"));
-                                        writer.Write("{0}", average.ToString("0.0000"));
-                                    }
-                                }
-                                else
-                                {
-                                    if (average > Convert.ToDouble(lightGlobalThresh.Text)) //If the current is above the thresh, light leak!
-                                        lightButtons[chan].BackColor = Color.Red; //flag the channel
-                                    else if (average < 0.025) //if it died or bias is lost, set "cold-no-current"
-                                        lightButtons[chan].BackColor = Color.Blue;
-
-                                    lightButtons[chan].Text = Math.Round(average, 2).ToString(); //Update each channel with the current reading
-                                    lightButtons[chan].Update();
-
-                                    if (j == 0 && lightWriteToFileBox.Checked && lightWriteToFileBox.Enabled)
-                                    {
-                                        writer.WriteLine("");
-                                        writer.Write("\t{0}\t", chan.ToString());
-                                        writer.Write("{0}\t", lightGlobalThresh.Text);
-                                        writer.Write("{0}", average.ToString("0.0000"));
-                                    }
-                                }
-                            }
-                            else
-                            {
-                                //averages[i] = 0;
-                            }
-                        }
-                        //foreach (double d in averages)
-                        //{
-                        //    sum += d / (double)numAverages;
-                        //}
-                        //Console.WriteLine("Sum: " + total_avg_I);
-                        //if (total_avg_I >= 0.1)
-                        //{
-                        //    int signal = 0;
-                        //    if (total_avg_I / .1 < 1)
-                        //    {
-                        //        signal = 1;
-                        //    }
-                        //    else if (total_avg_I / .1 > 20)
-                        //    {
-                        //        signal = 20;
-                        //    }
-                        //    else
-                        //    {
-                        //        signal = (int)(total_avg_I / .1);
-                        //    }
-                        //    Console.WriteLine("Signal: " + signal);
-                        //    //System.Windows.Media.MediaPlayer[] players = new System.Windows.Media.MediaPlayer[signal];
-                        //    for (int m = 0; m < signal; m++)
-                        //    {
-                        //        new System.Threading.Thread(() =>
-                        //        {
-                        //            var c = new System.Windows.Media.MediaPlayer();
-                        //            c.Open(new System.Uri(@"C:\Users\FEB-Laptop-1\Desktop\beep-07.wav"));
-                        //            c.Play();
-                        //        }).Start();
-                        //        //players[m] = new System.Windows.Media.MediaPlayer();
-                        //        //players[m].Open(new System.Uri(@"C:\Users\FEB-Laptop-1\Desktop\chimes.wav"));
-                        //        //players[m].Play();
-                        //        System.Threading.Thread.Sleep(100);
-                        //        //                        System.Media.SystemSounds.Beep.Play();
-
-                        //    }
-                        //}
-                        lightAutoThreshProgress.Increment(1);
-                    }
-
-
-                    PP.FEB1.SetVAll(0.0);
-                    txtI.Text = PP.FEB1.ReadA0((int)udFPGA.Value, (int)udChan.Value).ToString("0.0000");
-
-
-                    if (lightWriteToFileBox.Checked)
-                        writer.WriteLine();
                 }
+                else
+                {
+                    //Allow the button to switch to being a stop for the light tight checking
+                    lightCheckBtn.Text = "STOP";
+                    lightCheckBtn.BackColor = Color.Red;
+                    lightCheckBtn.Update();
 
-                lightAutoThreshProgress.Increment(-64);
-                lightCheckBtn.Enabled = true;
-                autoThreshBtn.Enabled = true;
-                qaStartButton.Enabled = true;
-                lightCheckResetThresh.Enabled = true;
+                    if (PP.lightCheckMeasurements == null) //If the measurement object is not yet created, create it now
+                        PP.lightCheckMeasurements = new CurrentMeasurements(PP.FEB1, "C:\\Users\\Boi\\Desktop\\Module.txt");
+                    else //Otherwise, purge any data that was present
+                        PP.lightCheckMeasurements.Purge();
+
+                    foreach(var btn in lightButtons) { if (!btn.Checked) { btn.BackColor = Color.Green; btn.Update(); } } //Reset all active channels
+
+                    currentChannel = 0;
+                    lightModuleLabel.Enabled = false;
+                    lightModuleLayer.Enabled = false;
+                    lightModuleSide.Enabled = false;
+                    dicounterQAGroup.Enabled = false;
+                    lightCheckResetThresh.Enabled = false;
+                    autoThreshBtn.Enabled = false;
+                    lightWriteToFileBox.Enabled = false;
+
+                    PP.FEB1.SetVAll(Convert.ToDouble(qaBias.Text));
+
+                    LightCheckMeasurementTimer.Enabled = true;
+                }
             }
         }
 
@@ -2615,8 +2477,10 @@ namespace TB_mu2e
             double fitThresh = 7.5;
             double flashGateDifferenceThresh = 20;
             double ledDifferenceThresh = 50; //Initial testing value
-            uint ledFlasherIntensity = 0x400; //3.5V
+            double cmbLedIntThresh = 25000;
+            uint ledFlasherIntensity = 0xFFF; //14V //0x400; //3.5V
             double maxUndershootThresh = 30; //Value is in ADC
+            int upperBinInt = 400;
             //Check that an FEB client exists, otherwise, don't bother setting up the pulser or trying to get data
             if (PP.FEB1.client != null)
             {
@@ -2660,7 +2524,7 @@ namespace TB_mu2e
                 PP.FEB1.SendStr("cmb"); //Ask the FEB about the CMBs
                 System.Threading.Thread.Sleep(100); //Wait for the FEB to get the message and respond
                 PP.FEB1.ReadStr(out string cmbMsg, out int r);
-                if (cmbMsg.Length > 400)//If it got 'all' the info
+                if (cmbMsg.Length > 32) //If it got 'all' the info (32 is just the header: "Ch    DegC     ROM_ID  (Errs=0)")
                 {
                     try
                     {
@@ -2668,18 +2532,36 @@ namespace TB_mu2e
 
                         if (String.Equals(tok[1], "DegC")) //Preproduction FEB 'cmb' format
                         {
-                            for (int cmb = 0; cmb < 16; cmb++)
+                            for (int i = 4; i+2 < tok.Length; i += 3)
                             {
+                                int cmb;
+                                try { cmb = Convert.ToInt16(tok[i]) - 1; } //start numbering at 0 instead of 1 
+                                catch { continue; } //in case there is an 'invalid' cmb number, skip.
+
                                 cmbs[cmb].num = cmb;
-                                cmbs[cmb].temp = Convert.ToDouble(tok[(cmb * 3) + 5]); //Starting at index 5, every 3rd string is the cmb temperature
-                                cmbs[cmb].rom_id = tok[(cmb * 3) + 6]; //Starting at index 6, every 3rd string is the cmb ROM_ID
-                                if (cmbs[cmb].temp == 0 || cmbs[cmb].rom_id == "0")
+
+                                try
                                 {
-                                    cmbs[cmb].flagged = true; //Flag the CMB if the temp or ROM_ID couldn't be read
+                                    cmbs[cmb].temp = Convert.ToDouble(tok[i + 1]);
+                                    cmbs[cmb].rom_id = tok[i + 2]; //TODO: Determine what the format of the rom_id should be so it can be checked for validity
+                                    cmbs[cmb].flagged = false;
+                                }
+                                catch (FormatException)
+                                {
+                                    cmbs[cmb].temp = -1;
+                                    cmbs[cmb].flagged = true;
                                     cmbs[cmb].failureType = (int)CMB.Failure.TempRom;
                                 }
-                                else
-                                    cmbs[cmb].flagged = false;
+                            }
+
+                            //Loop over all the CMBs in the list and flag all the ones that weren't shown by the FEB
+                            for(int cmb = 0; cmb < cmbs.Length; cmb++)
+                            {
+                                if (String.IsNullOrEmpty(cmbs[cmb].rom_id))
+                                {
+                                    cmbs[cmb].num = cmb;
+                                    cmbs[cmb].flagged = true;
+                                }
                             }
                         }
                         else if (String.Equals(tok[1], "Cnts_TEMP_DegC")) //Prototype FEB 'cmb' format
@@ -2842,24 +2724,29 @@ namespace TB_mu2e
 
                 Mu2e_Register.WriteReg(0x100, ref trigControlReg, ref PP.FEB1.client); //Enable the on-board test pulser, output of this signal will be delivered to external pulser to flash LED
                 Mu2e_Register.WriteReg(0x5E5E5E/*0x5E5E5E*/, ref testPulseFreqReg, ref PP.FEB1.client); //Set the on-board test pulser's frequency to ~230kHz
-                Mu2e_Register.WriteReg(0x1, ref hitPipelineDelayReg, ref PP.FEB1.client); //Set the hit pipeline delay to minimum value (12.56ns)
+                Mu2e_Register.WriteReg(0x4, ref hitPipelineDelayReg, ref PP.FEB1.client); //Set the hit pipeline delay to a low value (4 x 12.56ns)
 
                 for (uint channel = 0; channel < 64; channel++)
                 {
                     int cmbNum = (int)channel / 4; //spans from 0-15
                     if (peHistos[channel] == null && !(cmbs[cmbNum].flagged)) //skip the channels that have already been histogrammed (due to the two channel histograms return from the FEB), and skip any channels on flagged cmbs
                     {
-                        histos_temp = hist_helper.GetHistogram(channel, 1);
+                        histos_temp = hist_helper.GetHistogram(channel, 1, "extLED");
                         uint[] channels = { channel, Convert.ToUInt32(histos_temp[1].GetTitle()) }; //Lazily grab the other channel's label from the histogram title...
                         System.Console.WriteLine("Histo Chans: " + channels[0] + ", " + channels[1]);
 
                         for (int hist = 0; hist < 2; hist++)//Loop over each of the two histograms
                         {
-                            if (cmbs[channels[hist] / 4].flagged) //Skip if one of the two received channels was flagged
+                            if(hist == 1)
+                                cmbNum = (int)channels[hist] / 4;
+
+                            histos_temp[hist].Title = histos_temp[hist].Title + "_CMB_" + cmbNum.ToString();
+
+                            if (cmbs[cmbNum].flagged) //Skip if flagged
                                 continue;
                             peHistos[channels[hist]] = histos_temp[hist];
                             peCalibs[channels[hist]] = new ROOTNET.NTGraph();
-                            int peaksFound = peakFinder.Search(peHistos[channels[hist]], 1.5, "nobackground", 0.00001); //Don't try and estimate background, and set the threshold to only include pedestal, 1st, and 2nd PE
+                            int peaksFound = peakFinder.Search(peHistos[channels[hist]], 1.5, "", 0.00001); //Don't try and estimate background, and set the threshold to only include pedestal, 1st, and 2nd PE
                             if (peaksFound < 2)
                             {
                                 System.Console.WriteLine("Cannot find 1+ PE for Chan {0}", channels[hist]);
@@ -2886,7 +2773,7 @@ namespace TB_mu2e
                                 UpdateCMBInfoLabel(cmbNum);
                                 continue;
                             }
-                            float gain_estimate_thresh = (peakPositions[1] - peakPositions[0]) * 2; //Set threshold at ~2pe difference
+                            float gain_estimate_thresh = (peakPositions[1] - peakPositions[0]) * 1.5f; //Set threshold at ~1.5pe difference
                             fittingRanges.Add(0);
                             for (int p = 1; p < peakPositions.Count; p++)
                             {
@@ -2910,16 +2797,16 @@ namespace TB_mu2e
                             peCalibs[channels[hist]].SetName(channels[hist].ToString());
                             peCalibs[channels[hist]].GetXaxis().SetTitle("PE");
                             peCalibs[channels[hist]].GetYaxis().SetTitle("ADC");
-                            peHistos[channels[hist]].Fit(bulkRespFit, "CRQ+", "", gains[channels[hist]] * fitThresh, 512); //Fit from 7.5 PE (in ADC) up to max of histogram (will need to adjust later)
+                            peHistos[channels[hist]].Fit(bulkRespFit, "CRQ+", "", gains[channels[hist]] * fitThresh, upperBinInt); //Fit from 7.5 PE (in ADC) up to (max-2) of histogram (will need to adjust later)
 
                             //Display info for gain and pedestal
-                            cmbInfoLabels[cmbNum][(channel % 4) * 2 + 3].Text = Math.Floor(pedestals[channel]).ToString();
-                            cmbInfoLabels[cmbNum][(channel % 4) * 2 + 4].Text = Math.Floor(gains[channel]).ToString();
+                            cmbInfoLabels[cmbNum][(channels[hist] % 4) * 2 + 3].Text = Math.Floor(pedestals[channels[hist]]).ToString();
+                            cmbInfoLabels[cmbNum][(channels[hist] % 4) * 2 + 4].Text = Math.Floor(gains[channels[hist]]).ToString();
                             UpdateCMBInfoLabel(cmbNum);
 
                             //compare fit response to 'lookup value'
                             //For gaus fit: p0 is amplitude, p1 is mean, p2 is sigma
-                            if (PercentDifference(bulkRespFit.GetParameter(1), avgResp[channel] /*table value*/) > 200) //if the differnce is greater than 20%
+                            if (PercentDifference(bulkRespFit.GetParameter(1), avgResp[channel] /*table value*/) > 2000) //if the differnce is greater than 20%
                             {
                                 cmbs[cmbNum].flagged = true;
                                 cmbs[cmbNum].failureType = (int)CMB.Failure.SiPMResp;
@@ -2949,7 +2836,7 @@ namespace TB_mu2e
                         if (histo != null)
                         {
                             histo.Write();
-                            histo.Delete();
+                            //histo.Delete();
                         }
                     foreach (var plot in peCalibs)
                         if (plot != null)
@@ -2957,64 +2844,72 @@ namespace TB_mu2e
                             plot.Write();
                             plot.Delete();
                         }
+                    //histo_file.Close(); ///REMOVE
                 }
 
 
                 #region FlashGate
-                cmbInfoBox.Text = "Testing flashgate"; cmbInfoBox.Refresh();
-
-                ROOTNET.NTH1I[] flashHistos = new ROOTNET.NTH1I[64]; //Histograms used to determine response to LED (flashgate)
-
-                //Set registers for flashgate (0x3 enables flash gate and sets the routing to the flash gate (not LED)
-                Mu2e_Register.WriteAllReg(0x3, ref flashGateControlReg, ref PP.FEB1.client);
-
-                for (uint channel = 0; channel < 64; channel++) //Loop over the channels, re-histogram response to LED flashing, check that response is low
+                if (false)
                 {
-                    int cmbNum = (int)channel / 4; //spans from 0-15
-                    if (flashHistos[channel] == null && !(cmbs[cmbNum].flagged)) //skip the channels that have already been histogrammed (due to the two channel histograms return from the FEB), and skip any channels on flagged cmbs
+                    cmbInfoBox.Text = "Testing flashgate"; cmbInfoBox.Refresh();
+
+                    ROOTNET.NTH1I[] flashHistos = new ROOTNET.NTH1I[64]; //Histograms used to determine response to LED (flashgate)
+
+                    //Set registers for flashgate (0x3 enables flash gate and sets the routing to the flash gate (not LED)
+                    Mu2e_Register.WriteAllReg(0x3, ref flashGateControlReg, ref PP.FEB1.client);
+
+                    for (uint channel = 0; channel < 64; channel++) //Loop over the channels, re-histogram response to LED flashing, check that response is low
                     {
-                        histos_temp = hist_helper.GetHistogram(channel, 1);
-                        uint[] channels = { channel, Convert.ToUInt32(histos_temp[1].GetTitle()) }; //Lazily grab the other channel's label from the histogram title...
-                        System.Console.WriteLine("Histo Chans: " + channels[0] + ", " + channels[1]);
-
-                        for (int hist = 0; hist < 2; hist++)//Loop over each of the two histograms
+                        int cmbNum = (int)channel / 4; //spans from 0-15
+                        if (flashHistos[channel] == null && !(cmbs[cmbNum].flagged)) //skip the channels that have already been histogrammed (due to the two channel histograms return from the FEB), and skip any channels on flagged cmbs
                         {
-                            if (cmbs[channels[hist] / 4].flagged) //Skip if one of the two received channels was flagged
-                                continue;
-                            flashHistos[channels[hist]] = histos_temp[hist];
-                            //flashHistos[channels[hist]].Fit(bulkRespFit, "CRQ+", "", gains[channels[hist]] * 7.5, 512); //Fit from 7.5 PE (in ADC) up to max of histogram (will need to adjust later)
-                            int lowerIntegralBin = (int) (pedestals[channels[hist]] + gains[channels[hist]] * fitThresh); //truncate the value of 7.5PE for the bin # (since all histograms start at 0 and have 512 bins)
-                            double flashIntegral = flashHistos[channels[hist]].Integral(lowerIntegralBin, 512); //512 upper bound because all histograms have 512 bins
-                            double ledIntegral = peHistos[channels[hist]].Integral(lowerIntegralBin, 512); //Also compute integral for led histogram, so we can see if the response to LED has diminished
+                            histos_temp = hist_helper.GetHistogram(channel, 1);
+                            uint[] channels = { channel, Convert.ToUInt32(histos_temp[1].GetTitle()) }; //Lazily grab the other channel's label from the histogram title...
+                            System.Console.WriteLine("Histo Chans: " + channels[0] + ", " + channels[1]);
 
-                            if (PercentDifference(flashIntegral, ledIntegral) < flashGateDifferenceThresh) //if the differnce is less than flashGateDifferenceThresh, flashgate must not be working...
+                            for (int hist = 0; hist < 2; hist++)//Loop over each of the two histograms
                             {
-                                cmbs[cmbNum].flagged = true;
-                                cmbs[cmbNum].failureType = (int)CMB.Failure.Flashgate;
-                                cmbInfoLabels[cmbNum][11].Text = cmbs[cmbNum].FailType();
-                                SetRowColor(cmbNum, Color.MistyRose);
-                                UpdateCMBInfoLabel(cmbNum);
+                                if (cmbs[channels[hist] / 4].flagged) //Skip if one of the two received channels was flagged
+                                    continue;
+                                flashHistos[channels[hist]] = histos_temp[hist];
+                                //flashHistos[channels[hist]].Fit(bulkRespFit, "CRQ+", "", gains[channels[hist]] * 7.5, 512); //Fit from 7.5 PE (in ADC) up to max of histogram (will need to adjust later)
+                                int lowerIntegralBin = (int)(pedestals[channels[hist]] + gains[channels[hist]] * fitThresh); //truncate the value of 7.5PE for the bin # (since all histograms start at 0 and have 512 bins)
+                                double flashIntegral = flashHistos[channels[hist]].Integral(lowerIntegralBin, 512); //512 upper bound because all histograms have 512 bins
+                                double ledIntegral = peHistos[channels[hist]].Integral(lowerIntegralBin, 512); //Also compute integral for led histogram, so we can see if the response to LED has diminished
+
+                                if (PercentDifference(flashIntegral, ledIntegral) < flashGateDifferenceThresh) //if the differnce is less than flashGateDifferenceThresh, flashgate must not be working...
+                                {
+                                    cmbs[cmbNum].flagged = true;
+                                    cmbs[cmbNum].failureType = (int)CMB.Failure.Flashgate;
+                                    cmbInfoLabels[cmbNum][11].Text = cmbs[cmbNum].FailType();
+                                    SetRowColor(cmbNum, Color.MistyRose);
+                                    UpdateCMBInfoLabel(cmbNum);
+                                }
                             }
                         }
                     }
+
+                    Mu2e_Register.WriteAllReg(0x2, ref flashGateControlReg, ref PP.FEB1.client); //Turn off flash gate and keep routing to the Flash Gate (to LED flasher will create interference on CMB)
+
+                    if (outputOpened)
+                    {
+                        foreach (var histo in flashHistos)
+                            if (histo != null)
+                            {
+                                histo.Write();
+                                histo.Delete();
+                            }
+                        histo_file.Close();
+                    }
                 }
 
-                Mu2e_Register.WriteAllReg(0x2, ref flashGateControlReg, ref PP.FEB1.client); //Turn off flash gate and keep routing to the Flash Gate (to LED flasher will create interference on CMB)
-
-                if (outputOpened)
-                {
-                    foreach (var histo in flashHistos)
-                        if (histo != null)
-                        {
-                            histo.Write();
-                            histo.Delete();
-                        }
-                }
 
                 #endregion FlashGate
 
                 //return;
                 #endregion LED Response Evaluation and Gain/Pedestal Computation
+
+
 
 
                 #region CMB LED Flashers
@@ -3032,6 +2927,8 @@ namespace TB_mu2e
 
                 Mu2e_Register[][] ledFlasherIntensityRegs = Mu2e_Register.FindAllAddrRange(0x40, 0x43, ref PP.FEB1.arrReg); //Get the led flasher intensity registers, for all FPGAs
                 Mu2e_Register.WriteReg(0x500, ref trigControlReg, ref PP.FEB1.client); //Keep the on-board pulser enabled, but set the GPO to only output a single pulse at the beginning and end of the spill gate (which should not turn on while recording histograms AFAIK)
+                Mu2e_Register.WriteAllRegRange(0x0, ref ledFlasherIntensityRegs, ref PP.FEB1.client); //Set all cmb flasher intensities to 0
+                Mu2e_Register.WriteAllReg(0x2, ref flashGateControlReg, ref PP.FEB1.client); //Set all CMBs to flash gate routing
 
                 System.Threading.Thread.Sleep(250); //wait for the pulse to go by...
 
@@ -3039,21 +2936,21 @@ namespace TB_mu2e
 
                 for(uint fpga = 0; fpga < 4; fpga++)
                 {
-                    Mu2e_Register.WriteAllRegRange(0x0, ref ledFlasherIntensityRegs, ref PP.FEB1.client); //Set all cmb flasher intensities to 0
-                    Mu2e_Register.WriteAllReg(0x2, ref flashGateControlReg, ref PP.FEB1.client); //Set all CMBs to flash gate routing
-
                     for (uint cmb = 0; cmb < 4; cmb++)
                     {
+                        int flashing_cmb = -1; //used to remember which CMB's LEDs we are looking at
                         //We will run as follows: 0 reads 1, 1 reads 0, 2 reads 3, 3 reads 2
                         if (fpga == 1 || fpga == 3) //1 reads 0, 3 reads 2
                         {
                             Mu2e_Register.WriteReg(0x1, ref flashGateControlReg[fpga - 1], ref PP.FEB1.client); //Set LED pulse routing for single CMB
                             Mu2e_Register.WriteReg(ledFlasherIntensity, ref ledFlasherIntensityRegs[fpga - 1][cmb], ref PP.FEB1.client); //Set single CMB flasher intensity to ledFlasherIntensity
+                            flashing_cmb = (((int)fpga - 1) * 4) + (int)cmb;
                         }
                         else //0 reads 1, 2 reads 3
                         {
                             Mu2e_Register.WriteReg(0x1, ref flashGateControlReg[fpga + 1], ref PP.FEB1.client); //Set LED pulse routing for single CMB
                             Mu2e_Register.WriteReg(ledFlasherIntensity, ref ledFlasherIntensityRegs[fpga+1][cmb], ref PP.FEB1.client); //Set single CMB flasher intensity to ledFlasherIntensity
+                            flashing_cmb = (((int)fpga + 1) * 4) + (int)cmb;
                         }
 
                         //For only the outer channels on each CMB (ch. 0 and ch. 3), histogram the flashing of 
@@ -3061,30 +2958,47 @@ namespace TB_mu2e
                         {
                             uint cmbNum = (fpga * 4) + cmb;
                             uint channel = (fpga * 16) + (cmb * 4) + ch;
+                            
                             // [X] Get histograms
                             // [X] Evaluate flashers
 
-                            histos_temp = hist_helper.GetHistogram(channel, 1);
-                            ledHistos[channel] = histos_temp[0]; //"Discard" the second histogram, becuase it doesn't help us atm...
-                            int lowerIntegralBin = (int)(pedestals[channel] + (gains[channel] * fitThresh)); //truncate the value of 7.5PE for the bin # (since all histograms start at 0 and have 512 bins)
-                            double cmbLedIntegral = ledHistos[channel].Integral(lowerIntegralBin, 512); //512 upper bound because all histograms have 512 bins
-                            double ledIntegral = peHistos[channel].Integral(lowerIntegralBin, 512); //Also compute integral for led histogram, so we can see if the response to LED has diminished
-                            
-                            if (PercentDifference(cmbLedIntegral, ledIntegral) > ledDifferenceThresh) //if the differnce is greater than flashGateDifferenceThresh, flashgate must not be working...
+                            if (ledHistos[channel] == null && !(cmbs[cmbNum].flagged)) //skip flagged cmbs
                             {
-                                cmbs[cmbNum].flagged = true;
-                                cmbs[cmbNum].failureType = (int)CMB.Failure.LED;
-                                cmbInfoLabels[cmbNum][11].Text = cmbs[cmbNum].FailType();
-                                SetRowColor((int)cmbNum, Color.MistyRose);
-                                UpdateCMBInfoLabel((int)cmbNum);
+
+                                histos_temp = hist_helper.GetHistogram(channel, 1, "intLEDforCMB_" + flashing_cmb.ToString());
+                                ledHistos[channel] = histos_temp[0]; //"Discard" the second histogram, becuase it doesn't help us atm...
+                                histos_temp[1].Delete();
+                                int lowerIntegralBin = (int)(pedestals[channel] + (gains[channel] * fitThresh)); //truncate the value of 7.5PE for the bin # (since all histograms start at 0 and have 512 bins)
+                                double cmbLedIntegral = ledHistos[channel].Integral(lowerIntegralBin, upperBinInt); //512 upper bound because all histograms have 512 bins
+                                double ledIntegral = peHistos[channel].Integral(lowerIntegralBin, upperBinInt); //Also compute integral for led histogram, so we can see if the response to LED has diminished
+
+                                //if (PercentDifference(cmbLedIntegral, ledIntegral) > ledDifferenceThresh) //if the differnce is greater than flashGateDifferenceThresh, flashgate must not be working...
+                                //{
+                                //    cmbs[cmbNum].flagged = true;
+                                //    cmbs[cmbNum].failureType = (int)CMB.Failure.LED;
+                                //    cmbInfoLabels[cmbNum][11].Text = cmbs[cmbNum].FailType();
+                                //    SetRowColor((int)cmbNum, Color.MistyRose);
+                                //    UpdateCMBInfoLabel((int)cmbNum);
+                                //}
+                                if(cmbLedIntegral < cmbLedIntThresh)
+                                {
+                                    //cmbs[cmbNum].flagged = true;
+                                    //cmbs[cmbNum].failureType = (int)CMB.Failure.LED;
+                                    //cmbInfoLabels[cmbNum][11].Text = cmbs[cmbNum].FailType();
+                                    //SetRowColor((int)cmbNum, Color.MistyRose);
+                                    //UpdateCMBInfoLabel((int)cmbNum);
+                                    cmbs[flashing_cmb].flagged = true;
+                                    cmbs[flashing_cmb].failureType = (int)CMB.Failure.LED;
+                                    cmbInfoLabels[flashing_cmb][11].Text = cmbs[flashing_cmb].FailType();
+                                    SetRowColor(flashing_cmb, Color.MistyRose);
+                                    UpdateCMBInfoLabel(flashing_cmb);
+                                }
                             }
-
                         }
+
+                        Mu2e_Register.WriteAllRegRange(0x0, ref ledFlasherIntensityRegs, ref PP.FEB1.client); //Set all cmb flasher intensities to 0
+                        Mu2e_Register.WriteAllReg(0x2, ref flashGateControlReg, ref PP.FEB1.client); //Set all CMBs to flash gate routing
                     }
-
-                    Mu2e_Register.WriteAllRegRange(0x0, ref ledFlasherIntensityRegs, ref PP.FEB1.client); //Set all cmb flasher intensities to 0
-                    Mu2e_Register.WriteAllReg(0x2, ref flashGateControlReg, ref PP.FEB1.client); //Set all CMBs to flash gate routing
-
                 }
 
                 if (outputOpened)
@@ -3098,9 +3012,13 @@ namespace TB_mu2e
                     histo_file.Close();
                 }
 
+                
+
                 cmbInfoBox.Text = ""; cmbInfoBox.Refresh();
+                
 
                 #endregion CMB LED Flashers
+
 
                 //This is used later for gathering trace data for tail-cancellation evaluation
                 uint spill_status = 0;
@@ -3122,26 +3040,23 @@ namespace TB_mu2e
                 cmbInfoBox.Text = "Undershoot Evaluation"; cmbInfoBox.Refresh();
 
                 febSocket.Send(sendRDB);
-                while (febSocket.Available == 0) //Wait to receive data from the FEB
-                    System.Threading.Thread.Sleep(2);
-
                 int old_available = 0;
                 while (febSocket.Available > old_available) //Wait until the FEB has all the data to send
                 {
                     old_available = febSocket.Available;
-                    System.Threading.Thread.Sleep(250);
+                    System.Threading.Thread.Sleep(10);
                 }
                 byte[] rec_buf = new byte[febSocket.Available];
                 int lret = febSocket.Receive(rec_buf, rec_buf.Length, System.Net.Sockets.SocketFlags.None);
-                for (int iByte = 0; iByte < lret - 1; iByte++)
-                    rec_buf[iByte] = rec_buf[iByte + 1]; //ignore 0x3e at the beginning of data
+                //for (int iByte = 0; iByte < lret - 1; iByte++)
+                //    rec_buf[iByte] = rec_buf[iByte + 1]; //ignore 0x3e at the beginning of data
 
                 //MessageBox.Show("CMB Evaluation\nPlease connect the LED");
                 //Mu2e_Register.WriteReg(0x0C, ref controlStatusReg, ref PP.FEB1.client); //Issues a reset of the AFE deserializers on the FPGA and the MIG DDR interface
                 Mu2e_Register.WriteReg(0x2, ref spillDurReg, ref PP.FEB1.client); //Set the spill duration for 2 seconds
                 Mu2e_Register.WriteReg(0x64, ref sampleLengthReg, ref PP.FEB1.client); //Set the number of ADC samples to record per trigger
-                for (uint fpga = 0; fpga < 4; fpga++) //Turn on bias for SiPMs
-                    PP.FEB1.SetV(Convert.ToDouble(cmbBias.Text), (int)fpga);
+                //for (uint fpga = 0; fpga < 4; fpga++) //Turn on bias for SiPMs
+                //    PP.FEB1.SetV(Convert.ToDouble(cmbBias.Text), (int)fpga);
                 Mu2e_Register.WriteReg(0x300, ref trigControlReg, ref PP.FEB1.client); //Open the spill gate: Set trig-control register to enable board to record data for 1 spill, LED flashes during this time
                 while (spill_status != 2) //trig_num < Convert.ToInt16(requestNumTrigs.Text))
                 {
@@ -3158,20 +3073,17 @@ namespace TB_mu2e
                 SpillData testerData = new SpillData(); //create new SpillData object to hold incoming data from FEB
 
                 //Send RDB to FEB
-                febSocket.Send(sendRDB);
-                while (febSocket.Available == 0) //Wait to receive data from the FEB
-                    System.Threading.Thread.Sleep(10);
+                //febSocket.Send(sendRDB);
+                //old_available = 0;
+                //while (febSocket.Available > old_available) //Wait until the FEB has all the data to send
+                //{
+                //    old_available = febSocket.Available;
+                //    System.Threading.Thread.Sleep(250);
+                //}
+                //rec_buf = new byte[febSocket.Available];
+                //lret = febSocket.Receive(rec_buf, rec_buf.Length, System.Net.Sockets.SocketFlags.None);
 
-                old_available = 0;
-                while (febSocket.Available > old_available) //Wait until the FEB has all the data to send
-                {
-                    old_available = febSocket.Available;
-                    System.Threading.Thread.Sleep(250);
-                }
-                rec_buf = new byte[febSocket.Available];
-                lret = febSocket.Receive(rec_buf, rec_buf.Length, System.Net.Sockets.SocketFlags.None);
-
-                if (testerData.ParseInput(rec_buf))
+                if (TCP_receiver.ReadFeb(ref PP.FEB1, ref testerData, out long num_bytes))
                 {
                     double[] averageUndershoot = new double[64]; //hold the average response for each channel
 
@@ -3195,14 +3107,17 @@ namespace TB_mu2e
                         }
                     }
                 }
+                else
+                {
+                    MessageBox.Show("Couldn't get trace data to evaluate undershoot!");
+                }
 
                 #endregion Undershoot Evaluation
 
                 cmbInfoBox.Text = ""; cmbInfoBox.Refresh();
 
                 //Turn off bias for SiPMs
-                for (uint fpga = 0; fpga < 4; fpga++)
-                    PP.FEB1.SetV(0.0, (int)fpga);
+                PP.FEB1.SetVAll(0);
 
             }
             else
@@ -3418,10 +3333,12 @@ namespace TB_mu2e
 
         private void ModuleQADarkCurrentBtn_Click(object sender, EventArgs e)
         {
-            if (true)//PP.FEB1.client != null && PP.FEB2.client != null)
+            if (moduleQAMeasurementTimer.Enabled == false && (PP.FEB1.client != null && PP.FEB2.client != null))
             {
+                InitializeModuleQATab(); //reset the labels in the table
+
                 if (PP.moduleQACurrentMeasurements == null) //if we didn't make a measurement object yet, do so, else purge the existing one of information
-                    PP.moduleQACurrentMeasurements = new ModuleQACurrentMeasurements(PP.FEB1);//, PP.FEB2);
+                    PP.moduleQACurrentMeasurements = new ModuleQACurrentMeasurements(PP.FEB1, PP.FEB2);
                 else
                     PP.moduleQACurrentMeasurements.Purge();
 
@@ -3436,7 +3353,7 @@ namespace TB_mu2e
                 currentDicounter = 0; //Set back to 0, controlled by measurement timer
                 PP.moduleQACurrentMeasurements.SetSide(ModuleQASide.Text);
                 PP.FEB1.SetVAll(Convert.ToDouble(qaBias.Text)); //Turn on the bias for the FEBs
-                //PP.FEB2.SetVAll(Convert.ToDouble(qaBias.Text));
+                PP.FEB2.SetVAll(Convert.ToDouble(qaBias.Text));
                 darkCurrent = true;
                 moduleQAMeasurementTimer.Enabled = true;
             }
@@ -3461,10 +3378,12 @@ namespace TB_mu2e
         private void ModuleQABtn_Click(object sender, EventArgs e)
         {
             //Check that both FEBs are connected
-            if(true && moduleQAMeasurementTimer.Enabled == false)//PP.FEB1.client != null && PP.FEB2.client != null)
+            if(moduleQAMeasurementTimer.Enabled == false && (PP.FEB1.client != null && PP.FEB2.client != null))
             {
+                InitializeModuleQATab(); //Reset the labels in the table
+
                 if (PP.moduleQACurrentMeasurements == null) //if we didn't make a measurement object yet, do so, else purge the existing one of information
-                    PP.moduleQACurrentMeasurements = new ModuleQACurrentMeasurements(PP.FEB1);//, PP.FEB2);
+                    PP.moduleQACurrentMeasurements = new ModuleQACurrentMeasurements(PP.FEB1, PP.FEB2);
                 else
                     PP.moduleQACurrentMeasurements.Purge();
 
@@ -3482,9 +3401,9 @@ namespace TB_mu2e
                 currentDicounter = 0; //Set back to 0, controlled by measurement timer
                 PP.moduleQACurrentMeasurements.SetSide(ModuleQASide.Text);
                 PP.FEB1.SetVAll(Convert.ToDouble(qaBias.Text)); //Turn on the bias for the FEBs
-                comPort.WriteLine(PP.moduleQACurrentMeasurements.GetgCodeDicounterPosition(currentDicounter, 1200)); //tell it to go to the 0th dicounter position
+                PP.FEB2.SetVAll(Convert.ToDouble(qaBias.Text));
+                comPort.WriteLine(PP.moduleQACurrentMeasurements.GetgCodeDicounterPosition(currentDicounter, 1200, (int)ModuleQA_Offset.Value)); //tell it to go to the 0th dicounter position
                 ModuleQAStepTimer.Enabled = true;
-                //PP.FEB2.SetVAll(Convert.ToDouble(qaBias.Text));
                 moduleQAMeasurementTimer.Enabled = true;
             }
             else
@@ -3629,18 +3548,22 @@ namespace TB_mu2e
 
         private void ModuleQAMeasurementTimer_Tick(object sender, EventArgs e)
         {
-            System.Threading.Thread.Sleep(0); //yield
+            System.Threading.Thread.Sleep(1); //yield
             if (ModuleQAStepTimer.Enabled == false) //Block the contents of this timer if the stepper is moving
             {
                 if (!darkCurrent)
                 {
-                    if (currentDicounter < 100)//5)//8)
+                    if (currentDicounter < 8)//100)//5)//8)
                     {
-                        if (currentChannel < 20)//64)
+                        if (currentChannel < 32)//20)//64)
                         {
                             //take measurments
                             ComPortStatusBox.Text = "Measuring " + currentDicounter + " " + currentChannel;
-                            PP.moduleQACurrentMeasurements.TakeMeasurement(currentChannel);
+                            double[] currents = PP.moduleQACurrentMeasurements.TakeMeasurement(currentChannel);
+                            for(int feb = 0; feb < 2; feb++)
+                            {
+                                ModuleQALabels[feb][currentChannel].Text += currents[feb].ToString("0.0000");
+                            }
                             currentChannel++; //increment the channel
                         }
                         else //must have reached the end of 64 channels
@@ -3648,15 +3571,16 @@ namespace TB_mu2e
                             PP.moduleQACurrentMeasurements.WriteMeasurements("C:\\Users\\Boi\\Desktop\\ScanningData_" + ModuleQAFilenameBox.Text + ".txt", 0, currentDicounter);
                             PP.moduleQACurrentMeasurements.Purge();
                             currentDicounter++; //increment the dicounter
-                            if (currentDicounter < 100)//5)//8)
-                                comPort.WriteLine(PP.moduleQACurrentMeasurements.GetgCodeDicounterPosition(currentDicounter, 1200)); //tell it the position to go to
+                            if (currentDicounter < 8)//100)//5)//8)
+                                comPort.WriteLine(PP.moduleQACurrentMeasurements.GetgCodeDicounterPosition(currentDicounter, 1200, (int)ModuleQA_Offset.Value)); //tell it the position to go to
                             currentChannel = 0;
+                            InitializeModuleQATab();
                             ModuleQAStepTimer.Enabled = true;
                         }
                     }
                     else //must have reached the end of scanning across the module
                     {
-                        comPort.WriteLine(PP.moduleQACurrentMeasurements.GetgCodeDicounterPosition(0, 2800)); //go back to the home position quickly
+                        comPort.WriteLine(PP.moduleQACurrentMeasurements.GetgCodeDicounterPosition(0, 2800, (int)ModuleQA_Offset.Value)); //go back to the home position quickly
                         ModuleQAStepTimer.Enabled = true;
                         ModuleQADarkCurrentBtn.Enabled = true;
                         moduleQAMeasurementTimer.Enabled = false;
@@ -3665,11 +3589,16 @@ namespace TB_mu2e
                 }
                 else if (darkCurrent) //if it is a dark current measurement, just record all 64 channels
                 {
-                    if (currentChannel < 20)//64)
+                    if (currentChannel < 32)//20)//64)
                     {
                         //take measurments
                         Console.WriteLine("Measuring " + currentChannel);
-                        PP.moduleQACurrentMeasurements.TakeMeasurement(currentChannel);
+                        //PP.moduleQACurrentMeasurements.TakeMeasurement(currentChannel);
+                        double[] currents = PP.moduleQACurrentMeasurements.TakeMeasurement(currentChannel);
+                        for (int feb = 0; feb < 2; feb++)
+                        {
+                            ModuleQALabels[feb][currentChannel].Text += currents[feb].ToString("0.0000");
+                        }
                         //System.Threading.Thread.Sleep(10);
                         currentChannel++;
                     }
@@ -3677,6 +3606,7 @@ namespace TB_mu2e
                     {
                         PP.moduleQACurrentMeasurements.WriteMeasurements("C:\\Users\\Boi\\Desktop\\ScanningData_" + ModuleQAFilenameBox.Text + ".txt", 0, -1); //-1 will denote dark current measurement
                         PP.moduleQACurrentMeasurements.Purge();
+                        PP.moduleQACurrentMeasurements.TurnOffBias();
                         darkCurrent = false; //done with darkcurrent
                         ModuleQADarkCurrentBtn.Enabled = true;
                         ModuleQABtn.Enabled = true; //since we took the dark current measurements, now we can QA a module
@@ -3688,6 +3618,7 @@ namespace TB_mu2e
 
         private void ModuleQAHaltBtn_Click(object sender, EventArgs e)
         {
+            PP.moduleQACurrentMeasurements.TurnOffBias();
             if (moduleQAHomingTimer.Enabled == false) //cannot issue a halt while it is homing, a property of the controller...
             {
                 moduleQAMeasurementTimer.Enabled = false;
@@ -3726,6 +3657,8 @@ namespace TB_mu2e
 
         private void ModuleQAHomeResetBtn_Click(object sender, EventArgs e)
         {
+            PP.moduleQACurrentMeasurements.TurnOffBias();
+
             try
             {
                 if (zerod)
@@ -3748,7 +3681,7 @@ namespace TB_mu2e
 
         private void ModuleQAStepTimer_Tick(object sender, EventArgs e)
         {
-            System.Threading.Thread.Sleep(0); //yield
+            System.Threading.Thread.Sleep(1); //yield
             ComPortStatusBox.Text = "Moving";
             try
             {
@@ -3800,17 +3733,14 @@ namespace TB_mu2e
             {
                 try
                 {
-                    if (comPort.BytesToRead > 0)
-                    {
-                        while (comPort.BytesToRead > 0) //clear any messages that were being sent
-                            if(comPort.ReadLine().Contains("!"))
-                            {
-                                MessageBox.Show("The controller is alarmed, did you say something mean to it?", "Oh shit, something went wrong", MessageBoxButtons.YesNo, MessageBoxIcon.Exclamation);
-                                comPort.Close();
-                                ModuleQABtn.Enabled = false; //disable the QA button if we aren't connected to the stepper controller
+                    while (comPort.BytesToRead > 0) //clear any messages that were being sent
+                        if(comPort.ReadLine().Contains("!"))
+                        {
+                            MessageBox.Show("The controller is alarmed, did you say something mean to it?", "Oh shit, something went wrong", MessageBoxButtons.YesNo, MessageBoxIcon.Exclamation);
+                            comPort.Close();
+                            ModuleQABtn.Enabled = false; //disable the QA button if we aren't connected to the stepper controller
 
-                            }
-                    }
+                        }
                 }
                 catch (TimeoutException)
                 {
@@ -3824,37 +3754,34 @@ namespace TB_mu2e
 
         private void QaDiCounterMeasurementTimer_Tick(object sender, EventArgs e)
         {
-            System.Threading.Thread.Sleep(0); //yield
-            if(currentChannel < qaDiButtons.Length)
+            while (currentChannel < qaDiButtons.Length)
             {
+                System.Threading.Thread.Sleep(1); //yield
                 if (!qaDiButtons[currentChannel].Checked)
                 {
                     double measurement = PP.qaDicounterMeasurements.TakeMeasurement(currentChannel);
                     if (measurement < Convert.ToDouble(qaDiIWarningThresh.Text)) //Low current
                         qaDiButtons[currentChannel].BackColor = Color.Red;
-                    if (measurement < 0.025) //No Current
+                    if (measurement < NO_CURRENT_THRESH) //No Current
                         qaDiButtons[currentChannel].BackColor = Color.Blue;
                     qaDiButtons[currentChannel].Update();
                 }
                 currentChannel++;
                 autoDataProgress.Increment(1);
             }
-            else
+
+            PP.qaDicounterMeasurements.WriteMeasurements(dicounterNumberTextBox.Text, PP.FEB1.ReadTemp(0));
+            PP.qaDicounterMeasurements.TurnOffBias();
+            currentChannel = 0;
+            autoDataProgress.Value = 0;
+            autoDataProgress.Update();
+            using (System.Media.SoundPlayer soundPlayer = new System.Media.SoundPlayer("C:\\Windows\\media\\Windows Proximity Notification.wav"))
             {
-                PP.qaDicounterMeasurements.WriteMeasurements(dicounterNumberTextBox.Text, PP.FEB1.ReadTemp(0));
-                PP.qaDicounterMeasurements.TurnOffBias();
-                currentChannel = 0;
-                autoDataProgress.Value = 0;
-                autoDataProgress.Update();
-                using (System.Media.SoundPlayer soundPlayer = new System.Media.SoundPlayer("C:\\Windows\\media\\Windows Proximity Notification.wav"))
-                {
-                    soundPlayer.Play();
-                }
-                qaStartButton.Text = "Auto Data";
-                qaStartButton.BackColor = SystemColors.Control;
-                qaStartButton.Update();
-                qaDiCounterMeasurementTimer.Enabled = false;
+                soundPlayer.Play();
             }
+            qaStartButton.Text = "Auto Data";
+            qaStartButton.BackColor = SystemColors.Control;
+            qaStartButton.Update();
         }
 
         private void ValidateParseChkBox_CheckedChanged(object sender, EventArgs e)
@@ -3863,6 +3790,72 @@ namespace TB_mu2e
                 PP.myRun.validateParse = true;
             else if (validateParseChkBox.Checked)
                 PP.myRun.validateParse = false;
+        }
+
+        private void LightCheckMeasurementTimer_Tick(object sender, EventArgs e)
+        {
+            System.Threading.Thread.Sleep(1); //yield
+            if(currentChannel < lightButtons.Length)
+            {
+                if(!lightButtons[currentChannel].Checked)
+                {
+                    double measurement = PP.lightCheckMeasurements.TakeMeasurement(currentChannel);
+                    if (measurement < NO_CURRENT_THRESH)
+                        lightButtons[currentChannel].BackColor = Color.Blue;
+                    else
+                    {
+                        if (auto_thresh_enabled) //if we are setting thresholds automatically
+                        {
+                            PP.lightCheckChanThreshs[currentChannel] = measurement * AUTO_THRESH_MULTIPLIER; //set the threshold to 10% higher than dark-current
+                            lightCheckChanThresh.Text = PP.lightCheckChanThreshs[Convert.ToUInt16(lightCheckChanSelec.Value)].ToString("0.0000"); //update the current channel to display the new thresh
+                            lightCheckChanThresh.Update();
+                        }
+                        else //else we must be doing actual measurements
+                        {
+                            if (globalThreshChkBox.Checked) //if we should use the global threshold
+                            {
+                                if (measurement > Convert.ToDouble(lightGlobalThresh.Text)) //check the current against global threshold
+                                    lightButtons[currentChannel].BackColor = Color.Red;
+                            }
+                            else if (measurement > PP.lightCheckChanThreshs[currentChannel]) //else if we are using set thresholds, check against channel thresholds
+                                lightButtons[currentChannel].BackColor = Color.Red;
+                        }                        
+                    }
+                    lightButtons[currentChannel].Text = measurement.ToString("0.0000");
+                    lightButtons[currentChannel].Update();
+                }
+                currentChannel++;
+                lightCheckProgress.Increment(1);
+            }
+            else
+            {
+                if (lightWriteToFileBox.Checked && !auto_thresh_enabled)
+                    PP.lightCheckMeasurements.WriteMeasurements(lightModuleLabel.Text, PP.FEB1.ReadTemp(0));
+                PP.lightCheckMeasurements.TurnOffBias();
+                if (auto_thresh_enabled)
+                    auto_thresh_enabled = false;
+                currentChannel = 0;
+                lightCheckProgress.Value = 0;
+                lightCheckProgress.Update();
+                using (System.Media.SoundPlayer soundPlayer = new System.Media.SoundPlayer("C:\\Windows\\media\\Windows Proximity Notification.wav"))
+                {
+                    soundPlayer.Play();
+                }
+                lightCheckBtn.Text = "Light Check";
+                lightCheckBtn.BackColor = SystemColors.Control;
+                lightCheckBtn.Update();
+                autoThreshBtn.Text = "Auto Thresh";
+                autoThreshBtn.BackColor = SystemColors.Control;
+                autoThreshBtn.Update();
+                lightModuleLabel.Enabled = true;
+                lightModuleLayer.Enabled = true;
+                lightModuleSide.Enabled = true;
+                lightCheckResetThresh.Enabled = true;
+                lightCheckBtn.Enabled = true;
+                lightWriteToFileBox.Enabled = true;
+                dicounterQAGroup.Enabled = true;
+                LightCheckMeasurementTimer.Enabled = false;
+            }
         }
     }
 
