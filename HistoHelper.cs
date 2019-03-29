@@ -44,7 +44,8 @@ namespace TB_mu2e
             this.febClient = febClient;
             this.accumulation_interval = accumulation_interval;
             Ext_mode = (ext_mode) ? (byte)0x10 : (byte)0x0;//if the mode is set to be qualified by an external gate, turn on the mode bit for the histo control register
-            histo_controls = new Mu2e_Register[(base_addrs.Length * 4) - 4]; //*4 for the 4 fpgas, -4 because 0x311 is a broadcast to all fpga histo control registers
+            histo_controls = new Mu2e_Register[base_addrs.Length];//(base_addrs.Length * 4) - 4]; //*4 for the 4 fpgas, -4 because 0x311 is a broadcast to all fpga histo control registers
+            write_regs = new Mu2e_Register[write_addrs.Length];
             GetRegisters();
         }
 
@@ -142,7 +143,7 @@ namespace TB_mu2e
                     packs[packNum] = new byte[febSocket.Available];
                     lret = febSocket.Receive(packs[packNum], packs[packNum].Length, System.Net.Sockets.SocketFlags.None);
                     System.Console.WriteLine("Read: {0} / {1} bytes", lret, old_available);
-                } while (lret != old_available || old_available < 2048 || old_available > 2060); //2048 is the minimum byte length for an incoming histogram; each one is actually >=2049 due to the '>' sent by the board, also need to check if >2048 because sometimes the borad likes to send both histograms in one packet
+                } while (lret != old_available || old_available < 4096/*2048*/ || old_available > 4110/*2060*/); //2048 is the minimum byte length for an incoming histogram; each one is actually >=2049 due to the '>' sent by the board, also need to check if >2048 because sometimes the borad likes to send both histograms in one packet
             }
 
             return packs;
@@ -157,7 +158,7 @@ namespace TB_mu2e
                     incomingData[packNum] = incomingData[packNum].Skip(1).ToArray(); //Get rid of any 3e (>) at the beginning
                 incomingData[packNum] = incomingData[packNum].Take(incomingData[packNum].Length - 1).ToArray(); //Get rid of the 3e (>) at the end
 
-                if (incomingData[packNum].Length == 2048/*512*/) //Since the histogram memory is 512 deep by 32 bits wide, we should quickly check that the data length is really be 512 integers... you know, just in case....
+                if (incomingData[packNum].Length == 4096/*2048*//*512*/) //Since the histogram memory is 512 deep by 32 bits wide, we should quickly check that the data length is really be 512 integers... you know, just in case....
                 {
                     data[packNum] = new UInt32[incomingData[packNum].Length / 4];
                     uint byteIndex = 0;
