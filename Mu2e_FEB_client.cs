@@ -36,7 +36,7 @@ namespace TB_mu2e
         private bool _ClientBusy = true;
         private string _TNETname;
 
-        public int _TNETsocketNum = 000;
+        public int _TNETsocketNum = 5000;
         public TcpClient client;
         public Socket TNETSocket;
         public NetworkStream stream;
@@ -62,54 +62,71 @@ namespace TB_mu2e
 
         public void Open()
         {
-            _ClientOpen = false;
-            try
+            if (!_ClientOpen)
             {
-                client = new TcpClient();
-                TNETSocket = client.Client;
-                TNETSocket.ReceiveBufferSize = 5242880*4-1;
-                TNETSocket.SendBufferSize = 32000;
-                TNETSocket.ReceiveTimeout = 1;
-                TNETSocket.SendTimeout = 1;
-                TNETSocket.NoDelay = true;
-                TNETSocket.Connect(_host_name, _TNETsocketNum + 5000);
-
-                //Thread.Sleep(100);
-                _ClientOpen = true;
-                m = "connected " + _logical_name + " to " + _host_name + " on port " + (TNETsocketNum + 5000);
-            }
-            catch
-            {
-                _TNETsocketNum++;
-                if (_TNETsocketNum < 2)
+                try
                 {
-                    this.Open();
+                    client = new TcpClient();//_host_name, _TNETsocketNum + 5000);
+                    client.ReceiveBufferSize = 8192 * 8192; //magic number, seems to be maximum receive size with current hardware //5242880 * 4 - 1;
+                    client.NoDelay = true;
+                    TNETSocket = client.Client;
+                    TNETSocket.ReceiveBufferSize = 8192 * 8192; //magic number, seems to be maximum receive size with current hardware //5242880 * 4 - 1;
+                    TNETSocket.SendBufferSize = 32000;
+                    TNETSocket.ReceiveTimeout = 200;
+                    TNETSocket.SendTimeout = 200;
+                    TNETSocket.NoDelay = true;
+                    TNETSocket.Connect(_host_name, _TNETsocketNum);
+                    stream = client.GetStream();
+
+                    _ClientOpen = true;
+                    m = "connected " + _logical_name + " to " + _host_name + " on port " + (TNETsocketNum);
                 }
-                else
+                catch
                 {
                     _ClientOpen = false;
-                    return;
+                    _TNETsocketNum++;
+                    if (_TNETsocketNum < 5002)
+                    {
+                        this.Open();
+                    }
+                    else
+                    {
+                        _ClientOpen = false;
+                        return;
+                    }
                 }
             }
 
         }
 
+        public void Close()
+        {
+            if (stream != null) { stream.Close(); }
+            if (client != null) { client.Close(); }
+            _ClientOpen = false;
+        }
+
+
         //Read the temperatures from all the CMBs on a given FPGA
         public double[] ReadTempFPGA(int fpga = 0)
         {
-            double[] cmb_temps = new double[4];
+            double[] cmb_temps = { 0, 0, 0, 0 }; //new double[4];
 
-            ReadStr(out string junk, out int junkL);
+            //ReadStr(out string junk, out int junkL);
 
-            SendStr("cmb");//SendStr("STAB" );
+            SendStr("cmb");
             ReadStr(out string a, out int r);
-            if (a.Length > 400) //If it got 'all' the info
+            if (a.Length > 32) //If it got 'all' the info (32 is just the header: "Ch    DegC     ROM_ID  (Errs=0)")
             {
                 string[] tok = a.Split(new string[] { " ", Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
                 if (String.Equals(tok[1], "DegC")) //Preproduction FEB 'cmb' format
                 {
-                    for (int cmb = 0; cmb < 4; cmb++)
-                        cmb_temps[cmb] = Convert.ToDouble(tok[(cmb * 3) + (12 * fpga) + 5]); //Starting at index 5, every 3rd string is the cmb temperature
+                    for (int i = 4; i < tok.Length; i += 3)
+                    {
+                        int cmb = Convert.ToInt16(tok[i]) - 1; //start numbering at 0 instead of 1
+                        if (cmb / 4 == fpga)
+                            cmb_temps[cmb % 4] = Convert.ToDouble(tok[i + 1]);
+                    }
                 }
                 else if (String.Equals(tok[1], "Cnts_TEMP_DegC")) //Prototype FEB 'cmb' format
                 {
@@ -133,16 +150,21 @@ namespace TB_mu2e
                 return cmb_temp;
             //Else we can assume the user has given a cmb # between 0 and 3, and provided the FPGA number
 
-            SendStr("cmb");//SendStr("STAB" );
+            SendStr("cmb");
             ReadStr(out string a, out int r);
-            if (a.Length > 400)//If it got 'all' the info
+            if (a.Length > 32) //If it got 'all' the info (32 is just the header: "Ch    DegC     ROM_ID  (Errs=0)")
             {
                 string[] tok = a.Split(new string[] { " ", Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
                 try
                 {
                     if (String.Equals(tok[1], "DegC")) //Preproduction FEB 'cmb' format
                     {
-                        cmb_temp = Convert.ToDouble(tok[(cmb * 3) + (12 * fpga) + 5]); //Starting at index 5, every 3rd string is the cmb temperature
+                        for (int i = 4; i < tok.Length; i += 3) //Scan through the returned list for the CMB we are interested in
+                        {
+                            int cmb_num = Convert.ToInt16(tok[i]) - 1; //start numbering at 0 instead of 1
+                            if ((cmb_num/4 == fpga) && (cmb_num % 4 == cmb)) //If the cmb number is on the correct fpga and the one that was requested (0-3), then return the temperature
+                                cmb_temp = Convert.ToDouble(tok[i + 1]);
+                        }
                     }
                     else if (String.Equals(tok[1], "Cnts_TEMP_DegC")) //Prototype FEB 'cmb' format
                     {
@@ -248,49 +270,79 @@ namespace TB_mu2e
                     byte[] buf = new byte[TNETSocket.Available];
                     TNETSocket.Receive(buf);
                 }
-                t = "DREC\r\n";
+                //t = "DREC\r\n";
+                //SendStr(t);
+                //t = "TRIG 0\r\n";
+                //SendStr(t);
+                //t = "WR 0 3C\r\n";
+                //SendStr(t);
+                t = "WR 0 4\r\n"; //reset the AFE seserializer logic
                 SendStr(t);
-                t = "TRIG 0\r\n";
+                Thread.Sleep(1);
+                t = "WR 400 4\r\n"; //reset the AFE seserializer logic
                 SendStr(t);
-                t = "WR 0 3C\r\n";
+                Thread.Sleep(1);
+                t = "WR 0 20\r\n"; //reset the trigger counter and whatnot
                 SendStr(t);
+                Thread.Sleep(1);
+                t = "WR 400 20\r\n"; //reset the trigger counter and whatnot
+                SendStr(t);
+                Thread.Sleep(1);
+
             }
             return true;
         }
 
         public bool Arm()
         {
-            return true;
+            bool sent_arm_success = false;
+            string t = "wr 303 32\r\n";
+            try
+            {
+                if (_ClientOpen)
+                {
+                    if (TNETSocket.Available > 0)
+                    {
+                        byte[] buf = new byte[TNETSocket.Available];
+                        TNETSocket.Receive(buf);
+                    }
+                    SendStr(t);
+                    sent_arm_success = true;
+                }
+            }
+            catch { }
+            return sent_arm_success;
+
         }
 
         public bool Disarm()
         {
-            string t = "TRIG 0\r\n";
-            if (_ClientOpen)
+            bool sent_disarm_success = false;
+            string t = "wr 303 40\r\n";
+            try
             {
-
-                if (TNETSocket.Available > 0)
+                if (_ClientOpen)
                 {
-                    Thread.Sleep(1);
-                    byte[] buf = new byte[TNETSocket.Available];
-                    TNETSocket.Receive(buf);
+                    if (TNETSocket.Available > 0)
+                    {
+                        byte[] buf = new byte[TNETSocket.Available];
+                        TNETSocket.Receive(buf);
+                    }
+                    SendStr(t);
+                    sent_disarm_success = true;
                 }
-                SendStr(t);
             }
-            //SW.WriteLine("disarm");
-            //timeout = 0;
-            //while ((SR.ReadLine() != "disarm") && (timeout < max_timeout)) { System.Threading.Thread.Sleep(1); timeout++; }
-            //if (timeout < max_timeout) { return true; } else { return false; }
-            return true;
+            catch { }
+            return sent_disarm_success;
         }
 
-        public bool SoftwareTrig()
-        {
-            SW.WriteLine("trig");
-            timeout = 0;
-            while ((SR.ReadLine() != "trig") && (timeout < max_timeout)) { System.Threading.Thread.Sleep(1); timeout++; }
-            if (timeout < max_timeout) { return true; } else { return false; }
-        }
+        //public bool SoftwareTrig()
+        //{
+        //    SW.WriteLine("trig");
+        //    timeout = 0;
+        //    while ((SR.ReadLine() != "trig") && (timeout < max_timeout)) { System.Threading.Thread.Sleep(1); timeout++; }
+        //    if (timeout < max_timeout) { return true; } else { return false; }
+        //}
 
         public bool CheckStatus(out uint spill_state, out uint spill_num, out uint trig_num)
         {
@@ -394,18 +446,23 @@ namespace TB_mu2e
         {
             if (_ClientOpen)
             {
-
-                if (TNETSocket.Available > 0)
+                try
                 {
-                    Thread.Sleep(1);
-                    byte[] buf = new byte[TNETSocket.Available];
-                    TNETSocket.Receive(buf);
+                    if (TNETSocket.Available > 0)
+                    {
+                        byte[] buf = new byte[TNETSocket.Available];
+                        TNETSocket.Receive(buf);
+                    }
+                    // ? why does this not work? SW.WriteLine(t);
+                    //byte[] b = PP.GetBytes(t + Convert.ToChar((byte)0x0d));
+                    byte[] b = PP.GetBytes(t + "\r\n");
+                    TNETSocket.Send(b);
+                    Thread.Sleep(20);
                 }
-                // ? why does this not work? SW.WriteLine(t);
-                //byte[] b = PP.GetBytes(t + Convert.ToChar((byte)0x0d));
-                byte[] b = PP.GetBytes(t + "\r");
-                TNETSocket.Send(b);
-                Thread.Sleep(20);
+                catch(System.IO.IOException)
+                {
+                    _ClientOpen = false;
+                }
             }
         }
 
@@ -433,6 +490,7 @@ namespace TB_mu2e
                         Thread.Sleep(100); //Wait a little before it checks the socket again
                     }
                     t = t.Trim(new char[] { '>' }); //remove >
+                    t = t.Trim(Environment.NewLine.ToCharArray());
                 }
             }
             ret_time = this_t;
@@ -507,13 +565,6 @@ namespace TB_mu2e
             }
             else
             { }
-        }
-
-        public void Close()
-        {
-            if (stream != null) { stream.Close(); }
-            if (client != null) { client.Close(); }
-            _ClientOpen = false;
         }
 
         public static int Count_bits(int val)

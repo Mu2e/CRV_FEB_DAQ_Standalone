@@ -677,6 +677,7 @@ namespace TB_mu2e
             r1.bit_comment[7] = "[7] Not used.";
             r1.bit_comment[8] = "[8] Enable the on card test pulser.";
             r1.bit_comment[9] = "[9] Run the test pulser for one spill or continuously. 1: Run once 0: Run continuously";
+            r1.bit_comment[10] = "[10] GPO Select. 0: GPO outputs  trigger pulse. 1: GPO outputs spill gate";
             list_of_reg.Add(r1);
 
 
@@ -784,6 +785,72 @@ namespace TB_mu2e
                 bit_comment = new string[16]
             };
             list_of_reg.Add(r1);
+
+            r1 = new Mu2e_Register()
+            {
+                name = "MICROBUNCH_TRIG_POSITION",
+                addr = 0x310,
+                broadcast = true,
+                fpga_offset_mult = 0x400,
+                comment = "9-bit value which specifies the trigger position within the microbunch. Currently a microbunch = 270 160MHz ticks, which is 1687ns.",
+                bit_comment = new string[16]
+            };
+            list_of_reg.Add(r1);
+
+            r1 = new Mu2e_Register()
+            {
+                name = "HISTO_CONTROL_ALL",
+                addr = 0x311,
+                broadcast = true,
+                fpga_offset_mult = 0x400,
+                comment = "Broadcast. A write to this address writes to all FPGA histogram control registers (0x10). Histogram interval registers are still separate. Useful for making 8 histograms simultaneously.",
+                bit_comment = new string[16]
+            };
+            r1.bit_comment[0] = "Bits 2..0: Channel Select for both AFE histogrammers";
+            r1.bit_comment[1] = r1.bit_comment[0];
+            r1.bit_comment[2] = r1.bit_comment[0];
+            r1.bit_comment[3] = "Not Used";
+            r1.bit_comment[4] = "Mode bit. 0 = Histogrammer is free running over the accumulation interval. 1 = Histogram is qualified by an external gate and the accumulation interval.";
+            r1.bit_comment[5] = "Start Histogrammer for AFE 0";
+            r1.bit_comment[6] = "Start Histogrammer for AFE 1";
+            r1.bit_comment[7] = "Not Used";
+            r1.bit_comment[8] = "Bits 9..8: AFE 0 Binning. 0 = 1 ADC/bin, 1 = 2, 2 = 4, 3 = 8.";
+            r1.bit_comment[9] = r1.bit_comment[9];
+            r1.bit_comment[10] = "Bits 11..10: AFE 1 Binning. 0 = 1 ADC/bin, 1 = 2, 2 = 4, 3 = 8.";
+            r1.bit_comment[11] = r1.bit_comment[10];
+            r1.bit_comment[12] = "Not Used";
+            r1.bit_comment[13] = r1.bit_comment[12];
+            r1.bit_comment[14] = r1.bit_comment[12];
+            r1.bit_comment[15] = r1.bit_comment[12];
+            list_of_reg.Add(r1);
+
+            r1 = new Mu2e_Register()
+            {
+                name = "CONTROL_STATUS_ALL",
+                addr = 0x316,
+                broadcast = true,
+                fpga_offset_mult = 0x400,
+                comment = "Broadcast. Control status register broadcast. Write 0x100 to start pedestal averaging (16 ADC samples). Pedestal average is written to pedestal offset registers.",
+                bit_comment = new string[16]
+            };
+            r1.bit_comment[0] = "AFE 0 Power. 0 = Run. 1 = Power down.";
+            r1.bit_comment[1] = "AFE 1 Power. 0 = Run. 1 = Power down.";
+            r1.bit_comment[2] = "Issue a reset to the AFE deserializer logic in the FPGA.";
+            r1.bit_comment[3] = "Issue a MIG DDR interface reset.";
+            r1.bit_comment[4] = "Issue a readout sequencer reset. Force MIG DDR Write command.";
+            r1.bit_comment[5] = "Issue a general reset. The AFE FIFOs, trigger counter, spill counter, and readout sequencer are reset.";
+            r1.bit_comment[6] = "Reset the serial controller in the AFE chips.";
+            r1.bit_comment[7] = "Clear FM receive parity error.";
+            r1.bit_comment[8] = "Not Used";
+            r1.bit_comment[9] = r1.bit_comment[8];
+            r1.bit_comment[10] = r1.bit_comment[8];
+            r1.bit_comment[11] = r1.bit_comment[8];
+            r1.bit_comment[12] = r1.bit_comment[8];
+            r1.bit_comment[13] = r1.bit_comment[8];
+            r1.bit_comment[14] = r1.bit_comment[8];
+            r1.bit_comment[15] = r1.bit_comment[8];
+            list_of_reg.Add(r1);
+
 
             #endregion Broadcast Registers
 
@@ -943,9 +1010,9 @@ namespace TB_mu2e
         {
             if (reg_addr_begin > reg_addr_end) //If, for whatever reason, the start of the range is after the end of the range, just return the same range size, but from the starting range address
                 reg_addr_end = Convert.ToUInt16((reg_addr_begin - reg_addr_end) + reg_addr_begin);
-            Mu2e_Register[] reg_collect = new Mu2e_Register[reg_addr_end - reg_addr_begin]; //Create an array, with the same number of indices as the range-size, to hold the registers
+            Mu2e_Register[] reg_collect = new Mu2e_Register[(reg_addr_end - reg_addr_begin) + 1]; //Create an array, with the same number of indices as the range-size, to hold the registers
 
-            for (UInt16 addr = reg_addr_begin; addr < reg_addr_end; addr++)
+            for (UInt16 addr = reg_addr_begin; addr <= reg_addr_end; addr++)
                 FindAddr(addr, ref reg_list, out reg_collect[addr - reg_addr_begin]);
 
             return reg_collect;
@@ -986,17 +1053,22 @@ namespace TB_mu2e
                     NetworkStream TNETStream = myClient.GetStream();
                     //StreamWriter SW = new StreamWriter(TNETStream);
                     //StreamReader SR = new StreamReader(TNETStream);
-                    if (reg.width <= 16)
+                    while (myClient.Available > 0)
+                    {
+                        byte[] junk = new byte[myClient.Available];
+                        TNETStream.Read(junk, 0, junk.Length);
+                    }
+                        if (reg.width <= 16)
                     {
                         string lin = "rd " + Convert.ToString(addr, 16) + "\r\n";
                         byte[] buf = PP.GetBytes(lin);
                         TNETStream.Write(buf, 0, buf.Length);
 
-                        System.Threading.Thread.Sleep(5);
+                        System.Threading.Thread.Sleep(10);
                         if (myClient.Available > 0)
                         {
                             byte[] rec_buf = new byte[myClient.Available];
-                            Thread.Sleep(1);
+                            //Thread.Sleep(1);
                             int ret_len = TNETStream.Read(rec_buf, 0, rec_buf.Length);
                             reg.prev_val = reg.val;
                             BufVal(rec_buf, out uint t, out double dv);

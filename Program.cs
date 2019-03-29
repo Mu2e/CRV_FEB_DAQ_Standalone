@@ -57,8 +57,10 @@ namespace TB_mu2e
         public bool fake;
         public bool OneSpill;
         public string[] RunParams;
+        private List<byte[]> data_buffers;
 
         public LinkedList<SpillData> Spills;
+        internal bool validateParse;
 
         public bool SaveAscii { get; internal set; }
 
@@ -77,7 +79,7 @@ namespace TB_mu2e
             this_trig = new long[3];
             this_bytes_written = new long[3];
             total_bytes_written = new long[3];
-            myStatus = "Starting new run";
+            myStatus = "Run Object Created";//"Starting new run";
             RunStatus = new Queue<string>();
             UpdateStatus(myStatus);
             int last_num = 0;
@@ -107,58 +109,50 @@ namespace TB_mu2e
 
             try
             {
-                sr = File.OpenText("c:\\data\\run_list.txt");
-                string l = "";
-                while (!sr.EndOfStream)
+                if (File.Exists("c:\\data\\run_list.txt"))
                 {
-                    l = sr.ReadLine();
-                }
-                last_num = Convert.ToInt32(l.Substring(0, l.IndexOf(" ")));
+                    using (sr = File.OpenText("c:\\data\\run_list.txt"))
+                    {
+                        string l = "";
+                        while (!sr.EndOfStream) //read to the last line
+                            l = sr.ReadLine();
 
-                StreamReader sr2;
-                sr2 = null;
+                        last_num = Convert.ToInt32(l.Substring(0, l.IndexOf(" ")));
+                    }
+                }
+
                 if (File.Exists("c:\\data\\run_param.txt"))
                 {
-                    sr2 = File.OpenText("c:\\data\\run_param.txt");
-                    string l2 = "";
-                    while (!sr2.EndOfStream)
+                    using (StreamReader sr2 = File.OpenText("c:\\data\\run_param.txt"))
                     {
-                        l2 = sr2.ReadLine();
+                        string l2 = "";
+                        while (!sr2.EndOfStream)
+                        {
+                            l2 = sr2.ReadLine();
+                        }
+                        string[] words = l2.Split(' ');
+                        RunParams = words;
                     }
-                    string[] words = l2.Split(' ');
-                    RunParams = words;
-                    sr2.Close();
                 }
-                sr.Close();
             }
             catch(Exception e)
             {
                 System.Console.Write("Caught Exception {0} in Program.cs!", e);
-                last_num = 1;
+                last_num = 0;
             }
             num = last_num + 1;
             run_name = "Run_" + num.ToString("0000");
-            try
-            {
-                StreamWriter sw = File.AppendText("c:\\data\\run_list2.txt");
-                sw.WriteLine(num.ToString() + " starting at: " + DateTime.Now);
-                sw.Close();
-                sw = null;
-            }
-            catch (Exception e)
-            {
-                System.Console.Write("Caught Exception {0} in Program.cs!", e);
-                try
-                {
-                    StreamWriter sw1 = File.CreateText("c:\\data\\run_list2.txt");
-                    sw1.WriteLine(num.ToString() + " starting at: " + DateTime.Now);
-                    sw1.Close();
-                }
-                catch(Exception f)
-                {
-                    System.Console.Write("Caught Exception {0} in Program.cs!", f);
-                }
-            }
+            //try
+            //{
+            //    using (StreamWriter sw = File.AppendText("c:\\data\\run_list.txt"))
+            //    {
+            //        sw.WriteLine(num.ToString() + " starting at: " + DateTime.Now);
+            //    }
+            //}
+            //catch (Exception e)
+            //{
+            //    System.Console.Write("Caught Exception {0} in Program.cs!", e);
+            //}
         }
 
         public void UpdateStatus(string m)
@@ -187,95 +181,87 @@ namespace TB_mu2e
             //hName += DateTime.Now.Minute.ToString("00");
             //hName += DateTime.Now.Second.ToString("00");
             created = DateTime.Now;
-            hName = PP.myRun.run_name;
+            hName = run_name;//PP.myRun.run_name;
             hName = dirName + hName + ".data";
             OutFileName = hName;
-            if (sw == null)
-            {
-
-                try
-                {
-                    sw = new StreamWriter(OutFileName, true);
-                    StreamWriter sw1 = File.AppendText("c:\\data\\run_list2.txt");
-                    sw1.WriteLine(this.num.ToString() + " ACTIVE at: " + DateTime.Now);
-                    sw1.WriteLine(this.num.ToString() + " Name: " + hName);
-                    sw1.Close();
-                    sw1 = null;
-                }
-                catch(Exception e)
-                {
-                    System.Console.Write("Caught Exception {0} in Program.cs!", e);
-                }
-            }
-
-            if (!File.Exists("c:\\data\\run_param.txt"))
-            {
-                try
-                {
-                    File.CreateText("c:\\data\\run_param.txt");
-                }
-                catch (Exception e)
-                {
-                    System.Console.Write("Caught Exception {0} in Program.cs!", e);
-                }
-
-            }
-
             try
             {
-                StreamWriter sw2 = File.AppendText("c:\\data\\run_param.txt");
-                sw2.WriteLine(this.num.ToString() + " " + rn.textEbeam.Text + " " + rn.textIbeam.Text + " " + rn.BIASVtextBox.Text + " " + rn.GainTextBox.Text + " " + rn.comboPID.Text + " " + rn.textAngle.Text + " " + rn.textXpos.Text + " " + rn.textZpos.Text + " " + rn.textPressure.Text);
-                sw2.Close();
-                sw2 = null;
+                using (sw = new StreamWriter(OutFileName, true))
+                {
+                    sw.WriteLine("-- START OF RUN -- " + DateTime.Now.ToString());
+
+                    using (StreamWriter sw1 = File.AppendText("c:\\data\\run_list.txt"))
+                    {
+                        sw1.WriteLine(this.num.ToString() + " ACTIVE at: " + DateTime.Now);
+                        sw1.WriteLine(this.num.ToString() + " Name: " + hName);
+                    }
+
+                    using (StreamWriter sw2 = File.AppendText("c:\\data\\run_param.txt"))
+                    {
+                        sw2.WriteLine(this.num.ToString() + " " + rn.textEbeam.Text + " " + rn.textIbeam.Text + " " + rn.BIASVtextBox.Text + " " + rn.GainTextBox.Text + " " + rn.comboPID.Text + " " + rn.textAngle.Text + " " + rn.textXpos.Text + " " + rn.textZpos.Text + " " + rn.textTemp.Text);
+                    }
+
+                    //If all goes well above, we are good to go for taking data.
+                    UpdateStatus("RUN STARTED");
+                    TCP_receiver.SaveEnabled = true;
+                    ACTIVE = true;
+                }
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 System.Console.Write("Caught Exception {0} in Program.cs!", e);
             }
 
-            TCP_receiver.SaveEnabled = true;
-            ACTIVE = true;
         }
 
         public void DeactivateRun()
         {
             try
             {
-                sw.WriteLine("-- END OF RUN -- " + DateTime.Now.ToString());
-                sw.Close();
+                using (sw = new StreamWriter(OutFileName, true))
+                {
+                    sw.WriteLine("-- END OF RUN -- " + DateTime.Now.ToString());
+                }
 
-                StreamWriter sw1 = File.AppendText("c:\\data\\run_list2.txt");
-                sw1.WriteLine(this.num.ToString() + " STOPPED at: " + DateTime.Now);
-                sw1.Close();
-                sw1 = null;
             }
             catch { }
+
+            using (StreamWriter sw1 = File.AppendText("c:\\data\\run_list.txt"))
+            {
+                sw1.WriteLine(this.num.ToString() + " STOPPED at: " + DateTime.Now);
+            }
+
+
+            UpdateStatus("RUN STOPPED");
             TCP_receiver.SaveEnabled = false;
             ACTIVE = false;
-
         }
+
 
         public void RecordSpill()
         {
             if (ACTIVE)
             {
-                if (sw != null)
+                if ((PP.FEB1.client != null) || (PP.FEB2.client != null))
                 {
-                    if ((PP.FEB1.client != null) || (PP.FEB2.client != null))
+                    TCP_receiver.SaveEnabled = true;
+                    num_bytes = 0;
+                    if (PP.FEB1.client != null)
                     {
-                        TCP_receiver.SaveEnabled = true;
-                        num_bytes = 0;
-                        if (PP.FEB1.client != null)
-                        { TCP_receiver.ReadFeb("FEB1", PP.FEB1.TNETSocket_prop, out num_bytes); }
+                        TCP_receiver.ReadFeb(ref PP.FEB1, /*PP.FEB1.client PP.FEB1.TNETSocket_prop,*/ out num_bytes);
                         this_bytes_written[0] = num_bytes;
                         total_bytes_written[0] += num_bytes;
                         Application.DoEvents();
-                        if (PP.FEB2.client != null)
-                        { TCP_receiver.ReadFeb("FEB2", PP.FEB2.TNETSocket_prop, out num_bytes); }
-                        Application.DoEvents();
-                        //                        TCP_reciever.ReadFeb("WC", PP.WC.TNETSocket_prop, out num_bytes);
-                        spill_complete = true;
                     }
+                    if (PP.FEB2.client != null)
+                    {
+                        TCP_receiver.ReadFeb(ref PP.FEB2, /*PP.FEB1.client PP.FEB2.TNETSocket_prop,*/ out num_bytes);
+                        this_bytes_written[1] = num_bytes;
+                        total_bytes_written[1] += num_bytes;
+                        Application.DoEvents();
+                    }
+                    //                        TCP_reciever.ReadFeb("WC", PP.WC.TNETSocket_prop, out num_bytes);
+                    //spill_complete = true;
                 }
             }
         }
@@ -334,7 +320,7 @@ namespace TB_mu2e
     {
         private ConcurrentDictionary<int, double> currentMeasurements; //concurrent dictionary is thread-safe
         private Mu2e_FEB_client feb;
-        private string filename;
+        private readonly string filename;
 
         public CurrentMeasurements(Mu2e_FEB_client feb_client, string _filename)
         {
@@ -429,12 +415,17 @@ namespace TB_mu2e
             side = side_in;
         }
 
-        public void TakeMeasurement(int channel) //takes a current measurement for the same channel on all FEBs
+        public double[] TakeMeasurement(int channel) //takes a current measurement for the same channel on all FEBs
         {
+            double[] currents = new double[febs.Count];
             int fpga = channel / 16;
             int chan_fpga = channel % 16;
-            for(int i = 0; i < febs.Count; i++)
+            for (int i = 0; i < febs.Count; i++)
+            {
                 currentMeasurements[i].TryAdd(channel, Convert.ToDouble(febs[i].ReadA0(fpga, chan_fpga)));
+                currents[i] = currentMeasurements[i][channel];
+            }
+            return currents;
         }
 
         public void WriteMeasurements(string filename, double temperature, int dicounter)
@@ -455,10 +446,10 @@ namespace TB_mu2e
             }
         }
 
-        public string GetgCodeDicounterPosition(int dicounter, int feedrate)
+        public string GetgCodeDicounterPosition(int dicounter, int feedrate, int pos_offset)
         {
             int feed = feedrate;
-            if (dicounter > 100 || dicounter < 0)
+            if (dicounter > 8/*100*/ || dicounter < 0)
                 return "G1 X0 F1000";
             if (feedrate <= 0 || feedrate > 3000)
                 feed = 1000;
@@ -466,22 +457,23 @@ namespace TB_mu2e
                          width_bar = 51.33,
                          offset = 42.00;
             const string basegCode = "G1 X";
-            int layer = dicounter / 8, pos_layer = dicounter % 8;
+            //int layer = dicounter / 8, pos_layer = dicounter % 8;
             //double position = (pos_layer * width_dicounter) + (layer * offset);
-            double position = dicounter * 5.0; //5mm
-            string dicounterPositionCommand = basegCode + position + " F" + Convert.ToString(feed);
+            //double position = dicounter * 5.0; //5mm
+            double position = pos_offset + (dicounter * width_dicounter);
+            string dicounterPositionCommand = basegCode + position + " F" + feed;
             return dicounterPositionCommand;
         }
-
 
     }
 
     static class PP
     {
-        public static bool glbDebug=false;
+        public static bool glbDebug = false;
         public static Run myRun;
         public static CurrentMeasurements qaDicounterMeasurements;
         public static ModuleQACurrentMeasurements moduleQACurrentMeasurements;
+        public static CurrentMeasurements lightCheckMeasurements;
         //        public static frmTelnet myTelnet;
         //        public static Plot0 myPlot;
         public static frmMain myMain;
@@ -614,27 +606,37 @@ namespace TB_mu2e
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
             //myRun = new Run();
-            FEB1 = new Mu2e_FEB_client();
-            FEB1.name = "FEB1";
-            //FEB1.host_name_prop = "131.225.52.181";
-            //FEB1.host_name_prop = "128.143.196.218";
-            //FEB1.host_name_prop = "128.143.196.54";
-            //FEB1.host_name_prop = "131.225.52.177";
-            FEB1.host_name_prop = "crvfeb01.fnal.gov";
+            FEB1 = new Mu2e_FEB_client
+            {
+                name = "FEB1",
+                //host_name_prop = "131.225.52.181";
+                //host_name_prop = "128.143.196.218";
+                host_name_prop = "128.143.196.54"
+                //host_name_prop = "131.225.52.177";
+                //host_name_prop = "crvfeb01.fnal.gov"
+                //host_name_prop = "131.225.176.32"
+                //host_name_prop = "131.225.52.182"
+            };
 
-            FEB2 = new Mu2e_FEB_client();
-            FEB2.name = "FEB2";
-            //FEB2.host_name_prop = "DCRC5";
-            FEB2.host_name_prop = "crvfeb02.fnal.gov";
-            
+            FEB2 = new Mu2e_FEB_client
+            {
+                name = "FEB2",
+                //host_name_prop = "DCRC5";
+                host_name_prop = "crvfeb02.fnal.gov"
+                //host_name_prop = "131.225.176.34"
+                //host_name_prop = "131.225.52.181"
+            };
+
             //FEC = new Mu2e_FECC_client();
 
-            WC = new WC_client();
-            WC.name = "WC";
-            WC.host_name_prop = "FTBFWC01.FNAL.GOV";
+            WC = new WC_client()
+            {
+                host_name_prop = "FTBFWC01.FNAL.GOV",
+                name = "WC"
+            };
 
-            DAQ_server myDAQ_server = new DAQ_server();
-            myDAQ_server.StartRC();
+            //DAQ_server myDAQ_server = new DAQ_server();
+            //myDAQ_server.StartRC();
 
             myMain = new frmMain();
             Application.Run(myMain);

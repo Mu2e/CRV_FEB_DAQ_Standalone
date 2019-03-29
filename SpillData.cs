@@ -35,7 +35,7 @@ namespace TB_mu2e
 
         public bool ParseInput(byte[] pack, int err = 0)
         {
-            if (pack.Length < 0x10) //0x810) //Check if less than 16 bytes (0x10), since that is only the length of a spill header and event header
+            if (pack.Length <= 0x10) //0x810) //Check if less or equal to 16 bytes (0x10), since that is only the length of a spill header
                 return false; //empty event
 
             while (pack[0] == 0x3e)
@@ -63,7 +63,10 @@ namespace TB_mu2e
                 this.SpillTrigCount = t32;
 
                 if (this.SpillTrigCount > MaxTrigPerSpill) //If the number of triggers is too high, don't bother doing anything else...
-                    if (PP.glbDebug) { Console.WriteLine("too many trig, I quit"); return (false); }
+                {
+                    if (PP.glbDebug) { Console.WriteLine("too many trig, I quit"); }
+                    return false;
+                }
                 UInt32 event_num_left = this.SpillTrigCount; //Number of events to expect when reading data
 
                 //spill counter, 5
@@ -107,11 +110,15 @@ namespace TB_mu2e
                 }
                 #endregion SpillHeader
 
-                i = 17; //skip the 0x3e spacer between the spill header and event header. Obsolete: i = 16;
+                i = 16;
+                if (pack[i] == 0x3e) //detect if a '>' has been sent between the spill header and event header, if it has then we must skip it
+                    i = 17;
+
                 DateTime start_parsing = DateTime.Now; //used to determine how much time is spent parsing the incoming data
                 Mu2e_Event this_event = null; //create reference to mu2e_Event objects
 
-                while (event_num_left > 0) //while there are still events to be read
+                //trigger count starts at 1
+                while (event_num_left > 1) //while there are still events to be read
                 {
                     this_event = new Mu2e_Event(); //set this_event to new event object
 
@@ -159,7 +166,10 @@ namespace TB_mu2e
 
                     #region EventData
                     if (this_event.NumSamples == 0)
+                    {
                         if (PP.glbDebug) { Console.WriteLine("stop!"); }
+                        return false;
+                    }
 
                     int num_ch = Convert.ToInt32(this_event.EventWordCount / this_event.NumSamples);
                     int loop_limit = (num_ch > 15) ? 16 : num_ch; //Stop the event-reading loop from reading beyond 16 channels per FPGA

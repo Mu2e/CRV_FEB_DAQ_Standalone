@@ -12,187 +12,298 @@ namespace TB_mu2e
     static class TCP_receiver
     {
         private static StreamWriter sw;
+        private static BinaryWriter bw;
         public static DateTime time_start;
         public static DateTime time_read_done;
         public static DateTime time_save_done;
-        public static bool NewSpill;
         public static bool SaveEnabled;
         public static bool ParseEnabled;
-        public static bool AllDone;
         public static string source_name;
 
-        //To save data in binary
-        private static void Save(byte[] buf)
+        //To save data in "binary"
+        private static void Save(byte[] buf, string source)
         {
-            sw = PP.myRun.sw;
+            ReaderWriterLock locker = new ReaderWriterLock();
             try
             {
-                if (sw == null)
+                locker.AcquireWriterLock(10000);//timeout of 10 seconds,
+                using (bw = new BinaryWriter(File.Open(PP.myRun.OutFileName, FileMode.Append)))
                 {
-                    return;
+                    try
+                    {
+                        int i = 0;
+
+                        bw.Write("--Begin of spill\r\n");
+                        bw.Write("--** SOURCE = " + source + "\r\n");
+                        foreach (byte b in buf)
+                        {
+                            bw.Write(b);//.ToString());
+                            //sw.Write(" ");
+                            i++;
+                            if (i == 16) { bw.Write("\r\n"); i = 0; }
+                        }
+                        time_save_done = DateTime.Now;
+
+                        bw.Write("--wrote " + buf.Length.ToString() + " bytes\r\n");
+                        //bw.Write("--Read took (in ms):" + time_read_done.Subtract(time_start).TotalMilliseconds.ToString("") + "\r\n");
+                        //bw.Write("--Save took (in ms):" + time_save_done.Subtract(time_read_done).TotalMilliseconds.ToString("")+ "\r\n");
+                        bw.Write("--End of spill\r\n");
+
+                        //sw.WriteLine("--wrote " + buf.Length.ToString() + " bytes");
+                        //sw.WriteLine("--Read took (in ms):" + time_read_done.Subtract(time_start).TotalMilliseconds.ToString(""));
+                        //sw.WriteLine("--Save took (in ms):" + time_save_done.Subtract(time_read_done).TotalMilliseconds.ToString(""));
+                        //sw.WriteLine("--End of spill");
+                    }
+                    catch { Console.WriteLine("bad break"); }
                 }
-                int i = 0;
-                NewSpill = true;
 
-                sw.WriteLine("--Begin of spill");
-                sw.WriteLine("--** SOURCE = " + source_name);
-                foreach (byte b in buf)
-                {
-                    sw.Write(b.ToString());
-                    sw.Write(" ");
-                    i++;
-                    if (i == 16) { sw.WriteLine(); i = 0; }
-                }
-                time_save_done = DateTime.Now;
-
-                sw.WriteLine("--wrote " + buf.Length.ToString() + " bytes");
-                sw.WriteLine("--Read took (in ms):" + time_read_done.Subtract(time_start).TotalMilliseconds.ToString(""));
-                sw.WriteLine("--Save took (in ms):" + time_save_done.Subtract(time_read_done).TotalMilliseconds.ToString(""));
-
-                //close after 30 min
             }
-            catch { Console.WriteLine("bad break"); }
+            finally
+            {
+                locker.ReleaseLock();
+            }
         }
 
         //To save data in human-readable format
         private static void Save(SpillData spill)
         {
-            sw = PP.myRun.sw;
+            ReaderWriterLock locker = new ReaderWriterLock();
             try
             {
-                if (sw == null)
-                    return;
-
-                int i = 0;
-                NewSpill = true;
-
-                sw.WriteLine("--Begin of spill (ascii)");
-                sw.WriteLine("--** Source = " + source_name);
-                sw.WriteLine("--SpillHeader");
-                sw.Write(spill.SpillWordCount + " "); //Word counts in spill
-                sw.Write(spill.SpillTrigCount + " "); //Number of triggers in spill
-                sw.Write(spill.SpillCounter + " "); //Spill number
-                sw.Write(spill.ExpectNumCh + " "); //Channel mask
-                sw.Write(spill.BoardID + " "); //Board ID
-                sw.Write(spill.SpillStatus); //Spill status
-                sw.WriteLine("--End SpillHeader");
-                sw.WriteLine("--Events");
-                foreach (Mu2e_Event spillEvent in spill.SpillEvents)
+                locker.AcquireWriterLock(10000);//timeout of 10 seconds,
+                using (sw = new StreamWriter(PP.myRun.OutFileName, true))
                 {
-                    sw.WriteLine("--EventHeader");
-                    sw.Write(spillEvent.EventWordCount + " "); //Word count in event
-                    sw.Write(spillEvent.EventTimeStamp + " "); //Timestamp for event
-                    sw.Write(spillEvent.TrigCounter + " "); //Trigger number for event
-                    sw.Write(spillEvent.NumSamples + " "); //Number of ADC samples per event
-                    sw.Write(spillEvent.TrigType + " "); //Type of trigger
-                    sw.Write(spillEvent.EventStatus); //Event status
-                    sw.WriteLine("--End EventHeader");
-
-                    foreach(Mu2e_Ch chan in spillEvent.ChanData)
+                    try
                     {
-                        sw.Write(chan.num_ch + " "); //Write the channel number
-                        foreach(int adc in chan.data)
-                            sw.Write(adc + " "); //Write the ADC data
-                        sw.Write("\r\n");
+                        sw.WriteLine("--Begin of spill (ascii)");
+                        sw.WriteLine("--** Source = " + spill.Source);
+                        sw.WriteLine("--SpillHeader");
+                        sw.Write(spill.SpillWordCount + " "); //Word counts in spill
+                        sw.Write(spill.SpillTrigCount + " "); //Number of triggers in spill
+                        sw.Write(spill.SpillCounter + " "); //Spill number
+                        sw.Write(spill.ExpectNumCh + " "); //Channel mask
+                        sw.Write(spill.BoardID + " "); //Board ID
+                        sw.Write(spill.SpillStatus); //Spill status
+                        sw.WriteLine("--End SpillHeader");
+                        sw.WriteLine("--Events");
+                        foreach (Mu2e_Event spillEvent in spill.SpillEvents)
+                        {
+                            sw.WriteLine("--EventHeader");
+                            sw.Write(spillEvent.EventWordCount + " "); //Word count in event
+                            sw.Write(spillEvent.EventTimeStamp + " "); //Timestamp for event
+                            sw.Write(spillEvent.TrigCounter + " "); //Trigger number for event
+                            sw.Write(spillEvent.NumSamples + " "); //Number of ADC samples per event
+                            sw.Write(spillEvent.TrigType + " "); //Type of trigger
+                            sw.Write(spillEvent.EventStatus); //Event status
+                            sw.WriteLine("--End EventHeader");
+
+                            foreach (Mu2e_Ch chan in spillEvent.ChanData)
+                            {
+                                sw.Write(chan.num_ch + " "); //Write the channel number
+                                foreach (int adc in chan.data)
+                                    sw.Write(adc + " "); //Write the ADC data
+                                sw.Write("\r\n");
+                            }
+
+                        }
+                        sw.WriteLine("--End Events");
+                        sw.WriteLine("--End of spill (ascii)");
                     }
-                    
+                    catch (Exception e)
+                    {
+                        Console.WriteLine("Exception thrown in TCP_receiver::Save(SpillData spill) : " + e);
+                    }
                 }
-                sw.WriteLine("--End Events");
             }
-            catch(Exception e)
+            finally
             {
-                Console.WriteLine("Exception thrown in TCP_receiver::Save(SpillData spill) : " + e);
+                locker.ReleaseLock();
             }
         }
 
-        public static void ReadFeb(string BoardName, Socket s, out long l) //out List<byte> buf,
+        //To save trace data (from test beam spills) to file
+        public static void ReadFeb(ref Mu2e_FEB_client feb, /*TcpClient feb_client Socket feb_socket,*/ out long lret) //out List<byte> buf,
         {
-            source_name = BoardName;
-            PP.myMain.timer1.Enabled = false;
-            byte[] b = new byte[5];
-            s.ReceiveTimeout = 500;
-            if (s.Available > 0)
+            //Socket feb_socket = feb.TNETSocket;
+            //NetworkStream feb_stream = feb.stream;
+            source_name = feb.name;
+            //PP.myMain.SpillTimer.Enabled = false;
+            PP.myRun.ACTIVE = false; //Halt the status queries to the boards (single socket atm, so we cannot get data and status concurrently)
+            if (feb.TNETSocket.Available > 0)
             {
-                byte[] junk = new byte[s.Available];
-                s.Receive(junk);
+                byte[] junk = new byte[feb.TNETSocket.Available];
+                feb.stream.Read(junk, 0, feb.TNETSocket.Available);
             }
 
-            b = PP.GetBytes("rdb\r\n");
             time_start = DateTime.Now;
-            l = 0;
-
-            s.Send(b);
-            Thread.Sleep(2);
-            //wait to get the first packet
-            while (s.Available == 0)
-            {
-                Thread.Sleep(2);
-            }
+            lret = 0;
+            byte[] mem_buff;
+            byte[] b = PP.GetBytes("RDB 1\r\n"); //get the spill header (and 1 word) & reset read pointers
+            byte[] hdr_buf = new byte[18];
+            long spillwrdcnt = 0; //spill word count will be the total spill count for the FEB (which means BOTH FPGAs)
+            feb.TNETSocket.Send(b);
             Thread.Sleep(10);
-            int old_available = 0;
-            byte[] rec_buf;
-            byte[] mem_buf=new byte[5242879*8];
-            //int mem_ind = 0;
-            while (s.Available > old_available)
+            if (feb.TNETSocket.Available > 0) //if we can snag the wordcount from the spill header, then we know how much we should be reading
             {
-                Thread.Sleep(20);
-                old_available = s.Available;
-                Thread.Sleep(20);
-            }
-            rec_buf = new byte[s.Available];
+                feb.TNETSocket.Receive(hdr_buf);
+                spillwrdcnt = (hdr_buf[0] * 256 * 256 * 256 + //spillwrdcnt is how many words there are for ALL fpgas in a given spill
+                               hdr_buf[1] * 256 * 256 +
+                               hdr_buf[2] * 256 +
+                               hdr_buf[3]);
 
-            
-            int lret = s.Receive(rec_buf, rec_buf.Length, SocketFlags.None);
-
-            int tint = (int)(rec_buf[4] * 256 * 256 * 256 + rec_buf[5] * 256 * 256 + rec_buf[6] * 256 + rec_buf[7]);
-            PP.myRun.UpdateStatus("Got " + rec_buf.Length + " bytes, enough for " + ((rec_buf.Length-16)/ 4112)+ " tirg => " + (tint * 0x808*2+16).ToString() + ")");
-            Thread.Sleep(5);
-            byte[] buf = new byte[lret];
-            rec_buf.CopyTo(buf, 0);
-            
-            //PP.myRun.UpdateStatus("Ended recieving " + buf.LongCount() + " bytes");
-            //Thread.Sleep(25);
-            //spill word count is the first 4 bytes
-            //int ind = 0;
-            Int64 t = 0;
-            t = (Int64)(buf[0] * 256 * 256 * 256 + buf[1] * 256 * 256 + buf[2] * 256 + buf[3]);
-            long SpillWordCount = t * 2;
-            long RecWordCount = buf.LongCount<byte>();
-            DateTime start_rec = DateTime.Now;
-            TimeSpan MaxTimeSpan = TimeSpan.FromSeconds(2);
-
-            RecWordCount = buf.LongCount<byte>();
-            DateTime so_far_time = DateTime.Now;
-            TimeSpan elapsed = so_far_time.Subtract(start_rec);
-            Console.WriteLine("read... " + buf.LongCount<byte>().ToString() + " out of " + SpillWordCount.ToString() + " in " + elapsed.TotalMilliseconds + " ms");
-
-            time_read_done = DateTime.Now;
-
-                SpillData new_spill = new SpillData();
-                bool parse_ok=new_spill.ParseInput(buf);
-                if (parse_ok)
+                mem_buff = new byte[spillwrdcnt*2]; //each word = 2 bytes, we are going to allocate a buffer in memory to read the FEB data into that is the correct size.
+                int bytesread = 0;
+                int bytesleft = (int)spillwrdcnt * 2;
+                try
                 {
-                    PP.myRun.Spills.AddLast(new_spill);
-                    if (PP.myRun.Spills.Count > 2)
+                    b = PP.GetBytes("RDB\r\n");
+                    feb.TNETSocket.Send(b);
+                    Thread.Sleep(10);
+
+                    do
                     {
-                        if (PP.myRun.Spills.First.Value.IsDisplayed) { PP.myRun.Spills.Remove(PP.myRun.Spills.First.Next); }
-                        else { PP.myRun.Spills.RemoveFirst();}
-                    }
-                    if (PP.myRun != null)
+                        int bytes_now = feb.stream.Read(mem_buff, bytesread, feb.TNETSocket.Available);
+                        bytesread += bytes_now;
+                        bytesleft -= bytes_now;
+                        //Console.WriteLine(source_name + " got " + bytesread + " / " + spillwrdcnt * 2);
+                        Thread.Sleep(100);
+                    } while (feb.stream.DataAvailable);
+
+                    lret = bytesread;
+                }
+                catch (System.IO.IOException)
+                {
+                    feb.Close(); //IO exception thrown if socket was forcibly closed by FEB, so lets tell the C# FEB client it is closed
+                } //something went wrong skip spill
+
+                TimeSpan elapsed = DateTime.Now.Subtract(time_start);
+                PP.myRun.UpdateStatus(source_name + " read: " + bytesread.ToString() + " bytes out of " + (spillwrdcnt*2).ToString() + " bytes in " + elapsed.TotalMilliseconds + " ms");
+
+                time_read_done = DateTime.Now;
+
+                PP.myRun.ACTIVE = true;
+
+                if (PP.myRun.validateParse)
+                {
+                    SpillData new_spill = new SpillData();
+                    bool parse_ok = new_spill.ParseInput(mem_buff);
+                    if (parse_ok)
                     {
-                        if (PP.myRun.sw != null)
+                        if (PP.myRun != null)
                         {
-                            if (SaveEnabled && !PP.myRun.SaveAscii) { Save(buf); } //If it should NOT save in a human readable format
-                            else if(SaveEnabled && PP.myRun.SaveAscii) { Save(new_spill); } //If it should save in a human readable format
+                            if (PP.myRun.SaveAscii)
+                            {
+                                Thread save = new Thread(() => Save(new_spill));
+                                save.Start();
+                            }
+                            else
+                            {
+                                string savename = feb.name;
+                                Thread save = new Thread(() => Save(mem_buff, savename)); //Spawn a thread that will take care of writing the data to file
+                                save.Start();
+                            }
+
                         }
                     }
+                    else //if it fails to parse, don't bother trying to save the spill, but notify the user
+                        PP.myRun.UpdateStatus(source_name + " failed to parse! Skipping save!");
                 }
                 else
-                { }
-            AllDone = true;
+                {
+                    if (PP.myRun != null)
+                    {
+                        if (PP.myRun.SaveAscii)
+                        {
+                            SpillData new_spill = new SpillData();
+                            bool parse_ok = new_spill.ParseInput(mem_buff);
+                            Thread save = new Thread(() => Save(new_spill));
+                            save.Start();
+                        }
+                        else
+                        {
+                            string savename = feb.name;
+                            Thread save = new Thread(() => Save(mem_buff, savename)); //Spawn a thread that will take care of writing the data to file
+                            save.Start();
+                        }
 
-            PP.myMain.timer1.Enabled = true;
-            
+                    }
+                }
+
+            }
+
+            ////SpillData new_spill = new SpillData();
+            ////bool parse_ok = new_spill.ParseInput(mem_buff/*sock_buf*/);
+            //if (true)//(parse_ok)
+            //{
+            //    //PP.myRun.Spills.AddLast(new_spill);
+            //    //if (PP.myRun.Spills.Count > 2)
+            //    //{
+            //    //    if (PP.myRun.Spills.First.Value.IsDisplayed) { PP.myRun.Spills.Remove(PP.myRun.Spills.First.Next); }
+            //    //    else { PP.myRun.Spills.RemoveFirst(); }
+            //    //}
+            //}
+            //else
+            //{ }
+
+            //PP.myMain.SpillTimer.Enabled = true;
+
+        }
+
+        //To just read trace data from the FEB and work only in memory, returns true if able to parse, false if not
+        public static bool ReadFeb(ref Mu2e_FEB_client feb, ref SpillData spill, out long lret) 
+        {
+            source_name = feb.name;
+            if (feb.TNETSocket.Available > 0)
+            {
+                byte[] junk = new byte[feb.TNETSocket.Available];
+                feb.stream.Read(junk, 0, feb.TNETSocket.Available);
+            }
+
+            lret = 0;
+            byte[] mem_buff;
+            byte[] b = PP.GetBytes("RDB 1\r\n"); //get the spill header (and 1 word) & reset read pointers
+            byte[] hdr_buf = new byte[18];
+            long spillwrdcnt = 0; //spill word count will be the total spill count for the FEB (which means BOTH FPGAs)
+            feb.TNETSocket.Send(b);
+            Thread.Sleep(10);
+            if (feb.TNETSocket.Available > 0) //if we can snag the wordcount from the spill header, then we know how much we should be reading
+            {
+                feb.TNETSocket.Receive(hdr_buf);
+                spillwrdcnt = (hdr_buf[0] * 256 * 256 * 256 + //spillwrdcnt is how many words there are for ALL fpgas in a given spill
+                               hdr_buf[1] * 256 * 256 +
+                               hdr_buf[2] * 256 +
+                               hdr_buf[3]);
+
+                mem_buff = new byte[spillwrdcnt * 2]; //each word = 2 bytes, we are going to allocate a buffer in memory to read the FEB data into that is the correct size.
+                int bytesread = 0;
+                int bytesleft = (int)spillwrdcnt * 2;
+                try
+                {
+                    b = PP.GetBytes("RDB\r\n");
+                    feb.TNETSocket.Send(b);
+                    Thread.Sleep(10);
+
+                    do
+                    {
+                        int bytes_now = feb.stream.Read(mem_buff, bytesread, feb.TNETSocket.Available);
+                        bytesread += bytes_now;
+                        bytesleft -= bytes_now;
+                        Thread.Sleep(100);
+                    } while (feb.stream.DataAvailable);
+
+                    lret = bytesread;
+                }
+                catch (System.IO.IOException)
+                {
+                    feb.Close(); //IO exception thrown if socket was forcibly closed by FEB, so lets tell the C# FEB client it is closed
+                } //something went wrong skip spill
+
+                spill = new SpillData();
+                bool parse_ok = spill.ParseInput(mem_buff);
+                return parse_ok;
+            }
+            else
+                return false;
         }
     }
 }

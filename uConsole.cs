@@ -10,10 +10,26 @@ namespace TB_mu2e
     {
         public Queue<string> messg_que = new Queue<string>(1024);
         public int max_lines = 128;
-        public int current_lines;
+        public bool LogSave { get; set; }
+        private string logFile = "";
 
-        public string add_messg(string m)
+        public string Add_messg(string m)
         {
+            if(LogSave)
+            {
+                try
+                {
+                    using (System.IO.StreamWriter logStream = new System.IO.StreamWriter(logFile, true))
+                    {
+                        logStream.WriteLine(m + "\r\n");
+                    }
+                }
+                catch
+                {
+                    Console.WriteLine("Cannot find/write log file: " + logFile);
+                    LogSave = false;
+                }
+            }
             string[] messages;
             string new_m = "";
 
@@ -29,6 +45,24 @@ namespace TB_mu2e
             new_m = string.Join("\r\n", messg_que); //Make each line a line again
 
             return new_m; //return the concatination
+        }
+
+        public bool SetLogFile(string filename)
+        {
+            logFile = filename;
+            try
+            {
+                using (System.IO.StreamWriter logStream = new System.IO.StreamWriter(logFile, true))
+                {
+                    return true; //if we are able to create/write the file, return true to indicate the console is ready
+                }
+            }
+            catch
+            {
+                Console.WriteLine("Cannot find/write log file: " + logFile);
+                LogSave = false;
+                return false;
+            }            
         }
     }
 }

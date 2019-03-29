@@ -16,35 +16,37 @@ namespace TB_mu2e
         {
             InitializeComponent();
 
-            this.GainTextBox.Text = "unknown";
+            this.GainTextBox.Text = "";
 
             if (PP.FEB1.client != null)
             {
-                Mu2e_FEB_client myFEB;
-                myFEB = PP.FEB1;
+                Mu2e_FEB_client feb1 = PP.FEB1;
                 Mu2e_Register r1;
 
-                Mu2e_Register.FindName("AFE_VGA0", 0, ref myFEB.arrReg, out r1);
-                r1.fpga_index = 0;
-                Mu2e_Register.ReadReg(ref r1, ref myFEB.client);
-                this.GainTextBox.Text = r1.val.ToString();
-
-                Mu2e_Register.FindName("AFE_VGA1", 0, ref myFEB.arrReg, out r1);
-                r1.fpga_index = 0;
-                Mu2e_Register.ReadReg(ref r1, ref myFEB.client);
+                Mu2e_Register.FindName("AFE_VGA0", 0, ref feb1.arrReg, out r1);
+                //r1.fpga_index = 0;
+                Mu2e_Register.ReadReg(ref r1, ref feb1.client);
+                this.GainTextBox.Text += r1.val.ToString();
+                Mu2e_Register.FindName("AFE_VGA1", 0, ref feb1.arrReg, out r1);
+                //r1.fpga_index = 0;
+                Mu2e_Register.ReadReg(ref r1, ref feb1.client);
                 this.GainTextBox.Text += "-" + r1.val.ToString();
-
-                Mu2e_Register.FindName("AFE_VGA0", 1, ref myFEB.arrReg, out r1);
-                r1.fpga_index = 1;
-                Mu2e_Register.ReadReg(ref r1, ref myFEB.client);
-                this.GainTextBox.Text += "-" + r1.val.ToString();
-                Mu2e_Register.FindName("AFE_VGA1", 1, ref myFEB.arrReg, out r1);
-                r1.fpga_index = 1;
-                Mu2e_Register.ReadReg(ref r1, ref myFEB.client);
-                this.GainTextBox.Text += "-" + r1.val.ToString();
-
             }
 
+            if (PP.FEB2.client != null)
+            {
+                Mu2e_FEB_client feb2 = PP.FEB2;
+                Mu2e_Register r1;
+
+                Mu2e_Register.FindName("AFE_VGA0", 0, ref feb2.arrReg, out r1);
+                //r1.fpga_index = 0;
+                Mu2e_Register.ReadReg(ref r1, ref feb2.client);
+                this.GainTextBox.Text += "-" + r1.val.ToString();
+                Mu2e_Register.FindName("AFE_VGA1", 0, ref feb2.arrReg, out r1);
+                //r1.fpga_index = 0;
+                Mu2e_Register.ReadReg(ref r1, ref feb2.client);
+                this.GainTextBox.Text += "-" + r1.val.ToString();
+            }
 
         }
 
@@ -54,15 +56,18 @@ namespace TB_mu2e
             //(this.num.ToString() + " " + rn.textEbeam.Text + " " + rn.textIbeam.Text + " " + rn.BIASVtextBox.Text + " " + rn.GainTextBox.Text + " " + 
             //rn.comboPID.Text + " " + rn.textAngle.Text + " " + rn.textXpos.Text + " " + rn.textZpos.Text + " " + rn.textPressure.Text);
             this.txtRunNum.Text = PP.myRun.num.ToString();
-            this.textEbeam.Text = PP.myRun.RunParams[1];
-            this.textIbeam.Text = PP.myRun.RunParams[2];
-            this.BIASVtextBox.Text = PP.myRun.RunParams[3];
-            //this.GainTextBox.Text = PP.myRun.RunParams[4];
-            this.comboPID.Text = PP.myRun.RunParams[5];
-            this.textAngle.Text = PP.myRun.RunParams[6];
-            this.textXpos.Text = PP.myRun.RunParams[7];
-            this.textZpos.Text = PP.myRun.RunParams[8];
-            this.textPressure.Text = PP.myRun.RunParams[9];
+            if (PP.myRun.RunParams.Count() > 2)
+            {
+                this.textEbeam.Text = PP.myRun.RunParams[1];
+                this.textIbeam.Text = PP.myRun.RunParams[2];
+                this.BIASVtextBox.Text = PP.myRun.RunParams[3];
+                this.GainTextBox.Text = PP.myRun.RunParams[4];
+                this.comboPID.Text = PP.myRun.RunParams[5];
+                this.textAngle.Text = PP.myRun.RunParams[6];
+                this.textXpos.Text = PP.myRun.RunParams[7];
+                this.textZpos.Text = PP.myRun.RunParams[8];
+                this.textTemp.Text = PP.myRun.RunParams[9];
+            }
 
         }
 
@@ -90,8 +95,8 @@ namespace TB_mu2e
             PP.myRun.run_name += "_z";
             PP.myRun.run_name += textZpos.Text;
             PP.myRun.run_name += "_";
-            PP.myRun.run_name += textPressure.Text;
-            PP.myRun.run_name += "psi";
+            PP.myRun.run_name += textTemp.Text;
+            PP.myRun.run_name += "degF";
 
             this.textBox1.Text = PP.myRun.run_name;
 
