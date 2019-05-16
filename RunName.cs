@@ -17,36 +17,56 @@ namespace TB_mu2e
             InitializeComponent();
 
             this.GainTextBox.Text = "";
+            Mu2e_Register reg;
 
-            if (PP.FEB1.client != null)
+            if (PP.FEB_clients != null)
             {
-                Mu2e_FEB_client feb1 = PP.FEB1;
-                Mu2e_Register r1;
-
-                Mu2e_Register.FindName("AFE_VGA0", 0, ref feb1.arrReg, out r1);
-                //r1.fpga_index = 0;
-                Mu2e_Register.ReadReg(ref r1, ref feb1.client);
-                this.GainTextBox.Text += r1.val.ToString();
-                Mu2e_Register.FindName("AFE_VGA1", 0, ref feb1.arrReg, out r1);
-                //r1.fpga_index = 0;
-                Mu2e_Register.ReadReg(ref r1, ref feb1.client);
-                this.GainTextBox.Text += "-" + r1.val.ToString();
+                if (PP.FEB_clients.Any(x => x.ClientOpen))
+                {
+                    foreach (Mu2e_FEB_client feb in PP.FEB_clients)
+                    {
+                        if (feb.ClientOpen)
+                        {
+                            Mu2e_Register.FindName("AFE_VGA0", 0, ref feb.arrReg, out reg);
+                            Mu2e_Register.ReadReg(ref reg, ref feb.client);
+                            GainTextBox.Text += reg.val.ToString();
+                            Mu2e_Register.FindName("AFE_VGA1", 0, ref feb.arrReg, out reg);
+                            Mu2e_Register.ReadReg(ref reg, ref feb.client);
+                            GainTextBox.Text += "-" + reg.val.ToString() + "-";
+                        }
+                    }
+                }
             }
 
-            if (PP.FEB2.client != null)
-            {
-                Mu2e_FEB_client feb2 = PP.FEB2;
-                Mu2e_Register r1;
+            //if (PP.FEB1.client != null)
+            //{
+            //    Mu2e_FEB_client feb1 = PP.FEB1;
+            //    Mu2e_Register r1;
 
-                Mu2e_Register.FindName("AFE_VGA0", 0, ref feb2.arrReg, out r1);
-                //r1.fpga_index = 0;
-                Mu2e_Register.ReadReg(ref r1, ref feb2.client);
-                this.GainTextBox.Text += "-" + r1.val.ToString();
-                Mu2e_Register.FindName("AFE_VGA1", 0, ref feb2.arrReg, out r1);
-                //r1.fpga_index = 0;
-                Mu2e_Register.ReadReg(ref r1, ref feb2.client);
-                this.GainTextBox.Text += "-" + r1.val.ToString();
-            }
+            //    Mu2e_Register.FindName("AFE_VGA0", 0, ref feb1.arrReg, out r1);
+            //    //r1.fpga_index = 0;
+            //    Mu2e_Register.ReadReg(ref r1, ref feb1.client);
+            //    this.GainTextBox.Text += r1.val.ToString();
+            //    Mu2e_Register.FindName("AFE_VGA1", 0, ref feb1.arrReg, out r1);
+            //    //r1.fpga_index = 0;
+            //    Mu2e_Register.ReadReg(ref r1, ref feb1.client);
+            //    this.GainTextBox.Text += "-" + r1.val.ToString();
+            //}
+
+            //if (PP.FEB2.client != null)
+            //{
+            //    Mu2e_FEB_client feb2 = PP.FEB2;
+            //    Mu2e_Register r1;
+
+            //    Mu2e_Register.FindName("AFE_VGA0", 0, ref feb2.arrReg, out r1);
+            //    //r1.fpga_index = 0;
+            //    Mu2e_Register.ReadReg(ref r1, ref feb2.client);
+            //    this.GainTextBox.Text += "-" + r1.val.ToString();
+            //    Mu2e_Register.FindName("AFE_VGA1", 0, ref feb2.arrReg, out r1);
+            //    //r1.fpga_index = 0;
+            //    Mu2e_Register.ReadReg(ref r1, ref feb2.client);
+            //    this.GainTextBox.Text += "-" + r1.val.ToString();
+            //}
 
         }
 
@@ -58,20 +78,20 @@ namespace TB_mu2e
             this.txtRunNum.Text = PP.myRun.num.ToString();
             if (PP.myRun.RunParams.Count() > 2)
             {
-                this.textEbeam.Text = PP.myRun.RunParams[1];
-                this.textIbeam.Text = PP.myRun.RunParams[2];
-                this.BIASVtextBox.Text = PP.myRun.RunParams[3];
-                this.GainTextBox.Text = PP.myRun.RunParams[4];
-                this.comboPID.Text = PP.myRun.RunParams[5];
-                this.textAngle.Text = PP.myRun.RunParams[6];
-                this.textXpos.Text = PP.myRun.RunParams[7];
-                this.textZpos.Text = PP.myRun.RunParams[8];
-                this.textTemp.Text = PP.myRun.RunParams[9];
+                textEbeam.Text = PP.myRun.RunParams[1];
+                textIbeam.Text = PP.myRun.RunParams[2];
+                BIASVtextBox.Text = PP.myRun.RunParams[3];
+                GainTextBox.Text = PP.myRun.RunParams[4];
+                comboPID.Text = PP.myRun.RunParams[5];
+                textAngle.Text = PP.myRun.RunParams[6];
+                textXpos.Text = PP.myRun.RunParams[7];
+                textZpos.Text = PP.myRun.RunParams[8];
+                textTemp.Text = PP.myRun.RunParams[9];
             }
 
         }
 
-        private void button1_Click(object sender, EventArgs e)
+        private void Button1_Click(object sender, EventArgs e)
         {
             //PP.myRun.run_name = this.textBox1.Text;
 
@@ -98,9 +118,9 @@ namespace TB_mu2e
             PP.myRun.run_name += textTemp.Text;
             PP.myRun.run_name += "degF";
 
-            this.textBox1.Text = PP.myRun.run_name;
+            textBox1.Text = PP.myRun.run_name;
 
-            this.Close();
+            Close();
         }
     }
 }

@@ -52,6 +52,7 @@ namespace TB_mu2e
         public DateTime timeLastUpdate;
         public Queue<string> RunStatus;
         public bool ACTIVE;
+        public bool READING;
         public bool spill_complete;
         public long num_bytes;
         public bool fake;
@@ -64,21 +65,22 @@ namespace TB_mu2e
 
         public bool SaveAscii { get; internal set; }
 
-        public Run()
+        public Run(int num_clients)
         {
             num = 0;
             ACTIVE = false;
+            READING = false;
             spill_complete = false;
             start_evt_num = 0;
             stop_evt_num = 0;
             if (Spills != null) { Spills.Clear(); }
             else { Spills = new LinkedList<SpillData>(); }
             max_adc = new double[8];
-            total_trig = new long[3];
-            total_spill = new long[3];
-            this_trig = new long[3];
-            this_bytes_written = new long[3];
-            total_bytes_written = new long[3];
+            total_trig = new long[num_clients];
+            total_spill = new long[num_clients];
+            this_trig = new long[num_clients];
+            this_bytes_written = new long[num_clients];
+            total_bytes_written = new long[num_clients];
             myStatus = "Run Object Created";//"Starting new run";
             RunStatus = new Queue<string>();
             UpdateStatus(myStatus);
@@ -95,7 +97,7 @@ namespace TB_mu2e
                 RunParams[i] = "";
             }
 
-            for (int i = 0; i < 3; i++)
+            for (int i = 0; i < num_clients; i++)
             {
                 total_bytes_written[i] = 0;
                 total_trig[i] = 0;
@@ -157,12 +159,12 @@ namespace TB_mu2e
 
         public void UpdateStatus(string m)
         {
-            TimeSpan since_last_update = DateTime.Now.Subtract(this.timeLastUpdate);
-            if (since_last_update.TotalSeconds > 0.9)
-            {
+            //TimeSpan since_last_update = DateTime.Now.Subtract(this.timeLastUpdate);
+            //if (since_last_update.TotalSeconds > 0.9)
+            //{
                 RunStatus.Enqueue(DateTime.Now + ": " + m);
-                this.timeLastUpdate = DateTime.Now;
-            }
+                //this.timeLastUpdate = DateTime.Now;
+            //}
         }
 
         public void ActivateRun()
@@ -240,28 +242,44 @@ namespace TB_mu2e
 
         public void RecordSpill()
         {
+            Thread.Sleep(1);
             if (ACTIVE)
             {
-                if ((PP.FEB1.client != null) || (PP.FEB2.client != null))
+                if (PP.FEB_clients != null)
                 {
-                    TCP_receiver.SaveEnabled = true;
-                    num_bytes = 0;
-                    if (PP.FEB1.client != null)
+                    if (PP.FEB_clients.Any(x => x.ClientOpen))
                     {
-                        TCP_receiver.ReadFeb(ref PP.FEB1, /*PP.FEB1.client PP.FEB1.TNETSocket_prop,*/ out num_bytes);
-                        this_bytes_written[0] = num_bytes;
-                        total_bytes_written[0] += num_bytes;
-                        Application.DoEvents();
+                        TCP_receiver.SaveEnabled = true;
+                        num_bytes = 0;
+                        for(int feb = 0; feb < PP.FEB_clients.Length; feb++)
+                        {
+                            if(PP.FEB_clients[feb].ClientOpen) //For the clients that are open, get data from the FEB
+                            {
+                                TCP_receiver.ReadFeb(ref PP.FEB_clients[feb], out num_bytes);
+                                this_bytes_written[feb] = num_bytes;
+                                total_bytes_written[feb] += num_bytes;
+                                Application.DoEvents();
+                                
+                            }
+                        }
+
+                        //if (PP.FEB1.client != null)
+                        //{
+                        //    TCP_receiver.ReadFeb(ref PP.FEB1, /*PP.FEB1.client PP.FEB1.TNETSocket_prop,*/ out num_bytes);
+                        //    this_bytes_written[0] = num_bytes;
+                        //    total_bytes_written[0] += num_bytes;
+                        //    Application.DoEvents();
+                        //}
+                        //if (PP.FEB2.client != null)
+                        //{
+                        //    TCP_receiver.ReadFeb(ref PP.FEB2, /*PP.FEB1.client PP.FEB2.TNETSocket_prop,*/ out num_bytes);
+                        //    this_bytes_written[1] = num_bytes;
+                        //    total_bytes_written[1] += num_bytes;
+                        //    Application.DoEvents();
+                        //}
+                        //                        TCP_reciever.ReadFeb("WC", PP.WC.TNETSocket_prop, out num_bytes);
+                        //spill_complete = true;
                     }
-                    if (PP.FEB2.client != null)
-                    {
-                        TCP_receiver.ReadFeb(ref PP.FEB2, /*PP.FEB1.client PP.FEB2.TNETSocket_prop,*/ out num_bytes);
-                        this_bytes_written[1] = num_bytes;
-                        total_bytes_written[1] += num_bytes;
-                        Application.DoEvents();
-                    }
-                    //                        TCP_reciever.ReadFeb("WC", PP.WC.TNETSocket_prop, out num_bytes);
-                    //spill_complete = true;
                 }
             }
         }
@@ -355,11 +373,11 @@ namespace TB_mu2e
             return measurement;                
         }
 
-        public void WriteMeasurements(string dicounter, double temperature)
+        public void WriteMeasurements(string dicounter)//, double temperature)
         {
             using (StreamWriter writer = File.AppendText(filename)) //The output file
             {
-                writer.Write("{0}\t{1}\t{2}\t", DateTime.Now.ToString("MM/dd/yy HH:mm:ss\t"), dicounter, temperature); //Write current time, name of module, which side, and current temperature
+                writer.Write("{0}\t{1}\t{2}\t", DateTime.Now.ToString("MM/dd/yy HH:mm:ss\t"), dicounter, feb.ReadTemp(0)); //Write current time, name of module, which side, and current temperature
                 //foreach (KeyValuePair<int, double> channel in currentMeasurements)
                 for (int chan = 0; chan < 64; chan++)
                 {
@@ -388,9 +406,12 @@ namespace TB_mu2e
             currentMeasurements = new List<ConcurrentDictionary<int, double>>();
             foreach (Mu2e_FEB_client feb in feb_clients)
             {
-                febs.Add(feb);
-                //currentMeasurements.Add(new SortedDictionary<int, double>()); //Add a sorted dictionary for each FEB given  
-                currentMeasurements.Add(new ConcurrentDictionary<int, double>());
+                if (feb.ClientOpen)
+                {
+                    febs.Add(feb);
+                    //currentMeasurements.Add(new SortedDictionary<int, double>()); //Add a sorted dictionary for each FEB given  
+                    currentMeasurements.Add(new ConcurrentDictionary<int, double>());
+                }
             }
         }
 
@@ -400,6 +421,15 @@ namespace TB_mu2e
             //foreach(SortedDictionary<int, double> feb in currentMeasurements)
             foreach(ConcurrentDictionary<int, double> feb in currentMeasurements)
                 feb.Clear();
+        }
+
+        public void TurnOnBias(double bias)
+        {
+            foreach (Mu2e_FEB_client feb in febs)
+            {
+                feb.SetVAll(bias); //turns on the bias for all FEBs
+            }
+
         }
 
         public void TurnOffBias()
@@ -484,6 +514,9 @@ namespace TB_mu2e
         public static List<IV_curve> FEB2IVs = new List<IV_curve>();
         public static Mu2e_FEB_client FEB1;
         public static Mu2e_FEB_client FEB2;
+        public static Mu2e_FEB_client[] FEB_clients;
+        public static string[] FEB_client_addresses;
+        public static int Num_FEB_clients;
         public static WC_client WC;
         public static Mu2e_FECC_client FEC;
 
@@ -606,34 +639,34 @@ namespace TB_mu2e
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
             //myRun = new Run();
-            FEB1 = new Mu2e_FEB_client
-            {
-                name = "FEB1",
-                //host_name_prop = "131.225.52.181";
-                //host_name_prop = "128.143.196.218";
-                host_name_prop = "128.143.196.54"
-                //host_name_prop = "131.225.52.177";
-                //host_name_prop = "crvfeb01.fnal.gov"
-                //host_name_prop = "131.225.176.32"
-                //host_name_prop = "131.225.52.182"
-            };
+            //FEB1 = new Mu2e_FEB_client
+            //{
+            //    name = "FEB1",
+            //    //host_name_prop = "131.225.52.181";
+            //    //host_name_prop = "128.143.196.218";
+            //    host_name_prop = "128.143.196.58"
+            //    //host_name_prop = "131.225.52.177";
+            //    //host_name_prop = "crvfeb01.fnal.gov"
+            //    //host_name_prop = "131.225.176.32"
+            //    //host_name_prop = "131.225.52.182"
+            //};
 
-            FEB2 = new Mu2e_FEB_client
-            {
-                name = "FEB2",
-                //host_name_prop = "DCRC5";
-                host_name_prop = "crvfeb02.fnal.gov"
-                //host_name_prop = "131.225.176.34"
-                //host_name_prop = "131.225.52.181"
-            };
+            //FEB2 = new Mu2e_FEB_client
+            //{
+            //    name = "FEB2",
+            //    //host_name_prop = "DCRC5";
+            //    host_name_prop = "crvfeb02.fnal.gov"
+            //    //host_name_prop = "131.225.176.34"
+            //    //host_name_prop = "131.225.52.181"
+            //};
 
             //FEC = new Mu2e_FECC_client();
 
-            WC = new WC_client()
-            {
-                host_name_prop = "FTBFWC01.FNAL.GOV",
-                name = "WC"
-            };
+            //WC = new WC_client()
+            //{
+            //    host_name_prop = "FTBFWC01.FNAL.GOV",
+            //    name = "WC"
+            //};
 
             //DAQ_server myDAQ_server = new DAQ_server();
             //myDAQ_server.StartRC();

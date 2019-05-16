@@ -51,7 +51,7 @@ namespace TB_mu2e
 
         public ROOTNET.NTH1I[] GetHistogram(uint channel, byte binning, string suffix = "")
         {
-            channel = channel % 8;
+            channel %= 8;
 
             //Get the registers for the requested channel           
 
@@ -61,19 +61,19 @@ namespace TB_mu2e
             uint histCntrl_Dark_Base = 0x60 + (uint)Ext_mode + channel;//channels[0,4]; // This turns on the histogramming with the defined mode
             //binning should only be 1, 2, 4, or 8, since those are the only supported histogram bin widths
             switch (binning)
-            {
-                case 1:
-                    histCntrl_Dark_Base += 0x0;
-                    break;
-                case 2:
-                    histCntrl_Dark_Base += 0x500;
-                    break;
-                case 4:
-                    histCntrl_Dark_Base += 0xA00;
-                    break;
-                case 8:
-                    histCntrl_Dark_Base += 0xF00;
-                    break;
+            { //NOTICE: Binning has been deprecated. Adjustment of histogram "width" can be performed by adjusting the gain
+                //case 1:
+                //    histCntrl_Dark_Base += 0x0;
+                //    break;
+                //case 2:
+                //    histCntrl_Dark_Base += 0x500;
+                //    break;
+                //case 4:
+                //    histCntrl_Dark_Base += 0xA00;
+                //    break;
+                //case 8:
+                //    histCntrl_Dark_Base += 0xF00;
+                //    break;
                 default:
                     histCntrl_Dark_Base += 0x0;
                     break;
@@ -95,10 +95,10 @@ namespace TB_mu2e
             {
                 try
                 {
-                    histo[i] = new ROOTNET.NTH1I("Ch" + (8 * i).ToString() + suffix, (8 * i).ToString(), 512, 0, binning * 512);
+                    histo[i] = new ROOTNET.NTH1I("Ch" + ((8 * i) + channel).ToString() + suffix, ((8 * i) + channel).ToString(), 1024/*512*/, 0, binning * 1024/*512*/); //First bin is underflow, last bin is overflow
                     for (uint binIndex = 0; binIndex < histogramBinContents[i].Length; binIndex++)
                     {
-                        histo[i].SetBinContent((int)binIndex, histogramBinContents[i][binIndex]);
+                        histo[i].SetBinContent((int)binIndex+1, histogramBinContents[i][binIndex]);
                     }
                     histo[i].GetXaxis().SetTitle("ADC");
                     histo[i].GetYaxis().SetTitle("N");
@@ -156,7 +156,8 @@ namespace TB_mu2e
             {
                 while (incomingData[packNum][0] == 0x3e)
                     incomingData[packNum] = incomingData[packNum].Skip(1).ToArray(); //Get rid of any 3e (>) at the beginning
-                incomingData[packNum] = incomingData[packNum].Take(incomingData[packNum].Length - 1).ToArray(); //Get rid of the 3e (>) at the end
+                if(incomingData[packNum].Last() == 0x3e)
+                    incomingData[packNum] = incomingData[packNum].Take(incomingData[packNum].Length - 1).ToArray(); //Get rid of the 3e (>) at the end
 
                 if (incomingData[packNum].Length == 4096/*2048*//*512*/) //Since the histogram memory is 512 deep by 32 bits wide, we should quickly check that the data length is really be 512 integers... you know, just in case....
                 {

@@ -1036,7 +1036,7 @@ namespace TB_mu2e
         }
 
         //Reads a register
-        public static void ReadReg(ref Mu2e_Register reg, ref TcpClient myClient)
+        public static void ReadReg(ref Mu2e_Register reg, ref TcpClient febTCPClient)
         {
             //ushort addr = (ushort)(reg.addr + (reg.fpga_index * reg.fpga_offset_mult));
             //ushort upper_addr = (ushort)(reg.upper_addr + (reg.fpga_index * reg.fpga_offset_mult));
@@ -1048,66 +1048,82 @@ namespace TB_mu2e
             
             try
             {
-                if (myClient.Connected)
+                if (febTCPClient.Connected)
                 {
-                    NetworkStream TNETStream = myClient.GetStream();
+                    NetworkStream TNETStream = febTCPClient.GetStream();
                     //StreamWriter SW = new StreamWriter(TNETStream);
                     //StreamReader SR = new StreamReader(TNETStream);
-                    while (myClient.Available > 0)
+                    while (febTCPClient.Available > 0)
                     {
-                        byte[] junk = new byte[myClient.Available];
+                        byte[] junk = new byte[febTCPClient.Available];
                         TNETStream.Read(junk, 0, junk.Length);
                     }
-                        if (reg.width <= 16)
+                    if (reg.width <= 16)
                     {
-                        string lin = "rd " + Convert.ToString(addr, 16) + "\r\n";
-                        byte[] buf = PP.GetBytes(lin);
-                        TNETStream.Write(buf, 0, buf.Length);
-
-                        System.Threading.Thread.Sleep(10);
-                        if (myClient.Available > 0)
-                        {
-                            byte[] rec_buf = new byte[myClient.Available];
-                            //Thread.Sleep(1);
-                            int ret_len = TNETStream.Read(rec_buf, 0, rec_buf.Length);
-                            reg.prev_val = reg.val;
-                            BufVal(rec_buf, out uint t, out double dv);
-                            reg.val = t;
-                            reg.dv = dv;
-                        }
-                        else
-                        { }
+                        byte[] sbuf = PP.GetBytes("rd " + Convert.ToString(addr, 16) + "\r\n");
+                        //TNETStream.Write(buf, 0, buf.Length);
+                        TNETStream.Write(sbuf, 0, sbuf.Length);
+                        //System.Threading.Thread.Sleep(50);
+                        byte[] rbuf = new byte[6];
+                        IAsyncResult rResult = TNETStream.BeginRead(rbuf, 0, rbuf.Length, null, null);
+                        rResult.AsyncWaitHandle.WaitOne(200);
+                        if (!rResult.IsCompleted)
+                            Console.WriteLine("Reached timeout when reading register");
+                        BufVal(rbuf, out uint t, out double dv);
+                        reg.val = t;
+                        reg.dv = dv;
+                        //if (febTCPClient.Available > 0)
+                        //{
+                        //    byte[] rec_buf = new byte[febTCPClient.Available];
+                        //    //Thread.Sleep(1);
+                        //    int ret_len = TNETStream.Read(rec_buf, 0, rec_buf.Length);
+                        //    reg.prev_val = reg.val;
+                        //    BufVal(rec_buf, out uint t, out double dv);
+                        //    reg.val = t;
+                        //    reg.dv = dv;
+                        //    System.Threading.Thread.Sleep(10);
+                        //}
                     }
                     else if (reg.width > 16)
                     {
+                        reg.prev_val = reg.val;
+
                         string lin = "rd " + Convert.ToString(upper_addr, 16) + "\r\n";
                         byte[] buf = PP.GetBytes(lin);
                         TNETStream.Write(buf, 0, buf.Length);
-                        System.Threading.Thread.Sleep(10);
                         UInt32[] tv = new UInt32[2];
-                        if (myClient.Available > 0)
-                        {
-                            byte[] rec_buf = new byte[myClient.Available];
-                            Thread.Sleep(1);
-                            int ret_len = TNETStream.Read(rec_buf, 0, rec_buf.Length);
-                            reg.prev_val = reg.val;
-                            BufVal(rec_buf, out uint t, out double dv);
-                            tv[0] = t;
-                        }
+                        byte[] rbuf = new byte[6];
+                        IAsyncResult rResult = TNETStream.BeginRead(rbuf, 0, rbuf.Length, null, null);
+                        rResult.AsyncWaitHandle.WaitOne(200);
+                        if (!rResult.IsCompleted)
+                            Console.WriteLine("Reached timeout when reading register");
+                        BufVal(rbuf, out tv[0], out double dv);
+                        //if (febTCPClient.Available > 0)
+                        //{
+                        //    byte[] rec_buf = new byte[febTCPClient.Available];
+                        //    Thread.Sleep(1);
+                        //    int ret_len = TNETStream.Read(rec_buf, 0, rec_buf.Length);
+                        //    reg.prev_val = reg.val;
+                        //    BufVal(rec_buf, out uint t, out double dv);
+                        //    tv[0] = t;
+                        //}
                         lin = "rd " + Convert.ToString(lower_addr, 16) + "\r\n";
                         buf = PP.GetBytes(lin);
                         TNETStream.Write(buf, 0, buf.Length);
-                        System.Threading.Thread.Sleep(10);
-
-                        if (myClient.Available > 0)
-                        {
-                            byte[] rec_buf = new byte[myClient.Available];
-                            Thread.Sleep(1);
-                            int ret_len = TNETStream.Read(rec_buf, 0, rec_buf.Length);
-                            reg.prev_val = reg.val;
-                            BufVal(rec_buf, out uint t, out double dv);
-                            tv[1] = t;
-                        }
+                        rResult = TNETStream.BeginRead(rbuf, 0, rbuf.Length, null, null);
+                        rResult.AsyncWaitHandle.WaitOne(200);
+                        if (!rResult.IsCompleted)
+                            Console.WriteLine("Reached timeout when reading register");
+                        BufVal(rbuf, out tv[1], out dv);
+                        //if (febTCPClient.Available > 0)
+                        //{
+                        //    byte[] rec_buf = new byte[febTCPClient.Available];
+                        //    Thread.Sleep(1);
+                        //    int ret_len = TNETStream.Read(rec_buf, 0, rec_buf.Length);
+                        //    reg.prev_val = reg.val;
+                        //    BufVal(rec_buf, out uint t, out double dv);
+                        //    tv[1] = t;
+                        //}
 
                         reg.val = (tv[0] * 256*256) + tv[1];
                     }
@@ -1222,7 +1238,7 @@ namespace TB_mu2e
             }
             string t = new string(chars);
             string[] tok = t.Split(new string[] { " ", Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
-            try { v = Convert.ToUInt32(tok[0],16); }
+            try { v = Convert.ToUInt32(tok.Last(),16); }
             catch { v = 0; }
             //catch { adc = -1; }
             //double adc;

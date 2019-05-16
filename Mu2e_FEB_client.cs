@@ -45,6 +45,7 @@ namespace TB_mu2e
         public int max_timeout;
         public int timeout;
         public List<Mu2e_Register> arrReg;
+        public int clientNum;
 
         // events 
         //public delegate void cOpening();
@@ -75,11 +76,15 @@ namespace TB_mu2e
                     TNETSocket.ReceiveTimeout = 200;
                     TNETSocket.SendTimeout = 200;
                     TNETSocket.NoDelay = true;
-                    TNETSocket.Connect(_host_name, _TNETsocketNum);
-                    stream = client.GetStream();
-
-                    _ClientOpen = true;
-                    m = "connected " + _logical_name + " to " + _host_name + " on port " + (TNETsocketNum);
+                    //TNETSocket.Connect(_host_name, _TNETsocketNum);
+                    IAsyncResult sockResult = TNETSocket.BeginConnect(_host_name, _TNETsocketNum, null, null);
+                    sockResult.AsyncWaitHandle.WaitOne(2500);
+                    if(sockResult.IsCompleted && TNETSocket.Connected)
+                    {
+                        _ClientOpen = true;
+                        m = "connected " + _logical_name + " to " + _host_name + " on port " + (TNETsocketNum);
+                        stream = client.GetStream();
+                    }
                 }
                 catch
                 {
@@ -456,8 +461,11 @@ namespace TB_mu2e
                     // ? why does this not work? SW.WriteLine(t);
                     //byte[] b = PP.GetBytes(t + Convert.ToChar((byte)0x0d));
                     byte[] b = PP.GetBytes(t + "\r\n");
-                    TNETSocket.Send(b);
-                    Thread.Sleep(20);
+                    IAsyncResult sendResult = TNETSocket.BeginSend(b, 0, b.Length, SocketFlags.None, null, null);
+                    sendResult.AsyncWaitHandle.WaitOne();
+                    
+                    //TNETSocket.Send(b);
+                    //Thread.Sleep(20);
                 }
                 catch(System.IO.IOException)
                 {
