@@ -600,6 +600,18 @@ namespace TB_mu2e
             //}
         }
 
+        private void BtnBiasWRITEALL_Click(object sender, EventArgs e)
+        {
+            if (activeFEB != null)
+            {
+                if (activeFEB.ClientOpen)
+                {
+                    activeFEB.SetVAll(Convert.ToDouble(txtV.Text));
+                    txtI.Text = activeFEB.ReadA0((int)udFPGA.Value, (int)udChan.Value).ToString("0.0000");
+                }
+            }
+        }
+
         private void BtnScan_Click(object sender, EventArgs e)
         {
 
@@ -2055,7 +2067,7 @@ namespace TB_mu2e
                         qaStartButton.Text = "STOP";
                         qaStartButton.BackColor = Color.Red;
                         qaStartButton.Update();
-                        using (System.Media.SoundPlayer soundPlayer = new System.Media.SoundPlayer("C:\\Windows\\media\\Windows Proximity Connection.wav"))
+                        using (System.Media.SoundPlayer soundPlayer = new System.Media.SoundPlayer(Environment.GetFolderPath(Environment.SpecialFolder.Windows) + "\\media\\chord.wav"))// "C:\\Windows\\media\\Windows Proximity Notification.wav"))
                         {
                             soundPlayer.Play();
                         }
@@ -3629,9 +3641,9 @@ namespace TB_mu2e
 
         private void QaDiCounterMeasurementTimer_Tick(object sender, EventArgs e)
         {
-            while (currentChannel < qaDiButtons.Length)
+            System.Threading.Thread.Sleep(1); //yield
+            if (currentChannel < qaDiButtons.Length)
             {
-                System.Threading.Thread.Sleep(1); //yield
                 if (!qaDiButtons[currentChannel].Checked)
                 {
                     double measurement = PP.qaDicounterMeasurements.TakeMeasurement(currentChannel);
@@ -3644,19 +3656,28 @@ namespace TB_mu2e
                 currentChannel++;
                 autoDataProgress.Increment(1);
             }
-
-            PP.qaDicounterMeasurements.WriteMeasurements(dicounterNumberTextBox.Text);//PP.FEB1.ReadTemp(0));
-            PP.qaDicounterMeasurements.TurnOffBias();
-            currentChannel = 0;
-            autoDataProgress.Value = 0;
-            autoDataProgress.Update();
-            using (System.Media.SoundPlayer soundPlayer = new System.Media.SoundPlayer(Environment.GetFolderPath(Environment.SpecialFolder.Windows) + "\\media\\chord.wav"))// "C:\\Windows\\media\\Windows Proximity Notification.wav"))
+            else
             {
-                soundPlayer.Play();
+                qaDiCounterMeasurementTimer.Enabled = false;
+                PP.qaDicounterMeasurements.WriteMeasurements(dicounterNumberTextBox.Text);//PP.FEB1.ReadTemp(0));
+                PP.qaDicounterMeasurements.TurnOffBias();
+                currentChannel = 0;
+                autoDataProgress.Value = 0;
+                autoDataProgress.Update();
+                using (System.Media.SoundPlayer soundPlayer = new System.Media.SoundPlayer(Environment.GetFolderPath(Environment.SpecialFolder.Windows) + "\\media\\chord.wav"))// "C:\\Windows\\media\\Windows Proximity Notification.wav"))
+                {
+                    soundPlayer.Play();
+                }
+                FEBSelectPanel.Enabled = true;
+                autoThreshBtn.Enabled = true;
+                lightCheckResetThresh.Enabled = true;
+                lightCheckBtn.Enabled = true;
+                dicounterNumberTextBox.Enabled = true;
+                lightCheckGroup.Enabled = true;
+                qaStartButton.Text = "Auto Data";
+                qaStartButton.BackColor = SystemColors.Control;
+                qaStartButton.Update();
             }
-            qaStartButton.Text = "Auto Data";
-            qaStartButton.BackColor = SystemColors.Control;
-            qaStartButton.Update();
         }
 
         private void ValidateParseChkBox_CheckedChanged(object sender, EventArgs e)
@@ -3712,7 +3733,7 @@ namespace TB_mu2e
                 currentChannel = 0;
                 lightCheckProgress.Value = 0;
                 lightCheckProgress.Update();
-                using (System.Media.SoundPlayer soundPlayer = new System.Media.SoundPlayer("C:\\Windows\\media\\Windows Proximity Notification.wav"))
+                using (System.Media.SoundPlayer soundPlayer = new System.Media.SoundPlayer(Environment.GetFolderPath(Environment.SpecialFolder.Windows) + "\\media\\chord.wav"))// "C:\\Windows\\media\\Windows Proximity Notification.wav"))
                 {
                     soundPlayer.Play();
                 }
@@ -3732,6 +3753,7 @@ namespace TB_mu2e
                 LightCheckMeasurementTimer.Enabled = false;
             }
         }
+
     }
 
 

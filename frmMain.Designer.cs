@@ -222,6 +222,7 @@
             this.LightCheckMeasurementTimer = new System.Windows.Forms.Timer(this.components);
             this.qaDiCounterMeasurementTimer = new System.Windows.Forms.Timer(this.components);
             this.FEBClientFooterBar = new System.Windows.Forms.Label();
+            this.btnBiasWRITEALL = new System.Windows.Forms.Button();
             this.tabControl.SuspendLayout();
             this.tabRUN.SuspendLayout();
             this.groupBoxEvDisplay.SuspendLayout();
@@ -1370,6 +1371,7 @@
             // 
             // groupBox7
             // 
+            this.groupBox7.Controls.Add(this.btnBiasWRITEALL);
             this.groupBox7.Controls.Add(this.txtCMB_Temp4);
             this.groupBox7.Controls.Add(this.txtCMB_Temp3);
             this.groupBox7.Controls.Add(this.txtCMB_Temp2);
@@ -2525,6 +2527,17 @@
             this.FEBClientFooterBar.Size = new System.Drawing.Size(1260, 2);
             this.FEBClientFooterBar.TabIndex = 47;
             // 
+            // btnBiasWRITEALL
+            // 
+            this.btnBiasWRITEALL.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnBiasWRITEALL.Location = new System.Drawing.Point(259, 28);
+            this.btnBiasWRITEALL.Name = "btnBiasWRITEALL";
+            this.btnBiasWRITEALL.Size = new System.Drawing.Size(75, 23);
+            this.btnBiasWRITEALL.TabIndex = 70;
+            this.btnBiasWRITEALL.Text = "WRITE ALL";
+            this.btnBiasWRITEALL.UseVisualStyleBackColor = true;
+            this.btnBiasWRITEALL.Click += new System.EventHandler(this.BtnBiasWRITEALL_Click);
+            // 
             // frmMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 17F);
@@ -2799,5 +2812,6 @@
         private System.Windows.Forms.Label lblNumSpills;
         private System.Windows.Forms.Label lblSpillsNum;
         private System.Windows.Forms.Label FEBClientFooterBar;
+        private System.Windows.Forms.Button btnBiasWRITEALL;
     }
 }

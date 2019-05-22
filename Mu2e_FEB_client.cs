@@ -85,6 +85,11 @@ namespace TB_mu2e
                         m = "connected " + _logical_name + " to " + _host_name + " on port " + (TNETsocketNum);
                         stream = client.GetStream();
                     }
+                    else
+                    {
+                        _TNETsocketNum++;
+                        this.Open();
+                    }
                 }
                 catch
                 {

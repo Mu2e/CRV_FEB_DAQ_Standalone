@@ -377,7 +377,7 @@ namespace TB_mu2e
         {
             using (StreamWriter writer = File.AppendText(filename)) //The output file
             {
-                writer.Write("{0}\t{1}\t{2}\t", DateTime.Now.ToString("MM/dd/yy HH:mm:ss\t"), dicounter, feb.ReadTemp(0)); //Write current time, name of module, which side, and current temperature
+                writer.Write("{0}\t{1}\t{2}\t", dicounter, feb.ReadTemp(0), DateTime.Now.ToString("MM/dd/yy HH:mm:ss")); //Write current time, name of module, which side, and current temperature
                 //foreach (KeyValuePair<int, double> channel in currentMeasurements)
                 for (int chan = 0; chan < 64; chan++)
                 {
@@ -639,17 +639,17 @@ namespace TB_mu2e
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
             //myRun = new Run();
-            //FEB1 = new Mu2e_FEB_client
-            //{
-            //    name = "FEB1",
-            //    //host_name_prop = "131.225.52.181";
-            //    //host_name_prop = "128.143.196.218";
-            //    host_name_prop = "128.143.196.58"
-            //    //host_name_prop = "131.225.52.177";
-            //    //host_name_prop = "crvfeb01.fnal.gov"
-            //    //host_name_prop = "131.225.176.32"
-            //    //host_name_prop = "131.225.52.182"
-            //};
+            FEB1 = new Mu2e_FEB_client
+            {
+                name = "FEB1",
+                //host_name_prop = "131.225.52.181";
+                //host_name_prop = "128.143.196.218";
+                host_name_prop = "128.143.196.58"
+                //host_name_prop = "131.225.52.177";
+                //host_name_prop = "crvfeb01.fnal.gov"
+                //host_name_prop = "131.225.176.32"
+                //host_name_prop = "131.225.52.182"
+            };
 
             //FEB2 = new Mu2e_FEB_client
             //{
