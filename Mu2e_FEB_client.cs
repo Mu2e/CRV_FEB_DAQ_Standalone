@@ -194,7 +194,7 @@ namespace TB_mu2e
         public void SetV(double V, int fpga = 0)
         {
             UInt32 counts;
-            try { counts = Convert.ToUInt32(System.Math.Round(V / 5.38 * 256)); }
+            try { counts = Convert.ToUInt32(System.Math.Round(V / 5.12/*5.38*/ * 256)); }
             catch { counts = 0; }
             SendStr("wr " + Convert.ToString(4 * fpga, 16) + "44 " + Convert.ToString(counts, 16));
             SendStr("wr " + Convert.ToString(4 * fpga, 16) + "45 " + Convert.ToString(counts, 16));
@@ -204,7 +204,7 @@ namespace TB_mu2e
         public void SetVAll(double V)
         {
             UInt32 counts;
-            try { counts = Convert.ToUInt32(System.Math.Round(V / 5.38 * 256)); }
+            try { counts = Convert.ToUInt32(System.Math.Round(V / 5.12/*5.38*/ * 256)); }
             catch { counts = 0; }
 
             for (int fpga = 0; fpga < 4; fpga++)
@@ -227,7 +227,7 @@ namespace TB_mu2e
 
             try { V = (double)Convert.ToInt32(a, 16); }
             catch { V = 0; }
-            double t = V * 5.38 / 256;
+            double t = V * 5.12/*5.38*/ / 256;
             //t = System.Math.Round(t*1000)/1000;
 
             return t;

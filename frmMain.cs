@@ -495,7 +495,7 @@ namespace TB_mu2e
                 if (activeFEB.ClientOpen)
                 {
                     txtV.Text = activeFEB.ReadV(fpga).ToString("0.000");
-                    txtI.Text = activeFEB.ReadA0(fpga).ToString("0.0000");
+                    txtI.Text = activeFEB.ReadA0(fpga, (int)udChan.Value).ToString("0.0000");
                     cmb_temp = activeFEB.ReadTempFPGA(fpga);
                 }
 
@@ -2079,9 +2079,12 @@ namespace TB_mu2e
                         autoDataProgress.Maximum = qaDiButtons.Length; //set the max of the progress bar
 
                         if (PP.qaDicounterMeasurements == null)
-                            PP.qaDicounterMeasurements = new CurrentMeasurements(activeFEB, Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) + "Google Drive\\CRV Fabrication Documents\\Data\\QA\\Dicounter Source Testing\\ScanningData_" + qaOutputFileName.Text + ".txt");
+                            PP.qaDicounterMeasurements = new CurrentMeasurements(activeFEB, Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) + "\\Google Drive\\CRV Fabrication Documents\\Data\\QA\\Dicounter Source Testing\\ScanningData_" + qaOutputFileName.Text + ".txt");
                         else
+                        {
                             PP.qaDicounterMeasurements.Purge();
+                            PP.qaDicounterMeasurements.ChangeClient(activeFEB);
+                        }
 
                         foreach (var btn in qaDiButtons) { if (!btn.Checked) { btn.BackColor = Color.Green; btn.Update(); } } //Reset all active channel indicators to green
 
@@ -2136,9 +2139,12 @@ namespace TB_mu2e
                         FEBSelectPanel.Enabled = false;
 
                         if (PP.lightCheckMeasurements == null) //If the measurement object is not yet created, create it now
-                            PP.lightCheckMeasurements = new CurrentMeasurements(activeFEB, Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "Module.txt"); //"C:\\Users\\Boi\\Desktop\\Module.txt");
+                            PP.lightCheckMeasurements = new CurrentMeasurements(activeFEB, Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "\\Module.txt"); //"C:\\Users\\Boi\\Desktop\\Module.txt");
                         else //Otherwise, purge any data that was present
+                        {
                             PP.lightCheckMeasurements.Purge();
+                            PP.lightCheckMeasurements.ChangeClient(activeFEB);
+                        }
 
                         foreach (var btn in lightButtons) { if (!btn.Checked) { btn.BackColor = Color.Green; btn.Update(); } } //Reset all active channels
 
@@ -2210,9 +2216,12 @@ namespace TB_mu2e
                         FEBSelectPanel.Enabled = false;
 
                         if (PP.lightCheckMeasurements == null) //If the measurement object is not yet created, create it now
-                            PP.lightCheckMeasurements = new CurrentMeasurements(activeFEB, Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "Module.txt");// "C:\\Users\\Boi\\Desktop\\Module.txt");
+                            PP.lightCheckMeasurements = new CurrentMeasurements(activeFEB, Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "\\Module.txt");// "C:\\Users\\Boi\\Desktop\\Module.txt");
                         else //Otherwise, purge any data that was present
+                        {
                             PP.lightCheckMeasurements.Purge();
+                            PP.lightCheckMeasurements.ChangeClient(activeFEB);
+                        }
 
                         foreach (var btn in lightButtons) { if (!btn.Checked) { btn.BackColor = Color.Green; btn.Update(); } } //Reset all active channels
 
@@ -3750,6 +3759,8 @@ namespace TB_mu2e
                 lightCheckBtn.Enabled = true;
                 lightWriteToFileBox.Enabled = true;
                 dicounterQAGroup.Enabled = true;
+                autoThreshBtn.Enabled = true;
+                FEBSelectPanel.Enabled = true;
                 LightCheckMeasurementTimer.Enabled = false;
             }
         }

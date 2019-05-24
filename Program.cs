@@ -347,6 +347,11 @@ namespace TB_mu2e
             currentMeasurements = new ConcurrentDictionary<int, double>();
         }
 
+        public void ChangeClient(Mu2e_FEB_client feb_client)
+        {
+            feb = feb_client;
+        }
+
         public void Purge()
         {
             currentMeasurements.Clear();
