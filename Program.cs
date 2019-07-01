@@ -444,7 +444,20 @@ namespace TB_mu2e
                 feb.SetVAll(0); //turns off the bias for all FEBs
             }
         }
-        
+
+        public void ChangeClients(Mu2e_FEB_client[] feb_clients)
+        {
+            febs.Clear();
+            currentMeasurements.Clear();
+            foreach (Mu2e_FEB_client feb in feb_clients)
+            {
+                febs.Add(feb);
+                currentMeasurements.Add(new ConcurrentDictionary<int, double>());
+            }
+           
+        }
+
+
         public void SetSide(string side_in)
         {
             side = side_in;

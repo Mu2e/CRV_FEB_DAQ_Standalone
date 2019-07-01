@@ -88,7 +88,15 @@ namespace TB_mu2e
                     else
                     {
                         _TNETsocketNum++;
-                        this.Open();
+                        if (_TNETsocketNum < 5002)
+                        {
+                            this.Open();
+                        }
+                        else
+                        {
+                            _ClientOpen = false;
+                            return;
+                        }
                     }
                 }
                 catch

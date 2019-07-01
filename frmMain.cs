@@ -3211,7 +3211,10 @@ namespace TB_mu2e
                         if (PP.moduleQACurrentMeasurements == null) //if we didn't make a measurement object yet, do so, else purge the existing one of information
                             PP.moduleQACurrentMeasurements = new ModuleQACurrentMeasurements(PP.FEB_clients);
                         else
+                        {
                             PP.moduleQACurrentMeasurements.Purge();
+                            PP.moduleQACurrentMeasurements.ChangeClients(PP.FEB_clients);
+                        }
 
 
                         ModuleQADarkCurrentBtn.Enabled = false; //disabled the button to prevent repeated clicks
@@ -3223,7 +3226,7 @@ namespace TB_mu2e
                         currentChannel = 0; //Set back to 0, controlled by measurment timer
                         currentDicounter = 0; //Set back to 0, controlled by measurement timer
                         PP.moduleQACurrentMeasurements.SetSide(ModuleQASide.Text);
-                        PP.moduleQACurrentMeasurements.TurnOnBias(Convert.ToDouble(qaBias.Text));
+                        //PP.moduleQACurrentMeasurements.TurnOnBias(Convert.ToDouble(qaBias.Text));
                         //PP.FEB1.SetVAll(Convert.ToDouble(qaBias.Text)); //Turn on the bias for the FEBs
                         //PP.FEB2.SetVAll(Convert.ToDouble(qaBias.Text));
                         darkCurrent = true;
@@ -3260,7 +3263,7 @@ namespace TB_mu2e
         {
             if (PP.FEB_clients != null)
             {
-                if ((PP.FEB_clients.Count() > 0) && PP.FEB_clients.Any(x => x.ClientOpen)) //Check if any client is open
+                if (PP.FEB_clients.Count(x => x.ClientOpen) >= 2) //Check if any client is open
                 {
                     //Check that both FEBs are connected
                     if (moduleQAMeasurementTimer.Enabled == false)
@@ -3270,7 +3273,10 @@ namespace TB_mu2e
                         if (PP.moduleQACurrentMeasurements == null) //if we didn't make a measurement object yet, do so, else purge the existing one of information
                             PP.moduleQACurrentMeasurements = new ModuleQACurrentMeasurements(PP.FEB_clients);
                         else
+                        {
                             PP.moduleQACurrentMeasurements.Purge();
+                            PP.moduleQACurrentMeasurements.ChangeClients(PP.FEB_clients);
+                        }
 
 
                         //ModuleQABtn.Enabled = false; //disabled the button to prevent repeated clicks
@@ -3285,7 +3291,7 @@ namespace TB_mu2e
                         currentChannel = 0; //Set back to 0, controlled by measurment timer
                         currentDicounter = 0; //Set back to 0, controlled by measurement timer
                         PP.moduleQACurrentMeasurements.SetSide(ModuleQASide.Text);
-                        PP.moduleQACurrentMeasurements.TurnOnBias(Convert.ToDouble(qaBias.Text));
+                        //PP.moduleQACurrentMeasurements.TurnOnBias(Convert.ToDouble(qaBias.Text));
                         //PP.FEB1.SetVAll(Convert.ToDouble(qaBias.Text)); //Turn on the bias for the FEBs
                         //PP.FEB2.SetVAll(Convert.ToDouble(qaBias.Text));
                         comPort.WriteLine(PP.moduleQACurrentMeasurements.GetgCodeDicounterPosition(currentDicounter, 1200, (int)ModuleQA_Offset.Value)); //tell it to go to the 0th dicounter position
@@ -3449,9 +3455,9 @@ namespace TB_mu2e
             {
                 if (!darkCurrent)
                 {
-                    if (currentDicounter < 8)//100)//5)//8)
+                    if (currentDicounter < 9)//100)//5)//8)
                     {
-                        if (currentChannel < 32)//20)//64)
+                        if (currentChannel < 64)//32)//20)//64)
                         {
                             //take measurments
                             ComPortStatusBox.Text = "Measuring " + currentDicounter + " " + currentChannel;
@@ -3467,7 +3473,7 @@ namespace TB_mu2e
                             PP.moduleQACurrentMeasurements.WriteMeasurements("C:\\Users\\Boi\\Desktop\\ScanningData_" + ModuleQAFilenameBox.Text + ".txt", 0, currentDicounter);
                             PP.moduleQACurrentMeasurements.Purge();
                             currentDicounter++; //increment the dicounter
-                            if (currentDicounter < 8)//100)//5)//8)
+                            if (currentDicounter < 9)//100)//5)//8)
                                 comPort.WriteLine(PP.moduleQACurrentMeasurements.GetgCodeDicounterPosition(currentDicounter, 1200, (int)ModuleQA_Offset.Value)); //tell it the position to go to
                             currentChannel = 0;
                             InitializeModuleQATab();
@@ -3480,12 +3486,12 @@ namespace TB_mu2e
                         ModuleQAStepTimer.Enabled = true;
                         ModuleQADarkCurrentBtn.Enabled = true;
                         moduleQAMeasurementTimer.Enabled = false;
-                        PP.moduleQACurrentMeasurements.TurnOffBias(); //turn off the bias
+                        //PP.moduleQACurrentMeasurements.TurnOffBias(); //turn off the bias
                     }
                 }
                 else if (darkCurrent) //if it is a dark current measurement, just record all 64 channels
                 {
-                    if (currentChannel < 32)//20)//64)
+                    if (currentChannel < 64)//32)//20)//64)
                     {
                         //take measurments
                         Console.WriteLine("Measuring " + currentChannel);
@@ -3502,7 +3508,7 @@ namespace TB_mu2e
                     {
                         PP.moduleQACurrentMeasurements.WriteMeasurements("C:\\Users\\Boi\\Desktop\\ScanningData_" + ModuleQAFilenameBox.Text + ".txt", 0, -1); //-1 will denote dark current measurement
                         PP.moduleQACurrentMeasurements.Purge();
-                        PP.moduleQACurrentMeasurements.TurnOffBias();
+                        //PP.moduleQACurrentMeasurements.TurnOffBias();
                         darkCurrent = false; //done with darkcurrent
                         ModuleQADarkCurrentBtn.Enabled = true;
                         ModuleQABtn.Enabled = true; //since we took the dark current measurements, now we can QA a module
@@ -3514,7 +3520,7 @@ namespace TB_mu2e
 
         private void ModuleQAHaltBtn_Click(object sender, EventArgs e)
         {
-            PP.moduleQACurrentMeasurements.TurnOffBias();
+            //PP.moduleQACurrentMeasurements.TurnOffBias();
             if (moduleQAHomingTimer.Enabled == false) //cannot issue a halt while it is homing, a property of the controller...
             {
                 moduleQAMeasurementTimer.Enabled = false;
