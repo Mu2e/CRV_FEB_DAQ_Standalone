@@ -74,7 +74,7 @@
             this.btnConnectAll = new System.Windows.Forms.Button();
             this.zg1 = new ZedGraph.ZedGraphControl();
             this.tabConsole = new System.Windows.Forms.TabPage();
-            this.button4 = new System.Windows.Forms.Button();
+            this.loadCmdsBtn = new System.Windows.Forms.Button();
             this.btnDebugLogging = new System.Windows.Forms.Button();
             this.ConsoleBox = new System.Windows.Forms.TextBox();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
@@ -123,6 +123,7 @@
             this.chkIntegral = new System.Windows.Forms.CheckBox();
             this.chkLogY = new System.Windows.Forms.CheckBox();
             this.groupBox7 = new System.Windows.Forms.GroupBox();
+            this.btnBiasWRITEALL = new System.Windows.Forms.Button();
             this.txtCMB_Temp4 = new System.Windows.Forms.TextBox();
             this.txtCMB_Temp3 = new System.Windows.Forms.TextBox();
             this.txtCMB_Temp2 = new System.Windows.Forms.TextBox();
@@ -222,7 +223,6 @@
             this.LightCheckMeasurementTimer = new System.Windows.Forms.Timer(this.components);
             this.qaDiCounterMeasurementTimer = new System.Windows.Forms.Timer(this.components);
             this.FEBClientFooterBar = new System.Windows.Forms.Label();
-            this.btnBiasWRITEALL = new System.Windows.Forms.Button();
             this.tabControl.SuspendLayout();
             this.tabRUN.SuspendLayout();
             this.groupBoxEvDisplay.SuspendLayout();
@@ -784,7 +784,7 @@
             // 
             // tabConsole
             // 
-            this.tabConsole.Controls.Add(this.button4);
+            this.tabConsole.Controls.Add(this.loadCmdsBtn);
             this.tabConsole.Controls.Add(this.btnDebugLogging);
             this.tabConsole.Controls.Add(this.ConsoleBox);
             this.tabConsole.Controls.Add(this.groupBox3);
@@ -795,14 +795,15 @@
             this.tabConsole.Text = "Debug Console";
             this.tabConsole.UseVisualStyleBackColor = true;
             // 
-            // button4
+            // loadCmdsBtn
             // 
-            this.button4.Location = new System.Drawing.Point(1101, 623);
-            this.button4.Name = "button4";
-            this.button4.Size = new System.Drawing.Size(148, 25);
-            this.button4.TabIndex = 3;
-            this.button4.Text = "LOAD";
-            this.button4.UseVisualStyleBackColor = true;
+            this.loadCmdsBtn.Location = new System.Drawing.Point(1101, 623);
+            this.loadCmdsBtn.Name = "loadCmdsBtn";
+            this.loadCmdsBtn.Size = new System.Drawing.Size(148, 25);
+            this.loadCmdsBtn.TabIndex = 3;
+            this.loadCmdsBtn.Text = "LOAD";
+            this.loadCmdsBtn.UseVisualStyleBackColor = true;
+            this.loadCmdsBtn.Click += new System.EventHandler(this.LoadCmdsBtn_Click);
             // 
             // btnDebugLogging
             // 
@@ -1389,6 +1390,17 @@
             this.groupBox7.TabIndex = 5;
             this.groupBox7.TabStop = false;
             this.groupBox7.Text = "BIAS";
+            // 
+            // btnBiasWRITEALL
+            // 
+            this.btnBiasWRITEALL.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnBiasWRITEALL.Location = new System.Drawing.Point(259, 28);
+            this.btnBiasWRITEALL.Name = "btnBiasWRITEALL";
+            this.btnBiasWRITEALL.Size = new System.Drawing.Size(75, 23);
+            this.btnBiasWRITEALL.TabIndex = 70;
+            this.btnBiasWRITEALL.Text = "WRITE ALL";
+            this.btnBiasWRITEALL.UseVisualStyleBackColor = true;
+            this.btnBiasWRITEALL.Click += new System.EventHandler(this.BtnBiasWRITEALL_Click);
             // 
             // txtCMB_Temp4
             // 
@@ -2527,17 +2539,6 @@
             this.FEBClientFooterBar.Size = new System.Drawing.Size(1260, 2);
             this.FEBClientFooterBar.TabIndex = 47;
             // 
-            // btnBiasWRITEALL
-            // 
-            this.btnBiasWRITEALL.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btnBiasWRITEALL.Location = new System.Drawing.Point(259, 28);
-            this.btnBiasWRITEALL.Name = "btnBiasWRITEALL";
-            this.btnBiasWRITEALL.Size = new System.Drawing.Size(75, 23);
-            this.btnBiasWRITEALL.TabIndex = 70;
-            this.btnBiasWRITEALL.Text = "WRITE ALL";
-            this.btnBiasWRITEALL.UseVisualStyleBackColor = true;
-            this.btnBiasWRITEALL.Click += new System.EventHandler(this.BtnBiasWRITEALL_Click);
-            // 
             // frmMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 17F);
@@ -2677,7 +2678,7 @@
         private System.Windows.Forms.Button btnPrevDisp;
         private System.Windows.Forms.NumericUpDown ud_VertMin;
         private System.Windows.Forms.Button btnDisplaySpill;
-        private System.Windows.Forms.Button button4;
+        private System.Windows.Forms.Button loadCmdsBtn;
         private System.Windows.Forms.Button btnDebugLogging;
         private System.Windows.Forms.CheckBox chkPersist;
         private System.Windows.Forms.CheckBox chkLast;

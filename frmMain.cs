@@ -2580,7 +2580,7 @@ namespace TB_mu2e
                     cmbInfoBox.Text = "LED/Calibrating"; cmbInfoBox.Refresh();
 
                     Mu2e_Register.WriteReg(0x100, ref trigControlReg, ref activeFEB.client); //Enable the on-board test pulser, output of this signal will be delivered to external pulser to flash LED
-                    Mu2e_Register.WriteReg(0x5E5E5E/*0x5E5E5E*/, ref testPulseFreqReg, ref activeFEB.client); //Set the on-board test pulser's frequency to ~230kHz
+                    Mu2e_Register.WriteReg(0x27000 /*~ 95.25 KHz , was 0x5E5E5E (~230khz) TOO HIGH*/, ref testPulseFreqReg, ref activeFEB.client); //Set the on-board test pulser's frequency to ~230kHz
                     Mu2e_Register.WriteReg(0x4, ref hitPipelineDelayReg, ref activeFEB.client); //Set the hit pipeline delay to a low value (4 x 12.56ns)
 
                     for (uint channel = 0; channel < 64; channel++)
@@ -3771,6 +3771,50 @@ namespace TB_mu2e
             }
         }
 
+        private void LoadCmdsBtn_Click(object sender, EventArgs e)
+        {
+            if (activeFEB != null && activeFEB.ClientOpen)
+            {
+
+                Thread loadCmdsFileDialogThread = new Thread((ThreadStart)(() =>
+                {
+                    OpenFileDialog loadCmdsDialog = new OpenFileDialog
+                    {
+                        DefaultExt = "txt",
+                        CheckFileExists = true,
+                        CheckPathExists = true,
+                        Filter = "Text file (*.txt)|*.txt|Commands file (*.cmds)|*.cmds",
+                        InitialDirectory = Environment.GetFolderPath(System.Environment.SpecialFolder.Desktop)
+                    };
+
+                    if (loadCmdsDialog.ShowDialog() == DialogResult.Cancel)
+                        return;
+                    else
+                    {
+                        try
+                        {
+                            using (StreamReader cmdFile = new StreamReader(loadCmdsDialog.OpenFile()))
+                            {
+                                while (!cmdFile.EndOfStream)
+                                {
+                                    string cmd = cmdFile.ReadLine();
+                                    char commentChk = cmd.First();
+                                    if (commentChk != '$' || commentChk != '#' || commentChk != '/')
+                                        activeFEB.SendStr(cmd);
+                                }
+                            }
+                        }
+                        catch
+                        {
+                        }
+                    }
+                }));
+
+                loadCmdsFileDialogThread.SetApartmentState(ApartmentState.STA);
+                loadCmdsFileDialogThread.Start();
+                loadCmdsFileDialogThread.Join();
+            }
+        }
     }
 
 
