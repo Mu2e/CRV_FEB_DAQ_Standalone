@@ -262,7 +262,7 @@ namespace TB_mu2e
             else
                 SendStr("wr 20 1" + Convert.ToString(ch, 16));
             SendStr("gain 8");
-            SendStr("A0 2");
+            SendStr("A0 5");
             while (ReadStr(out t, out int dt) || !t.Contains("avg")) { Thread.Sleep(5); } //If after """reading""" we don't have the current, READ IT AGAIN DAMMIT
             string[] tok = t.Split(new string[] { " ", "\r\n", Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
             double adc = -4.096;
@@ -633,12 +633,12 @@ namespace TB_mu2e
         public ROOTNET.NTH1I[] flasherHisto;
         public ROOTNET.NTH1I[] gateHisto;
         public bool flagged;  
-        public enum Failure { NoFail=0, TempRom, SiPMResp, Flashgate, LED, TailCancellation};
+        public enum Failure { NoFail=0, TempRom, SiPMResp, Flashgate, LED, TailCancellation, LEDUntested};
         public int failureType;
 
         public string FailType()
         {
-            string[] failures = { "GOOD", "TEMP/ROM", "SiPMRESP", "FLASHGATE", "LED", "TAILCAN" };
+            string[] failures = { "GOOD", "TEMP/ROM", "SiPMRESP", "FLASHGATE", "LED", "TAILCAN", "LEDUNTEST" };
             return failures[failureType];
         }
     };

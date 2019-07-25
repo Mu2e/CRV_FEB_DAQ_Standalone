@@ -2167,7 +2167,7 @@
             this.cmbBias.Name = "cmbBias";
             this.cmbBias.Size = new System.Drawing.Size(65, 23);
             this.cmbBias.TabIndex = 1;
-            this.cmbBias.Text = "57.0";
+            this.cmbBias.Text = "53.7";
             this.cmbBias.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             this.cmbBias.TextChanged += new System.EventHandler(this.CmbBias_TextChanged);
             // 

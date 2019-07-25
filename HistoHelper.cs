@@ -141,8 +141,14 @@ namespace TB_mu2e
                         System.Threading.Thread.Sleep(10);
                     }
                     packs[packNum] = new byte[febSocket.Available];
-                    lret = febSocket.Receive(packs[packNum], packs[packNum].Length, System.Net.Sockets.SocketFlags.None);
-                    System.Console.WriteLine("Read: {0} / {1} bytes", lret, old_available);
+                    lret = febSocket.Available;
+                    IAsyncResult rResult = febSocket.BeginReceive(packs[packNum], 0, packs[packNum].Length, System.Net.Sockets.SocketFlags.None, null, null);
+                    rResult.AsyncWaitHandle.WaitOne(1000);
+                    if (!rResult.IsCompleted)
+                        Console.WriteLine("Reached timeout when reading histogram");
+                    System.Console.WriteLine("Expected {0} bytes for hitogram", lret);
+                    //lret = febSocket.Receive(packs[packNum], packs[packNum].Length, System.Net.Sockets.SocketFlags.None);
+                    //System.Console.WriteLine("Read: {0} / {1} bytes", lret, old_available);
                 } while (lret != old_available || old_available < 4096/*2048*/ || old_available > 4110/*2060*/); //2048 is the minimum byte length for an incoming histogram; each one is actually >=2049 due to the '>' sent by the board, also need to check if >2048 because sometimes the borad likes to send both histograms in one packet
             }
 
@@ -154,10 +160,10 @@ namespace TB_mu2e
             UInt32[][] data = new UInt32[read_addrs.Length][]; //32-bit numbers are 4-bytes, so the resulting array will be a factor of 4 shorter 
             for (int packNum = 0; packNum < read_addrs.Length; packNum++)
             {
-                while (incomingData[packNum][0] == 0x3e)
-                    incomingData[packNum] = incomingData[packNum].Skip(1).ToArray(); //Get rid of any 3e (>) at the beginning
-                if(incomingData[packNum].Last() == 0x3e)
-                    incomingData[packNum] = incomingData[packNum].Take(incomingData[packNum].Length - 1).ToArray(); //Get rid of the 3e (>) at the end
+                //while (incomingData[packNum][0] == 0x3e)
+                //    incomingData[packNum] = incomingData[packNum].Skip(1).ToArray(); //Get rid of any 3e (>) at the beginning
+                //if(incomingData[packNum].Last() == 0x3e)
+                //    incomingData[packNum] = incomingData[packNum].Take(incomingData[packNum].Length - 1).ToArray(); //Get rid of the 3e (>) at the end
 
                 if (incomingData[packNum].Length == 4096/*2048*//*512*/) //Since the histogram memory is 512 deep by 32 bits wide, we should quickly check that the data length is really be 512 integers... you know, just in case....
                 {
