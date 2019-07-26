@@ -223,6 +223,8 @@
             this.LightCheckMeasurementTimer = new System.Windows.Forms.Timer(this.components);
             this.qaDiCounterMeasurementTimer = new System.Windows.Forms.Timer(this.components);
             this.FEBClientFooterBar = new System.Windows.Forms.Label();
+            this.ModuleQAModuleNameLbl = new System.Windows.Forms.Label();
+            this.ModuleQAModuleNameBox = new System.Windows.Forms.TextBox();
             this.tabControl.SuspendLayout();
             this.tabRUN.SuspendLayout();
             this.groupBoxEvDisplay.SuspendLayout();
@@ -2194,6 +2196,8 @@
             // 
             // tabModuleQA
             // 
+            this.tabModuleQA.Controls.Add(this.ModuleQAModuleNameBox);
+            this.tabModuleQA.Controls.Add(this.ModuleQAModuleNameLbl);
             this.tabModuleQA.Controls.Add(this.ModuleQA_OffsetLbl);
             this.tabModuleQA.Controls.Add(this.ModuleQA_Offset);
             this.tabModuleQA.Controls.Add(this.ModuleQA_flipped_Chkbox);
@@ -2246,7 +2250,7 @@
             // ModuleQA_flipped_Chkbox
             // 
             this.ModuleQA_flipped_Chkbox.AutoSize = true;
-            this.ModuleQA_flipped_Chkbox.Location = new System.Drawing.Point(263, 66);
+            this.ModuleQA_flipped_Chkbox.Location = new System.Drawing.Point(361, 66);
             this.ModuleQA_flipped_Chkbox.Name = "ModuleQA_flipped_Chkbox";
             this.ModuleQA_flipped_Chkbox.Size = new System.Drawing.Size(81, 21);
             this.ModuleQA_flipped_Chkbox.TabIndex = 19;
@@ -2353,7 +2357,7 @@
             // 
             // ModuleQAFilenameBox
             // 
-            this.ModuleQAFilenameBox.Location = new System.Drawing.Point(593, 35);
+            this.ModuleQAFilenameBox.Location = new System.Drawing.Point(575, 33);
             this.ModuleQAFilenameBox.Name = "ModuleQAFilenameBox";
             this.ModuleQAFilenameBox.Size = new System.Drawing.Size(117, 23);
             this.ModuleQAFilenameBox.TabIndex = 2;
@@ -2362,16 +2366,16 @@
             // ModuleQAFileLbl
             // 
             this.ModuleQAFileLbl.AutoSize = true;
-            this.ModuleQAFileLbl.Location = new System.Drawing.Point(368, 38);
+            this.ModuleQAFileLbl.Location = new System.Drawing.Point(468, 17);
             this.ModuleQAFileLbl.Name = "ModuleQAFileLbl";
-            this.ModuleQAFileLbl.Size = new System.Drawing.Size(371, 17);
+            this.ModuleQAFileLbl.Size = new System.Drawing.Size(253, 34);
             this.ModuleQAFileLbl.TabIndex = 8;
-            this.ModuleQAFileLbl.Text = "Output File Name: \"ScanningData_                              .txt\"";
+            this.ModuleQAFileLbl.Text = "Output File Name:\r\n\"ScanningData_                              .txt\"";
             // 
             // ModuleQASideLbl
             // 
             this.ModuleQASideLbl.AutoSize = true;
-            this.ModuleQASideLbl.Location = new System.Drawing.Point(267, 17);
+            this.ModuleQASideLbl.Location = new System.Drawing.Point(358, 17);
             this.ModuleQASideLbl.Name = "ModuleQASideLbl";
             this.ModuleQASideLbl.Size = new System.Drawing.Size(36, 17);
             this.ModuleQASideLbl.TabIndex = 6;
@@ -2384,7 +2388,7 @@
             "A",
             "B",
             "Middle"});
-            this.ModuleQASide.Location = new System.Drawing.Point(263, 35);
+            this.ModuleQASide.Location = new System.Drawing.Point(361, 35);
             this.ModuleQASide.Name = "ModuleQASide";
             this.ModuleQASide.Size = new System.Drawing.Size(91, 25);
             this.ModuleQASide.TabIndex = 1;
@@ -2538,6 +2542,22 @@
             this.FEBClientFooterBar.Name = "FEBClientFooterBar";
             this.FEBClientFooterBar.Size = new System.Drawing.Size(1260, 2);
             this.FEBClientFooterBar.TabIndex = 47;
+            // 
+            // ModuleQAModuleNameLbl
+            // 
+            this.ModuleQAModuleNameLbl.AutoSize = true;
+            this.ModuleQAModuleNameLbl.Location = new System.Drawing.Point(231, 17);
+            this.ModuleQAModuleNameLbl.Name = "ModuleQAModuleNameLbl";
+            this.ModuleQAModuleNameLbl.Size = new System.Drawing.Size(54, 17);
+            this.ModuleQAModuleNameLbl.TabIndex = 22;
+            this.ModuleQAModuleNameLbl.Text = "Module";
+            // 
+            // ModuleQAModuleNameBox
+            // 
+            this.ModuleQAModuleNameBox.Location = new System.Drawing.Point(234, 35);
+            this.ModuleQAModuleNameBox.Name = "ModuleQAModuleNameBox";
+            this.ModuleQAModuleNameBox.Size = new System.Drawing.Size(100, 23);
+            this.ModuleQAModuleNameBox.TabIndex = 23;
             // 
             // frmMain
             // 
@@ -2814,5 +2834,7 @@
         private System.Windows.Forms.Label lblSpillsNum;
         private System.Windows.Forms.Label FEBClientFooterBar;
         private System.Windows.Forms.Button btnBiasWRITEALL;
+        private System.Windows.Forms.TextBox ModuleQAModuleNameBox;
+        private System.Windows.Forms.Label ModuleQAModuleNameLbl;
     }
 }

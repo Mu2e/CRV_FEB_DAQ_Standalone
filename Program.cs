@@ -402,6 +402,7 @@ namespace TB_mu2e
         //private List<SortedDictionary<int, double>> currentMeasurements;
         private List<ConcurrentDictionary<int, double>> currentMeasurements; //concurrent dictionary should be thread safe
         private string moduleName, side;
+        private bool flipped;
         List<Mu2e_FEB_client> febs;
 
         public ModuleQACurrentMeasurements(params Mu2e_FEB_client[] feb_clients)
@@ -457,12 +458,21 @@ namespace TB_mu2e
            
         }
 
+        public void SetName(string module_name)
+        {
+            moduleName = module_name;
+        }
 
         public void SetSide(string side_in)
         {
             side = side_in;
         }
 
+        public void SetFlip(bool flip)
+        {
+            flipped = flip;
+        }
+        
         public double[] TakeMeasurement(int channel) //takes a current measurement for the same channel on all FEBs
         {
             double[] currents = new double[febs.Count];
@@ -476,11 +486,19 @@ namespace TB_mu2e
             return currents;
         }
 
-        public void WriteMeasurements(string filename, double temperature, int dicounter)
+        public void WriteMeasurements(string filename, int dicounter)
         {
+            string flip;
+            if (flipped)
+                flip = "Y";
+            else
+                flip = "N";
+
+            double temperature = febs[0].ReadTemp(0);
+
             using (StreamWriter writer = File.AppendText(filename)) //The output file
             {
-                writer.Write("{0}\t{1}\t{2}\t{3}\t{4}\t", DateTime.Now.ToString("MM/dd/yy HH:mm\t"), moduleName, side, temperature, dicounter); //Write current time, name of module, which side, and current temperature
+                writer.Write("{0}\t{1}\t{2}\t{3}\t{4}\t{5}\t", DateTime.Now.ToString("MM/dd/yy HH:mm"), moduleName, flip, side, temperature, dicounter); //Write current time, name of module, which side, and current temperature
                //foreach(SortedDictionary<int, double> feb in currentMeasurements)
                foreach(ConcurrentDictionary<int, double> feb in currentMeasurements)
                     //foreach (KeyValuePair<int, double> channel in feb)

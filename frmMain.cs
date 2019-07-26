@@ -3364,7 +3364,9 @@ namespace TB_mu2e
                                                                 //Move source back to position 0
                         currentChannel = 0; //Set back to 0, controlled by measurment timer
                         currentDicounter = 0; //Set back to 0, controlled by measurement timer
+                        PP.moduleQACurrentMeasurements.SetName(ModuleQAModuleNameBox.Text);
                         PP.moduleQACurrentMeasurements.SetSide(ModuleQASide.Text);
+                        PP.moduleQACurrentMeasurements.SetFlip(ModuleQA_flipped_Chkbox.Checked);
                         //PP.moduleQACurrentMeasurements.TurnOnBias(Convert.ToDouble(qaBias.Text));
                         //PP.FEB1.SetVAll(Convert.ToDouble(qaBias.Text)); //Turn on the bias for the FEBs
                         //PP.FEB2.SetVAll(Convert.ToDouble(qaBias.Text));
@@ -3414,7 +3416,9 @@ namespace TB_mu2e
                         //Move source back to position 0
                         currentChannel = 0; //Set back to 0, controlled by measurment timer
                         currentDicounter = 0; //Set back to 0, controlled by measurement timer
+                        PP.moduleQACurrentMeasurements.SetName(ModuleQAModuleNameBox.Text);
                         PP.moduleQACurrentMeasurements.SetSide(ModuleQASide.Text);
+                        PP.moduleQACurrentMeasurements.SetFlip(ModuleQA_flipped_Chkbox.Checked);
                         //PP.moduleQACurrentMeasurements.TurnOnBias(Convert.ToDouble(qaBias.Text));
                         //PP.FEB1.SetVAll(Convert.ToDouble(qaBias.Text)); //Turn on the bias for the FEBs
                         //PP.FEB2.SetVAll(Convert.ToDouble(qaBias.Text));
@@ -3581,7 +3585,7 @@ namespace TB_mu2e
                         }
                         else //must have reached the end of 64 channels
                         {
-                            PP.moduleQACurrentMeasurements.WriteMeasurements("C:\\Users\\Boi\\Desktop\\ScanningData_" + ModuleQAFilenameBox.Text + ".txt", 0, currentDicounter);
+                            PP.moduleQACurrentMeasurements.WriteMeasurements("C:\\Users\\Boi\\Desktop\\ScanningData_" + ModuleQAFilenameBox.Text + ".txt", currentDicounter);
                             PP.moduleQACurrentMeasurements.Purge();
                             currentDicounter++; //increment the dicounter
                             if (currentDicounter < 9)//100)//5)//8)
@@ -3617,7 +3621,7 @@ namespace TB_mu2e
                     }
                     else //must have reached the end of 64 channels, write out the dark currents
                     {
-                        PP.moduleQACurrentMeasurements.WriteMeasurements("C:\\Users\\Boi\\Desktop\\ScanningData_" + ModuleQAFilenameBox.Text + ".txt", 0, -1); //-1 will denote dark current measurement
+                        PP.moduleQACurrentMeasurements.WriteMeasurements("C:\\Users\\Boi\\Desktop\\ScanningData_" + ModuleQAFilenameBox.Text + ".txt", -1); //-1 will denote dark current measurement
                         PP.moduleQACurrentMeasurements.Purge();
                         //PP.moduleQACurrentMeasurements.TurnOffBias();
                         darkCurrent = false; //done with darkcurrent
