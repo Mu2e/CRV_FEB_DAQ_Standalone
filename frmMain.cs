@@ -2329,10 +2329,12 @@ namespace TB_mu2e
 
         private void CmbTestBtn_Click(object sender, EventArgs e)
         {
-            double fitThresh = 7.5;//7.5;
+            double fitThresh = 8.5;//7.5;
+            double integralThresh = 2E5;
+            double flashgateThresh = 8E6;
             double flashGateDifferenceThresh = 20;
             double ledDifferenceThresh = 2000;// 50; //Initial testing value
-            double cmbLedIntThresh = 2500;
+            double cmbLedIntThresh = 1000;
             uint ledFlasherIntensity = 0xFFF; //14V //0x400; //3.5V
             double maxUndershootThresh = 30; //Value is in ADC
             int upperBinInt = 1000;
@@ -2617,7 +2619,7 @@ namespace TB_mu2e
 
                                 peHistos[channels[hist]] = histos_temp[hist];
                                 peCalibs[channels[hist]] = new ROOTNET.NTGraph();
-                                int peaksFound = peakFinder.Search(peHistos[channels[hist]], 1.7, "nobackground", 0.00001); //Don't try and estimate background, and set the threshold to only include pedestal, 1st, and 2nd PE
+                                int peaksFound = peakFinder.Search(peHistos[channels[hist]], 1.4, "nobackground", 0.00001); //Don't try and estimate background, and set the threshold to only include pedestal, 1st, and 2nd PE
                                 if (peaksFound < 2)
                                 {
                                     System.Console.WriteLine("Cannot find 1+ PE for Chan {0}", channels[hist]);
@@ -2677,7 +2679,11 @@ namespace TB_mu2e
 
                                 //compare fit response to 'lookup value'
                                 //For gaus fit: p0 is amplitude, p1 is mean, p2 is sigma
-                                if (PercentDifference(bulkRespFit.GetParameter(1), avgResp[channels[hist]] /*table value*/) > ledDifferenceThresh) //if the differnce is greater than 20%
+                                //if (PercentDifference(bulkRespFit.GetParameter(1), avgResp[channels[hist]] /*table value*/) > ledDifferenceThresh) //if the differnce is greater than 20%
+
+                                int lowerIntegralBin = (int)(pedestals[channels[hist]] + gains[channels[hist]] * fitThresh); //truncate the value of 7.5PE for the bin # (since all histograms start at 0 and have 512 bins)
+                                double ledIntegral = peHistos[channels[hist]].Integral(lowerIntegralBin, 1000); //512 upper bound because all histograms have 512 bins
+                                if (ledIntegral < integralThresh)
                                 {
                                     cmbs[cmbNum].flagged = true;
                                     cmbs[cmbNum].failureType = (int)CMB.Failure.SiPMResp;
@@ -2757,7 +2763,7 @@ namespace TB_mu2e
                                 //double flashIntegral = flashHistos[channels[hist]].Integral(lowerIntegralBin, 512); //512 upper bound because all histograms have 512 bins
                                 //double ledIntegral = peHistos[channels[hist]].Integral(lowerIntegralBin, 512); //Also compute integral for led histogram, so we can see if the response to LED has diminished
 
-                                if (flashHistos[channels[hist]].GetBinContent(1024) < 2500)//PercentDifference(flashIntegral, ledIntegral) < flashGateDifferenceThresh) //if the differnce is less than flashGateDifferenceThresh, flashgate must not be working...
+                                if (flashHistos[channels[hist]].GetBinContent(1024) + flashHistos[channels[hist]].GetBinContent(1)  < flashgateThresh)//PercentDifference(flashIntegral, ledIntegral) < flashGateDifferenceThresh) //if the differnce is less than flashGateDifferenceThresh, flashgate must not be working...
                                 {
                                     cmbs[cmbNum].flagged = true;
                                     cmbs[cmbNum].failureType = (int)CMB.Failure.Flashgate;
@@ -2901,6 +2907,20 @@ namespace TB_mu2e
                                         cmbInfoLabels[thiscmb][11].Text = cmbs[thiscmb].FailType();
                                         SetRowColor((int)thiscmb, Color.LightGoldenrodYellow);
                                         UpdateCMBInfoLabel((int)thiscmb);
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    if (!cmbs[flashing_cmb[i]].flagged)
+                                    {
+                                        cmbs[flashing_cmb[i]].flagged = false; //Also not a real failure, just needs to be tested again or manually tested
+                                        cmbs[flashing_cmb[i]].failureType = (int)CMB.Failure.LEDUntested;
+                                        cmbInfoLabels[flashing_cmb[i]][11].Text = cmbs[flashing_cmb[i]].FailType();
+                                        SetRowColor((int)flashing_cmb[i], Color.LightGoldenrodYellow);
+                                        UpdateCMBInfoLabel((int)flashing_cmb[i]);
                                     }
                                 }
                             }
