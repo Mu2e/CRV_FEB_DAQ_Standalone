@@ -393,6 +393,22 @@ namespace TB_mu2e
                 writer.WriteLine();
             }
         }
+
+        public void WriteMeasurements(string module, string side, string half, string type)//, double temperature)
+        {
+            using (StreamWriter writer = File.AppendText(filename)) //The output file
+            {
+                writer.Write("{0}\t{1}\t{2}\t{3}\t{4}\t{5}\t", module, side, half, type, feb.ReadTemp(0), DateTime.Now.ToString("MM/dd/yy HH:mm:ss")); //Write current time, name of module, which side, and current temperature
+                //foreach (KeyValuePair<int, double> channel in currentMeasurements)
+                for (int chan = 0; chan < 64; chan++)
+                {
+                    if (currentMeasurements.TryGetValue(chan, out double current))
+                        writer.Write("{0}\t", current.ToString("0.0000"));
+                }
+                //writer.Write("{0}\t", channel.Value.ToString("0.0000")); //write the measured current to file
+                writer.WriteLine();
+            }
+        }
     }
 
     //TODO: FIX THIS CLASS - To QA a module current measurements from 4 different FEBs are needed
@@ -537,8 +553,8 @@ namespace TB_mu2e
     {
         public static bool glbDebug = false;
         public static Run myRun;
-        public static CurrentMeasurements qaDicounterMeasurements;
-        public static ModuleQACurrentMeasurements moduleQACurrentMeasurements;
+        public static CurrentMeasurements qcDicounterMeasurements;
+        public static ModuleQACurrentMeasurements moduleQCCurrentMeasurements;
         public static CurrentMeasurements lightCheckMeasurements;
         //        public static frmTelnet myTelnet;
         //        public static Plot0 myPlot;

@@ -36,7 +36,7 @@ namespace TB_mu2e
         private const int num_chans = 16;
         private System.Windows.Forms.Label[] BDVoltLabels = new System.Windows.Forms.Label[num_chans];
 
-        private const double NO_CURRENT_THRESH = 0.025;
+        private const double NO_CURRENT_THRESH = 0.010;
         private const double AUTO_THRESH_MULTIPLIER = 1.10; //10% higher
         private bool auto_thresh_enabled = false;
 
@@ -1877,33 +1877,33 @@ namespace TB_mu2e
         private void FrmMain_Load(object sender, EventArgs e)
         {
             CreateButtonArrays();
-            InitializeModuleQATab();
+            InitializeModuleQCTab();
         }
 
         private void CreateButtonArrays()
         {
             //To-do: put these buttons into a TableLayoutPanel for easy organization as well as adding/subtracting buttons
-            #region DiCounterQAButtons
-            qaDiButtons = new System.Windows.Forms.RadioButton[12]; //Create an array of new buttons, originally 8, but extra 4 for crystals,
-            for (int btni = 0; btni < qaDiButtons.Length; btni++)
+            #region DiCounterQCButtons
+            qcDiButtons = new System.Windows.Forms.RadioButton[12]; //Create an array of new buttons, originally 8, but extra 4 for crystals,
+            for (int btni = 0; btni < qcDiButtons.Length; btni++)
             {
-                qaDiButtons[btni] = new System.Windows.Forms.RadioButton
+                qcDiButtons[btni] = new System.Windows.Forms.RadioButton
                 {
                     Appearance = System.Windows.Forms.Appearance.Button,
                     AutoCheck = false,
                     BackColor = System.Drawing.Color.Green,
                     Location = new System.Drawing.Point(385 + ((btni % 4) * 35), 17 + ((btni / 4) * 25)),
-                    Name = "qaDiButton" + btni,
+                    Name = "qcDiButton" + btni,
                     Size = new System.Drawing.Size(35, 25),
                     TabIndex = 109 + btni,
                     Text = btni.ToString(),
                     TextAlign = System.Drawing.ContentAlignment.MiddleCenter,
                     UseVisualStyleBackColor = false
                 }; //Create a new button in the array and set some properties
-                qaDiButtons[btni].Click += new System.EventHandler(QaDiButton_Click); //Assign the button a handler for when it is clicked
-                dicounterQAGroup.Controls.Add(qaDiButtons[btni]); //Add the button to the group box
+                qcDiButtons[btni].Click += new System.EventHandler(QcDiButton_Click); //Assign the button a handler for when it is clicked
+                dicounterQCGroup.Controls.Add(qcDiButtons[btni]); //Add the button to the group box
             }
-            #endregion DiCounterQAButtons
+            #endregion DiCounterQCButtons
 
 
             #region LightCheckButtons
@@ -1924,7 +1924,7 @@ namespace TB_mu2e
                 }; //Create a label for each CMB
                 lightCMBlabels[cmb].Click += new System.EventHandler(LightCMBLabel_Click); //Assign the label a handler for when it is clicked
             } //Create labels for each CMB
-            qaFPGALabels = new System.Windows.Forms.Label[4]; //Create an array of new labels
+            qcFPGALabels = new System.Windows.Forms.Label[4]; //Create an array of new labels
             int fpga = 0; //Define a variable called FPGA for drawing and filling through group boxes
             for (int btni = 0; btni < lightButtons.Length; btni++)
             {
@@ -1948,7 +1948,7 @@ namespace TB_mu2e
 
                 if (lightCheckGroupFPGAs[fpga] == null) //If the group box for that particular FPGA has not been created yet, create it now
                 {
-                    qaFPGALabels[fpga] = new System.Windows.Forms.Label
+                    qcFPGALabels[fpga] = new System.Windows.Forms.Label
                     {
                         AutoSize = false,
                         BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle,
@@ -1958,7 +1958,7 @@ namespace TB_mu2e
                         Text = "FPGA " + fpga,
                         TextAlign = System.Drawing.ContentAlignment.MiddleCenter
                     }; //Create a label for the FPGA
-                    qaFPGALabels[fpga].Click += new System.EventHandler(LightFPGALabel_Click); //Assign the label a handler for when it is clicked
+                    qcFPGALabels[fpga].Click += new System.EventHandler(LightFPGALabel_Click); //Assign the label a handler for when it is clicked
 
                     lightCheckGroupFPGAs[fpga] = new System.Windows.Forms.GroupBox
                     {
@@ -1983,26 +1983,28 @@ namespace TB_mu2e
                 if (((btni + 1) % 4) == 0)//At the end of filling each row with buttons, add a label
                     fpga_panel.Controls.Add(lightCMBlabels[btni / 4], 5, (btni % 16) / 4);
                 if (((btni + 1) % 16) == 0)//At the end of filling the panel with buttons and cmb labels, add the FPGA 
-                    fpga_panel.Controls.Add(qaFPGALabels[fpga], 6, 1);//Add the FPGA label to the layout table
+                    fpga_panel.Controls.Add(qcFPGALabels[fpga], 6, 1);//Add the FPGA label to the layout table
             }
             #endregion LightCheckButtons
         }
 
-        private void InitializeModuleQATab()
+
+        //TODO: remove reference to "two FEB hardcoding"
+        private void InitializeModuleQCTab()
         {
-            if(ModuleQALabels == null)             //Create labels for the Module QA Tab
-                ModuleQALabels = new System.Windows.Forms.Label[2][]; //One collection of 64 labels for each FEB
+            if(ModuleQCLabels == null)             //Create labels for the Module QC Tab
+                ModuleQCLabels = new System.Windows.Forms.Label[2][]; //One collection of 64 labels for each FEB
             for (uint feb = 0; feb < 2; feb++)
             {
-                if(ModuleQALabels[feb] == null)
-                    ModuleQALabels[feb] = new System.Windows.Forms.Label[64]; //64 channels on an FEB
+                if(ModuleQCLabels[feb] == null)
+                    ModuleQCLabels[feb] = new System.Windows.Forms.Label[64]; //64 channels on an FEB
                 for (uint channel = 0; channel < 64; channel++)
                 {
-                    if (ModuleQALabels[feb][channel] == null)
+                    if (ModuleQCLabels[feb][channel] == null)
                     {
-                        ModuleQALabels[feb][channel] = new System.Windows.Forms.Label
+                        ModuleQCLabels[feb][channel] = new System.Windows.Forms.Label
                         {
-                            Name = "moduleQAChannelLbl_FEB" + (feb).ToString() + "_ch" + (channel).ToString(),
+                            Name = "moduleQCChannelLbl_FEB" + (feb).ToString() + "_ch" + (channel).ToString(),
                             Text = (channel).ToString() + ":\n",
                             Margin = new System.Windows.Forms.Padding(0, 3, 0, 3),
                             TextAlign = System.Drawing.ContentAlignment.MiddleLeft,
@@ -2011,10 +2013,10 @@ namespace TB_mu2e
                         switch (feb) //Put the info into the table
                         {
                             case 0:
-                                ModuleQATableFEB1.Controls.Add(ModuleQALabels[feb][channel]);
+                                ModuleQCTableFEB1.Controls.Add(ModuleQCLabels[feb][channel]);
                                 break;
                             case 1:
-                                ModuleQATableFEB2.Controls.Add(ModuleQALabels[feb][channel]);
+                                ModuleQCTableFEB2.Controls.Add(ModuleQCLabels[feb][channel]);
                                 break;
                             default:
                                 break;
@@ -2022,8 +2024,8 @@ namespace TB_mu2e
                     }
                     else //reset the label text
                     {
-                        ModuleQALabels[feb][channel].Text = (channel).ToString() + ":\n";
-                        ModuleQALabels[feb][channel].Refresh();
+                        ModuleQCLabels[feb][channel].Text = (channel).ToString() + ":\n";
+                        ModuleQCLabels[feb][channel].Refresh();
                     }
                 }
             }
@@ -2034,9 +2036,9 @@ namespace TB_mu2e
 
         private void UpdateModuleLabel(int feb, int channel, double value)
         {
-            ModuleQALabels[feb][channel].Text = (channel).ToString() + ":\n";
-            ModuleQALabels[feb][channel].Text += (value).ToString("F4");
-            ModuleQALabels[feb][channel].Refresh();
+            ModuleQCLabels[feb][channel].Text = (channel).ToString() + ":\n";
+            ModuleQCLabels[feb][channel].Text += (value).ToString("F4");
+            ModuleQCLabels[feb][channel].Refresh();
         }
 
         private void GroupBoxEvDisplay_Enter(object sender, EventArgs e)
@@ -2044,30 +2046,30 @@ namespace TB_mu2e
 
         }
 
-        private void QaStartButton_Click(object sender, EventArgs e)
+        private void QcStartButton_Click(object sender, EventArgs e)
         {
             if (activeFEB != null)
             {
                 if (activeFEB.ClientOpen)
                 {
-                    if (qaDiCounterMeasurementTimer.Enabled)
+                    if (qcDiCounterMeasurementTimer.Enabled)
                     {
-                        qaDiCounterMeasurementTimer.Enabled = false;
-                        PP.qaDicounterMeasurements.TurnOffBias();
-                        PP.qaDicounterMeasurements.Purge();
-                        qaStartButton.Text = "Auto Data";
-                        qaStartButton.BackColor = SystemColors.Control;
-                        qaStartButton.Update();
+                        qcDiCounterMeasurementTimer.Enabled = false;
+                        PP.qcDicounterMeasurements.TurnOffBias();
+                        PP.qcDicounterMeasurements.Purge();
+                        qcStartButton.Text = "Auto Data";
+                        qcStartButton.BackColor = SystemColors.Control;
+                        qcStartButton.Update();
                         lightCheckGroup.Enabled = true;
                         FEBSelectPanel.Enabled = true;
                         dicounterNumberTextBox.Enabled = true;
                     }
                     else
                     {
-                        //qaStartButton.Enabled = false;  //prevents multiple clicks of the buttons
-                        qaStartButton.Text = "STOP";
-                        qaStartButton.BackColor = Color.Red;
-                        qaStartButton.Update();
+                        //qcStartButton.Enabled = false;  //prevents multiple clicks of the buttons
+                        qcStartButton.Text = "STOP";
+                        qcStartButton.BackColor = Color.Red;
+                        qcStartButton.Update();
                         using (System.Media.SoundPlayer soundPlayer = new System.Media.SoundPlayer(Environment.GetFolderPath(Environment.SpecialFolder.Windows) + "\\media\\chord.wav"))// "C:\\Windows\\media\\Windows Proximity Notification.wav"))
                         {
                             soundPlayer.Play();
@@ -2076,27 +2078,27 @@ namespace TB_mu2e
                         autoThreshBtn.Enabled = false;
                         lightCheckResetThresh.Enabled = false;
                         lightCheckBtn.Enabled = false;
-                        //string[] chanOuts = new string[qaDiButtons.Length];
-                        autoDataProgress.Maximum = qaDiButtons.Length; //set the max of the progress bar
+                        //string[] chanOuts = new string[qcDiButtons.Length];
+                        autoDataProgress.Maximum = qcDiButtons.Length; //set the max of the progress bar
 
-                        if (PP.qaDicounterMeasurements == null)
-                            PP.qaDicounterMeasurements = new CurrentMeasurements(activeFEB, Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) + "\\Google Drive\\CRV Fabrication Documents\\Data\\QA\\Dicounter Source Testing\\ScanningData_" + qaOutputFileName.Text + ".txt");
+                        if (PP.qcDicounterMeasurements == null)
+                            PP.qcDicounterMeasurements = new CurrentMeasurements(activeFEB, Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) + "\\Google Drive\\CRV Fabrication Documents\\Data\\QA\\Dicounter Source Testing\\ScanningData_" + qaOutputFileName.Text + ".txt");
                         else
                         {
-                            PP.qaDicounterMeasurements.Purge();
-                            PP.qaDicounterMeasurements.ChangeClient(activeFEB);
+                            PP.qcDicounterMeasurements.Purge();
+                            PP.qcDicounterMeasurements.ChangeClient(activeFEB);
                         }
 
-                        foreach (var btn in qaDiButtons) { if (!btn.Checked) { btn.BackColor = Color.Green; btn.Update(); } } //Reset all active channel indicators to green
+                        foreach (var btn in qcDiButtons) { if (!btn.Checked) { btn.BackColor = Color.Green; btn.Update(); } } //Reset all active channel indicators to green
 
 
                         currentChannel = 0; //Set the current channel being measured to 0
                         dicounterNumberTextBox.Enabled = false;
                         lightCheckGroup.Enabled = false;
 
-                        activeFEB.SetV(Convert.ToDouble(qaBias.Text)); //Turn on the bias
+                        activeFEB.SetV(Convert.ToDouble(qcBias.Text)); //Turn on the bias
 
-                        qaDiCounterMeasurementTimer.Enabled = true;
+                        qcDiCounterMeasurementTimer.Enabled = true;
                     }
 
                     ////Data are written to the Google Drive, CRV Fabrication Documents folder ScanningData, subfolder DicounterQA
@@ -2123,9 +2125,10 @@ namespace TB_mu2e
                         autoThreshBtn.Update();
                         auto_thresh_enabled = false;
                         lightModuleLabel.Enabled = true;
-                        lightModuleLayer.Enabled = true;
+                        LightCheckModuleHalf.Enabled = true;
+                        LightCheckType.Enabled = true;
                         lightModuleSide.Enabled = true;
-                        dicounterQAGroup.Enabled = true;
+                        dicounterQCGroup.Enabled = true;
                         lightCheckResetThresh.Enabled = true;
                         lightCheckBtn.Enabled = true;
                         FEBSelectPanel.Enabled = true;
@@ -2151,14 +2154,15 @@ namespace TB_mu2e
 
                         currentChannel = 0;
                         lightModuleLabel.Enabled = false;
-                        lightModuleLayer.Enabled = false;
+                        LightCheckModuleHalf.Enabled = false;
+                        LightCheckType.Enabled = false;
                         lightModuleSide.Enabled = false;
-                        dicounterQAGroup.Enabled = false;
+                        dicounterQCGroup.Enabled = false;
                         lightCheckResetThresh.Enabled = false;
                         lightCheckBtn.Enabled = false;
                         auto_thresh_enabled = true;
 
-                        //activeFEB.SetVAll(Convert.ToDouble(qaBias.Text));
+                        //activeFEB.SetVAll(Convert.ToDouble(qcBias.Text));
 
                         LightCheckMeasurementTimer.Enabled = true;
                     }
@@ -2198,9 +2202,10 @@ namespace TB_mu2e
                         lightCheckBtn.BackColor = SystemColors.Control;
                         lightCheckBtn.Update();
                         lightModuleLabel.Enabled = true;
-                        lightModuleLayer.Enabled = true;
+                        LightCheckModuleHalf.Enabled = true;
+                        LightCheckType.Enabled = true;
                         lightModuleSide.Enabled = true;
-                        dicounterQAGroup.Enabled = true;
+                        dicounterQCGroup.Enabled = true;
                         lightCheckResetThresh.Enabled = true;
                         autoThreshBtn.Enabled = true;
                         lightWriteToFileBox.Enabled = true;
@@ -2228,14 +2233,15 @@ namespace TB_mu2e
 
                         currentChannel = 0;
                         lightModuleLabel.Enabled = false;
-                        lightModuleLayer.Enabled = false;
+                        LightCheckModuleHalf.Enabled = false;
+                        LightCheckType.Enabled = false;
                         lightModuleSide.Enabled = false;
-                        dicounterQAGroup.Enabled = false;
+                        dicounterQCGroup.Enabled = false;
                         lightCheckResetThresh.Enabled = false;
                         autoThreshBtn.Enabled = false;
                         lightWriteToFileBox.Enabled = false;
 
-                        //activeFEB.SetVAll(Convert.ToDouble(qaBias.Text));
+                        //activeFEB.SetVAll(Convert.ToDouble(qcBias.Text));
 
                         LightCheckMeasurementTimer.Enabled = true;
                     }
@@ -2243,35 +2249,35 @@ namespace TB_mu2e
             }
         }
 
-        private void QaBias_TextChanged(object sender, EventArgs e)
+        private void QcBias_TextChanged(object sender, EventArgs e)
         {
-            qaBias.BackColor = Color.Orange;
-            bool parsed = double.TryParse(qaBias.Text, out var isNumber);
+            qcBias.BackColor = Color.Orange;
+            bool parsed = double.TryParse(qcBias.Text, out var isNumber);
             //Check for invalid input
-            if (string.IsNullOrWhiteSpace(qaBias.Text))
+            if (string.IsNullOrWhiteSpace(qcBias.Text))
             {
-                qaBias.BackColor = Color.Red;
-                qaStartButton.Enabled = false;
+                qcBias.BackColor = Color.Red;
+                qcStartButton.Enabled = false;
                 lightCheckBtn.Enabled = false;
                 autoThreshBtn.Enabled = false;
             }
             else if (!parsed || isNumber < 0 || isNumber > 80)
             {
-                qaBias.Text = "57.0";
-                qaBias.BackColor = Color.LightGray;
-                qaStartButton.Enabled = true;
+                qcBias.Text = "57.0";
+                qcBias.BackColor = Color.LightGray;
+                qcStartButton.Enabled = true;
                 lightCheckBtn.Enabled = true;
                 autoThreshBtn.Enabled = true;
             }
             else
             {
-                qaStartButton.Enabled = true;
+                qcStartButton.Enabled = true;
                 lightCheckBtn.Enabled = true;
                 autoThreshBtn.Enabled = true;
             }
         }
 
-        private void QaDiButton_Click(object sender, EventArgs e)
+        private void QcDiButton_Click(object sender, EventArgs e)
         {
             RadioButton btn = (RadioButton)sender;
             if (!btn.Checked)
@@ -2532,7 +2538,7 @@ namespace TB_mu2e
                     //Open up the file used to store/read channel responses
                     //Stores in single line per channel format, channel# AverageADCresponse
                     #region ReadFileAvgs
-                    String cmbAvgFileName = "D:\\data\\cmb_tester_data\\cmb_channel_averages.root";
+                    String cmbAvgFileName = "C:\\data\\cmb_tester_data\\cmb_channel_averages.root";
                     ROOTNET.NTH1I[] channelAvgHist = new ROOTNET.NTH1I[64];
                     ROOTNET.NTFile cmbAvgsFile;
                     double[] avgResp = new double[64];
@@ -2564,7 +2570,7 @@ namespace TB_mu2e
                     #endregion ReadFileAvgs
 
                     #region Output histograms
-                    var histo_file = ROOTNET.NTFile.Open("D:/Resp_Calib_BACKUP_" + System.DateTime.Now.ToFileTime().ToString() + ".root", "RECREATE");
+                    var histo_file = ROOTNET.NTFile.Open("C:\\data\\cmb_tester_data\\Resp_Calib_BACKUP_" + System.DateTime.Now.ToFileTime().ToString() + ".root", "RECREATE");
                     bool outputOpened = false;
                     if (histo_file != null)
                         outputOpened = true;
@@ -3177,19 +3183,19 @@ namespace TB_mu2e
         {
             if (oneReadout.Checked == true)
             {
-                foreach (var btn in qaDiButtons.Take(4).ToArray()) //If any of the first 4 buttons have been checked, uncheck them
+                foreach (var btn in qcDiButtons.Take(4).ToArray()) //If any of the first 4 buttons have been checked, uncheck them
                     if (btn.Checked)
-                        QaDiButton_Click(btn, e);
+                        QcDiButton_Click(btn, e);
 
-                foreach (var btn in qaDiButtons.Skip(4).ToArray()) //Check the remaining buttons, if not checked already
+                foreach (var btn in qcDiButtons.Skip(4).ToArray()) //Check the remaining buttons, if not checked already
                     if (!btn.Checked) //if it isn't checked, then check it
-                        QaDiButton_Click(btn, e);
+                        QcDiButton_Click(btn, e);
             }
             else
             {
-                foreach (var btn in qaDiButtons) //If any button is checked, uncheck it
+                foreach (var btn in qcDiButtons) //If any button is checked, uncheck it
                     if (btn.Checked)
-                        QaDiButton_Click(btn, e);
+                        QcDiButton_Click(btn, e);
             }
         }
 
@@ -3198,11 +3204,17 @@ namespace TB_mu2e
             lightModuleLabel.BackColor = Color.White;
             if (string.IsNullOrWhiteSpace(lightModuleSide.Text))
                 lightModuleSide.SelectedIndex = 0;
+            if (string.IsNullOrWhiteSpace(LightCheckType.Text))
+                LightCheckType.SelectedIndex = 0;
+            if (string.IsNullOrWhiteSpace(LightCheckModuleHalf.Text))
+                LightCheckModuleHalf.SelectedIndex = 0;
             if (!string.IsNullOrWhiteSpace(lightModuleLabel.Text))
             {
                 lightWriteToFileBox.Enabled = true;
                 lightModuleSide.Enabled = true;
-                lightModuleLayer.Enabled = true;
+                LightCheckModuleHalf.Enabled = true;
+                LightCheckType.Enabled = true;
+
             }
             else
             {
@@ -3210,7 +3222,8 @@ namespace TB_mu2e
                 lightWriteToFileBox.Enabled = false;
                 lightModuleLabel.BackColor = Color.Yellow;
                 lightModuleSide.Enabled = false;
-                lightModuleLayer.Enabled = false;
+                LightCheckModuleHalf.Enabled = false;
+                LightCheckType.Enabled = false;
             }
             lightModuleLabel.Update();
         }
@@ -3264,23 +3277,23 @@ namespace TB_mu2e
             catch { }
         }
 
-        private void QaDiIWarningThresh_TextChanged(object sender, EventArgs e)
+        private void QcDiIWarningThresh_TextChanged(object sender, EventArgs e)
         {
-            qaDiIWarningThresh.BackColor = Color.White;
-            bool parsed = double.TryParse(qaDiIWarningThresh.Text, out var isNumber);
+            qcDiIWarningThresh.BackColor = Color.White;
+            bool parsed = double.TryParse(qcDiIWarningThresh.Text, out var isNumber);
             //Check for invalid input
-            if (string.IsNullOrWhiteSpace(qaDiIWarningThresh.Text))
+            if (string.IsNullOrWhiteSpace(qcDiIWarningThresh.Text))
             {
-                qaDiIWarningThresh.BackColor = Color.Red;
-                qaStartButton.Enabled = false;
+                qcDiIWarningThresh.BackColor = Color.Red;
+                qcStartButton.Enabled = false;
             }
             else if (!parsed || isNumber < 0)
             {
-                qaDiIWarningThresh.Text = "0.1";
-                qaStartButton.Enabled = true;
+                qcDiIWarningThresh.Text = "0.1";
+                qcStartButton.Enabled = true;
             }
             else
-                qaStartButton.Enabled = true;
+                qcStartButton.Enabled = true;
         }
 
         private void SetRowColor(int cmbRow, Color col)
@@ -3322,7 +3335,7 @@ namespace TB_mu2e
 
         private void LostCMBavgsBtn_Click(object sender, EventArgs e)
         {
-            String cmbAvgFileName = "D:\\data\\cmb_tester_data\\cmb_channel_averages.root";
+            String cmbAvgFileName = "C:\\data\\cmb_tester_data\\cmb_channel_averages.root";
             ROOTNET.NTFile cmbAvgsFile;
             if (!(File.Exists(cmbAvgFileName)))
             {
@@ -3337,26 +3350,26 @@ namespace TB_mu2e
             }
         }
 
-        private void ModuleQADarkCurrentBtn_Click(object sender, EventArgs e)
+        private void ModuleQCDarkCurrentBtn_Click(object sender, EventArgs e)
         {
             if (PP.FEB_clients != null)
             {
                 if ((PP.FEB_clients.Count() > 0) && PP.FEB_clients.Any(x => x.ClientOpen)) //Check if any client is open
                 {
-                    if (moduleQAMeasurementTimer.Enabled == false)
+                    if (moduleQCMeasurementTimer.Enabled == false)
                     {
-                        InitializeModuleQATab(); //reset the labels in the table
+                        InitializeModuleQCTab(); //reset the labels in the table
 
-                        if (PP.moduleQACurrentMeasurements == null) //if we didn't make a measurement object yet, do so, else purge the existing one of information
-                            PP.moduleQACurrentMeasurements = new ModuleQACurrentMeasurements(PP.FEB_clients);
+                        if (PP.moduleQCCurrentMeasurements == null) //if we didn't make a measurement object yet, do so, else purge the existing one of information
+                            PP.moduleQCCurrentMeasurements = new ModuleQACurrentMeasurements(PP.FEB_clients);
                         else
                         {
-                            PP.moduleQACurrentMeasurements.Purge();
-                            PP.moduleQACurrentMeasurements.ChangeClients(PP.FEB_clients);
+                            PP.moduleQCCurrentMeasurements.Purge();
+                            PP.moduleQCCurrentMeasurements.ChangeClients(PP.FEB_clients);
                         }
 
 
-                        ModuleQADarkCurrentBtn.Enabled = false; //disabled the button to prevent repeated clicks
+                        ModuleQCDarkCurrentBtn.Enabled = false; //disabled the button to prevent repeated clicks
                                                                 //Loop
                                                                 // take current measurements
                                                                 // move source
@@ -3364,14 +3377,14 @@ namespace TB_mu2e
                                                                 //Move source back to position 0
                         currentChannel = 0; //Set back to 0, controlled by measurment timer
                         currentDicounter = 0; //Set back to 0, controlled by measurement timer
-                        PP.moduleQACurrentMeasurements.SetName(ModuleQAModuleNameBox.Text);
-                        PP.moduleQACurrentMeasurements.SetSide(ModuleQASide.Text);
-                        PP.moduleQACurrentMeasurements.SetFlip(ModuleQA_flipped_Chkbox.Checked);
-                        //PP.moduleQACurrentMeasurements.TurnOnBias(Convert.ToDouble(qaBias.Text));
-                        //PP.FEB1.SetVAll(Convert.ToDouble(qaBias.Text)); //Turn on the bias for the FEBs
-                        //PP.FEB2.SetVAll(Convert.ToDouble(qaBias.Text));
+                        PP.moduleQCCurrentMeasurements.SetName(ModuleQCModuleNameBox.Text);
+                        PP.moduleQCCurrentMeasurements.SetSide(ModuleQCSide.Text);
+                        PP.moduleQCCurrentMeasurements.SetFlip(ModuleQC_flipped_Chkbox.Checked);
+                        //PP.moduleQCCurrentMeasurements.TurnOnBias(Convert.ToDouble(qcBias.Text));
+                        //PP.FEB1.SetVAll(Convert.ToDouble(qcBias.Text)); //Turn on the bias for the FEBs
+                        //PP.FEB2.SetVAll(Convert.ToDouble(qcBias.Text));
                         darkCurrent = true;
-                        moduleQAMeasurementTimer.Enabled = true;
+                        moduleQCMeasurementTimer.Enabled = true;
                     }
                 }
                 else
@@ -3385,29 +3398,29 @@ namespace TB_mu2e
             }
         }
     
-        private void ModuleQABtn_Click(object sender, EventArgs e)
+        private void ModuleQCBtn_Click(object sender, EventArgs e)
         {
             if (PP.FEB_clients != null)
             {
                 if (PP.FEB_clients.Count(x => x.ClientOpen) >= 2) //Check if any client is open
                 {
                     //Check that both FEBs are connected
-                    if (moduleQAMeasurementTimer.Enabled == false)
+                    if (moduleQCMeasurementTimer.Enabled == false)
                     {
-                        InitializeModuleQATab(); //Reset the labels in the table
+                        InitializeModuleQCTab(); //Reset the labels in the table
 
-                        if (PP.moduleQACurrentMeasurements == null) //if we didn't make a measurement object yet, do so, else purge the existing one of information
-                            PP.moduleQACurrentMeasurements = new ModuleQACurrentMeasurements(PP.FEB_clients);
+                        if (PP.moduleQCCurrentMeasurements == null) //if we didn't make a measurement object yet, do so, else purge the existing one of information
+                            PP.moduleQCCurrentMeasurements = new ModuleQACurrentMeasurements(PP.FEB_clients);
                         else
                         {
-                            PP.moduleQACurrentMeasurements.Purge();
-                            PP.moduleQACurrentMeasurements.ChangeClients(PP.FEB_clients);
+                            PP.moduleQCCurrentMeasurements.Purge();
+                            PP.moduleQCCurrentMeasurements.ChangeClients(PP.FEB_clients);
                         }
 
 
-                        //ModuleQABtn.Enabled = false; //disabled the button to prevent repeated clicks
-                        ModuleQADarkCurrentBtn.Enabled = false;
-                        ModuleQAHomeResetBtn.Enabled = false;
+                        //ModuleQCBtn.Enabled = false; //disabled the button to prevent repeated clicks
+                        ModuleQCDarkCurrentBtn.Enabled = false;
+                        ModuleQCHomeResetBtn.Enabled = false;
 
                         //Loop
                         // take current measurements
@@ -3416,15 +3429,15 @@ namespace TB_mu2e
                         //Move source back to position 0
                         currentChannel = 0; //Set back to 0, controlled by measurment timer
                         currentDicounter = 0; //Set back to 0, controlled by measurement timer
-                        PP.moduleQACurrentMeasurements.SetName(ModuleQAModuleNameBox.Text);
-                        PP.moduleQACurrentMeasurements.SetSide(ModuleQASide.Text);
-                        PP.moduleQACurrentMeasurements.SetFlip(ModuleQA_flipped_Chkbox.Checked);
-                        //PP.moduleQACurrentMeasurements.TurnOnBias(Convert.ToDouble(qaBias.Text));
-                        //PP.FEB1.SetVAll(Convert.ToDouble(qaBias.Text)); //Turn on the bias for the FEBs
-                        //PP.FEB2.SetVAll(Convert.ToDouble(qaBias.Text));
-                        comPort.WriteLine(PP.moduleQACurrentMeasurements.GetgCodeDicounterPosition(currentDicounter, 1200, (int)ModuleQA_Offset.Value)); //tell it to go to the 0th dicounter position
-                        ModuleQAStepTimer.Enabled = true;
-                        moduleQAMeasurementTimer.Enabled = true;
+                        PP.moduleQCCurrentMeasurements.SetName(ModuleQCModuleNameBox.Text);
+                        PP.moduleQCCurrentMeasurements.SetSide(ModuleQCSide.Text);
+                        PP.moduleQCCurrentMeasurements.SetFlip(ModuleQC_flipped_Chkbox.Checked);
+                        //PP.moduleQCCurrentMeasurements.TurnOnBias(Convert.ToDouble(qcBias.Text));
+                        //PP.FEB1.SetVAll(Convert.ToDouble(qcBias.Text)); //Turn on the bias for the FEBs
+                        //PP.FEB2.SetVAll(Convert.ToDouble(qcBias.Text));
+                        comPort.WriteLine(PP.moduleQCCurrentMeasurements.GetgCodeDicounterPosition(currentDicounter, 1200, (int)ModuleQC_Offset.Value)); //tell it to go to the 0th dicounter position
+                        ModuleQCStepTimer.Enabled = true;
+                        moduleQCMeasurementTimer.Enabled = true;
                     }
                 }
                 else
@@ -3476,7 +3489,7 @@ namespace TB_mu2e
                 {
                     MessageBox.Show("Reached timeout while communicating with controller.", "Oh shit, something went wrong", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                     comPort.Close();
-                    ModuleQABtn.Enabled = false; //disable the QA button if we aren't connected to the stepper controller
+                    ModuleQCBtn.Enabled = false; //disable the QA button if we aren't connected to the stepper controller
                 }
                 catch
                 {
@@ -3489,7 +3502,7 @@ namespace TB_mu2e
 
         private void ComPortDisconnectBtn_Click(object sender, EventArgs e)
         {
-            if (comPort != null && moduleQAMeasurementTimer.Enabled == false)
+            if (comPort != null && moduleQCMeasurementTimer.Enabled == false)
             {
                 try
                 {
@@ -3501,7 +3514,7 @@ namespace TB_mu2e
                 catch //Catch comport IO exception or anything else
                 {  }
             }
-            ModuleQABtn.Enabled = false; //disable the QA button if we aren't connected to the stepper controller
+            ModuleQCBtn.Enabled = false; //disable the QA button if we aren't connected to the stepper controller
             zerod = false;
             ComPortStatusBox.Text = "Disconnected";
         }
@@ -3514,7 +3527,7 @@ namespace TB_mu2e
             comPortBox.Refresh();
         }
 
-        private void ModuleQAHomingTimer_Tick(object sender, EventArgs e)
+        private void ModuleQCHomingTimer_Tick(object sender, EventArgs e)
         {
             ComPortStatusBox.Text = "Homing";
             try
@@ -3550,7 +3563,7 @@ namespace TB_mu2e
                 moduleQAHomingTimer.Enabled = false;
                 MessageBox.Show("Reached timeout while communicating with controller.", "Oh shit, something went wrong", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                 comPort.Close();
-                ModuleQABtn.Enabled = false; //disable the QA button if we aren't connected to the stepper controller
+                ModuleQCBtn.Enabled = false; //disable the QA button if we aren't connected to the stepper controller
                 ComPortStatusBox.Text = "ERR";
             }
             catch
@@ -3558,15 +3571,15 @@ namespace TB_mu2e
                 moduleQAHomingTimer.Enabled = false;
                 MessageBox.Show("Trouble communicating with controller.", "Oh shit, something went wrong", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                 comPort.Close();
-                ModuleQABtn.Enabled = false; //disable the QA button if we aren't connected to the stepper controller
+                ModuleQCBtn.Enabled = false; //disable the QA button if we aren't connected to the stepper controller
                 ComPortStatusBox.Text = "ERR";
             }
         }
 
-        private void ModuleQAMeasurementTimer_Tick(object sender, EventArgs e)
+        private void ModuleQCMeasurementTimer_Tick(object sender, EventArgs e)
         {
             System.Threading.Thread.Sleep(1); //yield
-            if (ModuleQAStepTimer.Enabled == false) //Block the contents of this timer if the stepper is moving
+            if (ModuleQCStepTimer.Enabled == false) //Block the contents of this timer if the stepper is moving
             {
                 if (!darkCurrent)
                 {
@@ -3576,32 +3589,32 @@ namespace TB_mu2e
                         {
                             //take measurments
                             ComPortStatusBox.Text = "Measuring " + currentDicounter + " " + currentChannel;
-                            double[] currents = PP.moduleQACurrentMeasurements.TakeMeasurement(currentChannel);
+                            double[] currents = PP.moduleQCCurrentMeasurements.TakeMeasurement(currentChannel);
                             for(int feb = 0; feb < 2; feb++)
                             {
-                                ModuleQALabels[feb][currentChannel].Text += currents[feb].ToString("0.0000");
+                                ModuleQCLabels[feb][currentChannel].Text += currents[feb].ToString("0.0000");
                             }
                             currentChannel++; //increment the channel
                         }
                         else //must have reached the end of 64 channels
                         {
-                            PP.moduleQACurrentMeasurements.WriteMeasurements("C:\\Users\\Boi\\Desktop\\ScanningData_" + ModuleQAFilenameBox.Text + ".txt", currentDicounter);
-                            PP.moduleQACurrentMeasurements.Purge();
+                            PP.moduleQCCurrentMeasurements.WriteMeasurements(Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "\\ScanningData_" + ModuleQCFilenameBox.Text + ".txt", currentDicounter);
+                            PP.moduleQCCurrentMeasurements.Purge();
                             currentDicounter++; //increment the dicounter
                             if (currentDicounter < 9)//100)//5)//8)
-                                comPort.WriteLine(PP.moduleQACurrentMeasurements.GetgCodeDicounterPosition(currentDicounter, 1200, (int)ModuleQA_Offset.Value)); //tell it the position to go to
+                                comPort.WriteLine(PP.moduleQCCurrentMeasurements.GetgCodeDicounterPosition(currentDicounter, 1200, (int)ModuleQC_Offset.Value)); //tell it the position to go to
                             currentChannel = 0;
-                            InitializeModuleQATab();
-                            ModuleQAStepTimer.Enabled = true;
+                            InitializeModuleQCTab();
+                            ModuleQCStepTimer.Enabled = true;
                         }
                     }
                     else //must have reached the end of scanning across the module
                     {
-                        comPort.WriteLine(PP.moduleQACurrentMeasurements.GetgCodeDicounterPosition(0, 2800, (int)ModuleQA_Offset.Value)); //go back to the home position quickly
-                        ModuleQAStepTimer.Enabled = true;
-                        ModuleQADarkCurrentBtn.Enabled = true;
-                        moduleQAMeasurementTimer.Enabled = false;
-                        //PP.moduleQACurrentMeasurements.TurnOffBias(); //turn off the bias
+                        comPort.WriteLine(PP.moduleQCCurrentMeasurements.GetgCodeDicounterPosition(0, 2800, (int)ModuleQC_Offset.Value)); //go back to the home position quickly
+                        ModuleQCStepTimer.Enabled = true;
+                        ModuleQCDarkCurrentBtn.Enabled = true;
+                        moduleQCMeasurementTimer.Enabled = false;
+                        //PP.moduleQCCurrentMeasurements.TurnOffBias(); //turn off the bias
                     }
                 }
                 else if (darkCurrent) //if it is a dark current measurement, just record all 64 channels
@@ -3610,39 +3623,39 @@ namespace TB_mu2e
                     {
                         //take measurments
                         Console.WriteLine("Measuring " + currentChannel);
-                        //PP.moduleQACurrentMeasurements.TakeMeasurement(currentChannel);
-                        double[] currents = PP.moduleQACurrentMeasurements.TakeMeasurement(currentChannel);
+                        //PP.moduleQCCurrentMeasurements.TakeMeasurement(currentChannel);
+                        double[] currents = PP.moduleQCCurrentMeasurements.TakeMeasurement(currentChannel);
                         for (int feb = 0; feb < 2; feb++)
                         {
-                            ModuleQALabels[feb][currentChannel].Text += currents[feb].ToString("0.0000");
+                            ModuleQCLabels[feb][currentChannel].Text += currents[feb].ToString("0.0000");
                         }
                         //System.Threading.Thread.Sleep(10);
                         currentChannel++;
                     }
                     else //must have reached the end of 64 channels, write out the dark currents
                     {
-                        PP.moduleQACurrentMeasurements.WriteMeasurements("C:\\Users\\Boi\\Desktop\\ScanningData_" + ModuleQAFilenameBox.Text + ".txt", -1); //-1 will denote dark current measurement
-                        PP.moduleQACurrentMeasurements.Purge();
-                        //PP.moduleQACurrentMeasurements.TurnOffBias();
+                        PP.moduleQCCurrentMeasurements.WriteMeasurements(Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "\\ScanningData_" + ModuleQCFilenameBox.Text + ".txt", -1); //-1 will denote dark current measurement
+                        PP.moduleQCCurrentMeasurements.Purge();
+                        //PP.moduleQCCurrentMeasurements.TurnOffBias();
                         darkCurrent = false; //done with darkcurrent
-                        ModuleQADarkCurrentBtn.Enabled = true;
-                        ModuleQABtn.Enabled = true; //since we took the dark current measurements, now we can QA a module
-                        moduleQAMeasurementTimer.Enabled = false;
+                        ModuleQCDarkCurrentBtn.Enabled = true;
+                        ModuleQCBtn.Enabled = true; //since we took the dark current measurements, now we can QA a module
+                        moduleQCMeasurementTimer.Enabled = false;
                     }
                 }
             }
         }
 
-        private void ModuleQAHaltBtn_Click(object sender, EventArgs e)
+        private void ModuleQCHaltBtn_Click(object sender, EventArgs e)
         {
             //PP.moduleQACurrentMeasurements.TurnOffBias();
             if (moduleQAHomingTimer.Enabled == false) //cannot issue a halt while it is homing, a property of the controller...
             {
-                moduleQAMeasurementTimer.Enabled = false;
-                ModuleQAStepTimer.Enabled = false;
+                moduleQCMeasurementTimer.Enabled = false;
+                ModuleQCStepTimer.Enabled = false;
                 moduleQAHomingTimer.Enabled = false;
-                ModuleQABtn.Enabled = false;
-                ModuleQAHomeResetBtn.Enabled = true;
+                ModuleQCBtn.Enabled = false;
+                ModuleQCHomeResetBtn.Enabled = true;
                 zerod = false;
 
                 try
@@ -3656,7 +3669,7 @@ namespace TB_mu2e
                     moduleQAHomingTimer.Enabled = false;
                     MessageBox.Show("Reached timeout while communicating with controller.", "Oh shit, something went wrong", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                     comPort.Close();
-                    ModuleQABtn.Enabled = false; //disable the QA button if we aren't connected to the stepper controller
+                    ModuleQCBtn.Enabled = false; //disable the QA button if we aren't connected to the stepper controller
                     zerod = false;
                 }
                 catch
@@ -3664,7 +3677,7 @@ namespace TB_mu2e
                     moduleQAHomingTimer.Enabled = false;
                     MessageBox.Show("Trouble communicating with controller.", "Oh shit, something went wrong", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                     comPort.Close();
-                    ModuleQABtn.Enabled = false; //disable the QA button if we aren't connected to the stepper controller
+                    ModuleQCBtn.Enabled = false; //disable the QA button if we aren't connected to the stepper controller
                     zerod = false;
                 }
 
@@ -3672,7 +3685,7 @@ namespace TB_mu2e
             }
         }
 
-        private void ModuleQAHomeResetBtn_Click(object sender, EventArgs e)
+        private void ModuleQCHomeResetBtn_Click(object sender, EventArgs e)
         {
             //PP.moduleQACurrentMeasurements.TurnOffBias();
 
@@ -3681,7 +3694,7 @@ namespace TB_mu2e
                 if (zerod)
                 {
                     comPort.WriteLine("G1 X0"); //Go back to zero if zero'd
-                    ModuleQAStepTimer.Enabled = true;
+                    ModuleQCStepTimer.Enabled = true;
                 }
                 else
                 { //Else issue a reset, since a halt must have been issued
@@ -3696,7 +3709,7 @@ namespace TB_mu2e
             catch { ComPortStatusBox.Text = "It's dead, Jim.";  }
         }
 
-        private void ModuleQAStepTimer_Tick(object sender, EventArgs e)
+        private void ModuleQCStepTimer_Tick(object sender, EventArgs e)
         {
             System.Threading.Thread.Sleep(1); //yield
             ComPortStatusBox.Text = "Moving";
@@ -3720,7 +3733,7 @@ namespace TB_mu2e
 
                     if (Math.Abs(destination_xPos - current_xPos) < 0.01) //arbitrary threshold, if the current position is at the destination, we are done moving
                     {
-                        ModuleQAStepTimer.Enabled = false;
+                        ModuleQCStepTimer.Enabled = false;
                         ComPortStatusBox.Text = "";
                     }
                 }
@@ -3730,7 +3743,7 @@ namespace TB_mu2e
                 moduleQAHomingTimer.Enabled = false;
                 MessageBox.Show("Reached timeout while communicating with controller.", "Oh shit, something went wrong", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                 comPort.Close();
-                ModuleQABtn.Enabled = false; //disable the QA button if we aren't connected to the stepper controller
+                ModuleQCBtn.Enabled = false; //disable the QA button if we aren't connected to the stepper controller
             }
             catch(Exception exc)
             {
@@ -3739,7 +3752,7 @@ namespace TB_mu2e
                 var answer = MessageBox.Show("Trouble communicating with controller. Close connection?", "Oh shit, something went wrong", MessageBoxButtons.YesNo, MessageBoxIcon.Exclamation);
                 if(answer.Equals(DialogResult.Yes))
                     comPort.Close();
-                ModuleQABtn.Enabled = false; //disable the QA button if we aren't connected to the stepper controller
+                ModuleQCBtn.Enabled = false; //disable the QA button if we aren't connected to the stepper controller
             }
 
         }
@@ -3755,7 +3768,7 @@ namespace TB_mu2e
                         {
                             MessageBox.Show("The controller is alarmed, did you say something mean to it?", "Oh shit, something went wrong", MessageBoxButtons.YesNo, MessageBoxIcon.Exclamation);
                             comPort.Close();
-                            ModuleQABtn.Enabled = false; //disable the QA button if we aren't connected to the stepper controller
+                            ModuleQCBtn.Enabled = false; //disable the QA button if we aren't connected to the stepper controller
 
                         }
                 }
@@ -3764,33 +3777,33 @@ namespace TB_mu2e
                     moduleQAHomingTimer.Enabled = false;
                     MessageBox.Show("Reached timeout while communicating with controller.", "Oh shit, something went wrong", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                     comPort.Close();
-                    ModuleQABtn.Enabled = false; //disable the QA button if we aren't connected to the stepper controller
+                    ModuleQCBtn.Enabled = false; //disable the QA button if we aren't connected to the stepper controller
                 }
             }
         }
 
-        private void QaDiCounterMeasurementTimer_Tick(object sender, EventArgs e)
+        private void QcDiCounterMeasurementTimer_Tick(object sender, EventArgs e)
         {
             System.Threading.Thread.Sleep(1); //yield
-            if (currentChannel < qaDiButtons.Length)
+            if (currentChannel < qcDiButtons.Length)
             {
-                if (!qaDiButtons[currentChannel].Checked)
+                if (!qcDiButtons[currentChannel].Checked)
                 {
-                    double measurement = PP.qaDicounterMeasurements.TakeMeasurement(currentChannel);
-                    if (measurement < Convert.ToDouble(qaDiIWarningThresh.Text)) //Low current
-                        qaDiButtons[currentChannel].BackColor = Color.Red;
+                    double measurement = PP.qcDicounterMeasurements.TakeMeasurement(currentChannel);
+                    if (measurement < Convert.ToDouble(qcDiIWarningThresh.Text)) //Low current
+                        qcDiButtons[currentChannel].BackColor = Color.Red;
                     if (measurement < NO_CURRENT_THRESH) //No Current
-                        qaDiButtons[currentChannel].BackColor = Color.Blue;
-                    qaDiButtons[currentChannel].Update();
+                        qcDiButtons[currentChannel].BackColor = Color.Blue;
+                    qcDiButtons[currentChannel].Update();
                 }
                 currentChannel++;
                 autoDataProgress.Increment(1);
             }
             else
             {
-                qaDiCounterMeasurementTimer.Enabled = false;
-                PP.qaDicounterMeasurements.WriteMeasurements(dicounterNumberTextBox.Text);//PP.FEB1.ReadTemp(0));
-                PP.qaDicounterMeasurements.TurnOffBias();
+                qcDiCounterMeasurementTimer.Enabled = false;
+                PP.qcDicounterMeasurements.WriteMeasurements(dicounterNumberTextBox.Text);//PP.FEB1.ReadTemp(0));
+                PP.qcDicounterMeasurements.TurnOffBias();
                 currentChannel = 0;
                 autoDataProgress.Value = 0;
                 autoDataProgress.Update();
@@ -3804,9 +3817,9 @@ namespace TB_mu2e
                 lightCheckBtn.Enabled = true;
                 dicounterNumberTextBox.Enabled = true;
                 lightCheckGroup.Enabled = true;
-                qaStartButton.Text = "Auto Data";
-                qaStartButton.BackColor = SystemColors.Control;
-                qaStartButton.Update();
+                qcStartButton.Text = "Auto Data";
+                qcStartButton.BackColor = SystemColors.Control;
+                qcStartButton.Update();
             }
         }
 
@@ -3856,7 +3869,7 @@ namespace TB_mu2e
             else
             {
                 if (lightWriteToFileBox.Checked && !auto_thresh_enabled)
-                    PP.lightCheckMeasurements.WriteMeasurements(lightModuleLabel.Text);//, PP.FEB1.ReadTemp(0));
+                    PP.lightCheckMeasurements.WriteMeasurements(lightModuleLabel.Text, lightModuleSide.Text, LightCheckModuleHalf.Text, LightCheckType.Text);//, PP.FEB1.ReadTemp(0));
                 //PP.lightCheckMeasurements.TurnOffBias();
                 if (auto_thresh_enabled)
                     auto_thresh_enabled = false;
@@ -3874,12 +3887,13 @@ namespace TB_mu2e
                 autoThreshBtn.BackColor = SystemColors.Control;
                 autoThreshBtn.Update();
                 lightModuleLabel.Enabled = true;
-                lightModuleLayer.Enabled = true;
+                LightCheckModuleHalf.Enabled = true;
+                LightCheckType.Enabled = true;
                 lightModuleSide.Enabled = true;
                 lightCheckResetThresh.Enabled = true;
                 lightCheckBtn.Enabled = true;
                 lightWriteToFileBox.Enabled = true;
-                dicounterQAGroup.Enabled = true;
+                dicounterQCGroup.Enabled = true;
                 autoThreshBtn.Enabled = true;
                 FEBSelectPanel.Enabled = true;
                 LightCheckMeasurementTimer.Enabled = false;
