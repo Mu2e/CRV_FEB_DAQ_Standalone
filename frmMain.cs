@@ -3927,9 +3927,12 @@ namespace TB_mu2e
                                 while (!cmdFile.EndOfStream)
                                 {
                                     string cmd = cmdFile.ReadLine();
-                                    char commentChk = cmd.First();
-                                    if (commentChk != '$' || commentChk != '#' || commentChk != '/')
-                                        activeFEB.SendStr(cmd);
+                                    if (!string.IsNullOrWhiteSpace(cmd))
+                                    {
+                                        char commentChk = cmd.First();
+                                        if (commentChk != '$' && commentChk != '#' && commentChk != '/')
+                                            activeFEB.SendStr(cmd);
+                                    }
                                 }
                             }
                         }
