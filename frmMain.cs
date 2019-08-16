@@ -2335,7 +2335,7 @@ namespace TB_mu2e
         {
             double fitThresh = 8.5;//7.5;
             double integralThresh = 2E5;
-            double flashgateThresh = 3.5E6;
+            double flashgateThresh = 4E6;
             double flashGateDifferenceThresh = 20;
             double ledDifferenceThresh = 2000;// 50; //Initial testing value
             double cmbLedIntThresh = 1000;
@@ -2468,6 +2468,16 @@ namespace TB_mu2e
                             for (int cmb = 0; cmb < 16; cmb++)
                                 cmbs[cmb].flagged = true;
                         }
+                    }
+                    else
+                    {
+                        for (int cmb = 0; cmb < 16; cmb++)
+                        {
+                            cmbs[cmb].flagged = true;
+                            cmbs[cmb].failureType = (int)CMB.Failure.TempRom;
+                        }
+                        UpdateCMBInfoLabels();
+                        return;
                     }
 
                     foreach (CMB cmb in cmbs)
