@@ -1988,8 +1988,6 @@ namespace TB_mu2e
             #endregion LightCheckButtons
         }
 
-
-        //TODO: remove reference to "two FEB hardcoding"
         private void InitializeModuleQCTab()
         {
             if(ModuleQCLabels == null)             //Create labels for the Module QC Tab
@@ -2082,7 +2080,7 @@ namespace TB_mu2e
                         autoDataProgress.Maximum = qcDiButtons.Length; //set the max of the progress bar
 
                         if (PP.qcDicounterMeasurements == null)
-                            PP.qcDicounterMeasurements = new CurrentMeasurements(activeFEB, Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) + "\\Google Drive\\CRV Fabrication Documents\\Data\\QA\\Dicounter Source Testing\\ScanningData_" + qaOutputFileName.Text + ".txt");
+                            PP.qcDicounterMeasurements = new CurrentMeasurements(activeFEB, Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) + "\\Google Drive\\CRV Fabrication Documents\\Data\\QA\\Dicounter Source Testing\\ScanningData_" + qcOutputFileName.Text + ".txt");
                         else
                         {
                             PP.qcDicounterMeasurements.Purge();
@@ -2343,12 +2341,13 @@ namespace TB_mu2e
             double cmbLedIntThresh = 1000;
             uint ledFlasherIntensity = 0xFFF; //14V //0x400; //3.5V
             double maxUndershootThresh = 30; //Value is in ADC
-            int upperBinInt = 1000;
+            int upperBinInt = 1024; //include overflow bin in case LED response is beyond x-axis limit
             //Check that an FEB client exists, otherwise, don't bother setting up the pulser or trying to get data
             if (activeFEB != null)
             {
                 if (activeFEB.ClientOpen)
                 {
+                    cmbTestBtn.Enabled = false;
                     FEBSelectPanel.Enabled = false;
                     cmbInfoBox.Text = ""; cmbInfoBox.Refresh();
 
@@ -2435,6 +2434,7 @@ namespace TB_mu2e
                                     {
                                         cmbs[cmb].num = cmb;
                                         cmbs[cmb].flagged = true;
+                                        cmbs[cmb].failureType = (int)CMB.Failure.TempRom;
                                     }
                                 }
                             }
@@ -2545,7 +2545,7 @@ namespace TB_mu2e
 
                     if (File.Exists(cmbAvgFileName))
                     {
-                        String fileOptn = "";
+                        string fileOptn;
                         if (updateFilesChkBox.Checked) //If the file is to be updated, change the open option to "UPDATE" instead of just "READ" (preserves existing data)
                             fileOptn = "UPDATE";
                         else
@@ -2565,6 +2565,7 @@ namespace TB_mu2e
                     {
                         System.Console.WriteLine("ERR: Could not find " + cmbAvgFileName + "!");
                         System.Console.WriteLine("Does the file exist and is it accessible?");
+                        activeFEB.SetVAll(0);
                         return;
                     }
                     #endregion ReadFileAvgs
@@ -2576,13 +2577,12 @@ namespace TB_mu2e
                         outputOpened = true;
                     #endregion Output histograms
 
-
-                    #region LED Response Evaluation and Gain/Pedestal Computation
-
                     #region BiasWait
                     cmbInfoBox.Text = "Waiting for bias"; cmbInfoBox.Refresh();
                     activeFEB.SetVAll(Convert.ToDouble(cmbBias.Text));
                     #endregion BiasWait
+
+                    #region LED Response Evaluation and Gain/Pedestal Computation
 
                     //return;
                     double[] pedestals = new double[64]; //pedestal for each channel
@@ -2603,17 +2603,17 @@ namespace TB_mu2e
 
                     for (uint channel = 0; channel < 64; channel++)
                     {
+                        cmbTesterProgresBar.Increment(1);
                         int cmbNum = (int)channel / 4; //spans from 0-15
                         if (peHistos[channel] == null && !(cmbs[cmbNum].flagged)) //skip the channels that have already been histogrammed (due to the two channel histograms return from the FEB), and skip any channels on flagged cmbs
                         {
-                            histos_temp = hist_helper.GetHistogram(channel, 1, "extLED");
+                            histos_temp = hist_helper.GetHistogram(channel, "extLED");
                             //uint[] channels = { channel, Convert.ToUInt32(histos_temp[1].GetTitle()) }; //Lazily grab the other channel's label from the histogram title...
                             uint[] channels = new uint[8]; //Could get the channel from the histogram title, or compute it here. Not really sure which is safer...
                             for (int ch = 0; ch < channels.Length; ch++)
                                 channels[ch] = Convert.ToUInt16(histos_temp[ch].GetTitle());
-                                //channels[ch] = (uint)((ch * 8) + (channel%16));
+                            //channels[ch] = (uint)((ch * 8) + (channel%16));
                             System.Console.WriteLine("Histo Chans: {0}, {1}, {2}, {3}, {4}, {5}, {6}, {7}", channels[0], channels[1], channels[2], channels[3], channels[4], channels[5], channels[6], channels[7]);
-
                             for (int hist = 0; hist < 8; hist++)//Loop over each of the 8 histograms
                             {
                                 cmbNum = (int)channels[hist] / 4; //Recompute the cmb number since we will get histograms from other cmbs along with our requested channel
@@ -2635,7 +2635,7 @@ namespace TB_mu2e
                                     SetRowColor(cmbNum, Color.MistyRose);
                                     UpdateCMBInfoLabel(cmbNum);
                                     continue;
-                                } //Need this beacuse we need to know the gain, which is impossible if we can't see first PE
+                                } //Need this beacuse we need to know the gain, which is impossible if we can't see what looks like the first PE
                                 List<float> peakPositions = peakFinder.GetPositionX().as_array(peaksFound).ToList();
                                 for (int p = 1; p < peakPositions.Count; p++)
                                     if (peakPositions[p] < peakPositions[0])//if there are any peaks less than pedestal, remove them
@@ -2688,7 +2688,7 @@ namespace TB_mu2e
                                 //if (PercentDifference(bulkRespFit.GetParameter(1), avgResp[channels[hist]] /*table value*/) > ledDifferenceThresh) //if the differnce is greater than 20%
 
                                 int lowerIntegralBin = (int)(pedestals[channels[hist]] + gains[channels[hist]] * fitThresh); //truncate the value of 7.5PE for the bin # (since all histograms start at 0 and have 512 bins)
-                                double ledIntegral = peHistos[channels[hist]].Integral(lowerIntegralBin, 1000); //512 upper bound because all histograms have 512 bins
+                                double ledIntegral = peHistos[channels[hist]].Integral(lowerIntegralBin, upperBinInt); //512 upper bound because all histograms have 512 bins
                                 if (ledIntegral < integralThresh)
                                 {
                                     cmbs[cmbNum].flagged = true;
@@ -2734,6 +2734,9 @@ namespace TB_mu2e
                     //FEBSelectPanel.Enabled = true;
                     //return;
 
+                    #endregion LED Response Evaluation and Gain/Pedestal Computation
+
+
                     #region FlashGate
                     cmbInfoBox.Text = "Testing flashgate"; cmbInfoBox.Refresh();
 
@@ -2744,10 +2747,11 @@ namespace TB_mu2e
 
                     for (uint channel = 0; channel < 64; channel++) //Loop over the channels, re-histogram response to LED flashing, check that response is low
                     {
+                        cmbTesterProgresBar.Increment(1);
                         int cmbNum = (int)channel / 4; //spans from 0-15
                         if (flashHistos[channel] == null && !(cmbs[cmbNum].flagged)) //skip the channels that have already been histogrammed (due to the two channel histograms return from the FEB), and skip any channels on flagged cmbs
                         {
-                            histos_temp = hist_helper.GetHistogram(channel, 1, "FlashGate");
+                            histos_temp = hist_helper.GetHistogram(channel, "FlashGate");
                             uint[] channels = new uint[8]; //Could get the channel from the histogram title, or compute it here. Not really sure which is safer...
                             for (int ch = 0; ch < channels.Length; ch++)
                                 channels[ch] = Convert.ToUInt16(histos_temp[ch].GetTitle());
@@ -2769,7 +2773,7 @@ namespace TB_mu2e
                                 //double flashIntegral = flashHistos[channels[hist]].Integral(lowerIntegralBin, 512); //512 upper bound because all histograms have 512 bins
                                 //double ledIntegral = peHistos[channels[hist]].Integral(lowerIntegralBin, 512); //Also compute integral for led histogram, so we can see if the response to LED has diminished
 
-                                if (flashHistos[channels[hist]].GetBinContent(1024) + flashHistos[channels[hist]].GetBinContent(1)  < flashgateThresh)//PercentDifference(flashIntegral, ledIntegral) < flashGateDifferenceThresh) //if the differnce is less than flashGateDifferenceThresh, flashgate must not be working...
+                                if (flashHistos[channels[hist]].GetBinContent(1024) + flashHistos[channels[hist]].GetBinContent(1) < flashgateThresh)//PercentDifference(flashIntegral, ledIntegral) < flashGateDifferenceThresh) //if the differnce is less than flashGateDifferenceThresh, flashgate must not be working...
                                 {
                                     cmbs[cmbNum].flagged = true;
                                     cmbs[cmbNum].failureType = (int)CMB.Failure.Flashgate;
@@ -2798,7 +2802,6 @@ namespace TB_mu2e
                     //activeFEB.SetVAll(0);
                     //FEBSelectPanel.Enabled = true;
                     //return;
-                    #endregion LED Response Evaluation and Gain/Pedestal Computation
 
 
 
@@ -2867,10 +2870,13 @@ namespace TB_mu2e
                                 readchannel_backup[1] += 8;
                             }
 
-                            //If the flashing cmb is not flagged AND either the reading cmb or the backup is not flagged, OR the flashing cmb on the other side of the box is not flagged AND either the reading cmb or the backup is not flagged, continue
-                            if ((!(cmbs[flashing_cmb[0]].flagged) && (!(cmbs[readchannel[0] / 4].flagged) || !(cmbs[readchannel_backup[0] / 4].flagged))) || (!(cmbs[flashing_cmb[1]].flagged) && (!(cmbs[readchannel[1] / 4].flagged) || !(cmbs[readchannel_backup[1] / 4].flagged))))
+                            //If the flashing cmb is not flagged AND either the reading cmb or the backup is not flagged, OR the flashing cmb on the other side of the box is not flagged AND either the reading cmb or the backup is not flagged for having sipm response problems, continue
+                            if ((!(cmbs[flashing_cmb[0]].flagged) && (!(cmbs[readchannel[0] / 4].flagged && (cmbs[readchannel[0] / 4].failureType == (int)CMB.Failure.SiPMResp || cmbs[readchannel[0] / 4].failureType == (int)CMB.Failure.TempRom)) 
+                                    || !(cmbs[readchannel_backup[0] / 4].flagged && (cmbs[readchannel_backup[0] / 4].failureType == (int)CMB.Failure.SiPMResp || cmbs[readchannel_backup[0] / 4].failureType == (int)CMB.Failure.TempRom)))) 
+                                || (!(cmbs[flashing_cmb[1]].flagged) && (!(cmbs[readchannel[1] / 4].flagged && (cmbs[readchannel[1] / 4].failureType == (int) CMB.Failure.SiPMResp || cmbs[readchannel[1] / 4].failureType == (int)CMB.Failure.TempRom)) 
+                                    || !(cmbs[readchannel_backup[1] / 4].flagged && (cmbs[readchannel_backup[1] / 4].failureType == (int)CMB.Failure.SiPMResp || cmbs[readchannel_backup[1] / 4].failureType == (int)CMB.Failure.TempRom)))))
                             { 
-                                histos_temp = hist_helper.GetHistogram(readchannel[0], 1, "intLEDforCMB_");
+                                histos_temp = hist_helper.GetHistogram(readchannel[0], "intLEDforCMB_");
 
                                 for (uint fcmb = 0; fcmb < 2; fcmb++)
                                 {
@@ -2878,16 +2884,16 @@ namespace TB_mu2e
                                     if (cmbs[thiscmb].flagged) //skip it if it was already flagged
                                         continue;
 
-                                    if ((!cmbs[readchannel[fcmb] / 4].flagged) || (!cmbs[readchannel_backup[fcmb] / 4].flagged)) //should we not be able to read the flashing cmb with the expected or backup channel, flag it as untested
+                                    if (!(cmbs[readchannel[fcmb] / 4].flagged && cmbs[readchannel[fcmb] / 4].failureType == (int)CMB.Failure.SiPMResp) || !(cmbs[readchannel_backup[fcmb] / 4].flagged && cmbs[readchannel_backup[fcmb] / 4].failureType == (int)CMB.Failure.SiPMResp)) //should we not be able to read the flashing cmb with the expected or backup channel, flag it as untested
                                     {
                                         uint channel_select = readchannel[fcmb];
                                         uint fch = (thiscmb * 4) + ch;
 
-                                        if (!cmbs[readchannel[fcmb] / 4].flagged) //try and read the flashing LED with the expected channel
+                                        if (!(cmbs[readchannel[fcmb] / 4].flagged && cmbs[readchannel[fcmb] / 4].failureType == (int)CMB.Failure.SiPMResp)) //try and read the flashing LED with the expected channel
                                         {
                                             ledHistos[fch] = histos_temp[readchannel[fcmb] / 8];
                                         }
-                                        else if (!cmbs[readchannel_backup[fcmb] / 4].flagged) //should there be a problem with the expected channel, we can try and read using a backup
+                                        else if (!(cmbs[readchannel_backup[fcmb] / 4].flagged && cmbs[readchannel_backup[fcmb]/4].failureType == (int) CMB.Failure.SiPMResp)) //should there be a problem with the expected channel, we can try and read using a backup
                                         {
                                             channel_select = readchannel_backup[fcmb];
                                             ledHistos[fch] = histos_temp[readchannel_backup[fcmb] / 8];
@@ -2930,83 +2936,13 @@ namespace TB_mu2e
                                     }
                                 }
                             }
+                            cmbTesterProgresBar.Increment(2);
                         }
 
                         Mu2e_Register.WriteAllRegRange(0x0, ref ledFlasherIntensityRegs, ref activeFEB.client); //Set all cmb flasher intensities to 0
                         Mu2e_Register.WriteAllReg(0x2, ref flashGateControlReg, ref activeFEB.client); //Set all CMBs to flash gate routing (but do not enable flashgate)
                     }
 
-
-                    #region hide
-                    //for (uint fpga = 0; fpga < 4; fpga++)
-                    //{
-                    //    for (uint cmb = 0; cmb < 4; cmb++)
-                    //    {
-                    //        int flashing_cmb = -1; //used to remember which CMB's LEDs we are looking at
-                    //                               //We will run as follows: 0 reads 1, 1 reads 0, 2 reads 3, 3 reads 2
-                    //        if (fpga == 1 || fpga == 3) //1 reads 0, 3 reads 2
-                    //        {
-                    //            Mu2e_Register.WriteReg(0x1, ref flashGateControlReg[fpga - 1], ref activeFEB.client); //Set LED pulse routing for single CMB
-                    //            Mu2e_Register.WriteReg(ledFlasherIntensity, ref ledFlasherIntensityRegs[fpga - 1][cmb], ref activeFEB.client); //Set single CMB flasher intensity to ledFlasherIntensity
-                    //            flashing_cmb = (((int)fpga - 1) * 4) + (int)cmb;
-                    //        }
-                    //        else //0 reads 1, 2 reads 3
-                    //        {
-                    //            Mu2e_Register.WriteReg(0x1, ref flashGateControlReg[fpga + 1], ref activeFEB.client); //Set LED pulse routing for single CMB
-                    //            Mu2e_Register.WriteReg(ledFlasherIntensity, ref ledFlasherIntensityRegs[fpga + 1][cmb], ref activeFEB.client); //Set single CMB flasher intensity to ledFlasherIntensity
-                    //            flashing_cmb = (((int)fpga + 1) * 4) + (int)cmb;
-                    //        }
-
-                    //        //For only the outer channels on each CMB (ch. 0 and ch. 3), histogram the flashing of 
-                    //        for (uint ch = 0; ch < 4; ch += 3)
-                    //        {
-                    //            uint cmbNum = (fpga * 4) + cmb;
-                    //            uint channel = (fpga * 16) + (cmb * 4) + ch;
-
-                    //            // [X] Get histograms
-                    //            // [X] Evaluate flashers
-
-                    //            if (ledHistos[channel] == null && !(cmbs[cmbNum].flagged)) //skip flagged cmbs
-                    //            {
-
-                    //                histos_temp = hist_helper.GetHistogram(channel, 1, "intLEDforCMB_" + flashing_cmb.ToString() + "_");
-                    //                ledHistos[channel] = histos_temp[0]; //"Discard" the second histogram, becuase it doesn't help us atm...
-                    //                ledHistos[channel].Name += cmbs[flashing_cmb].rom_id;
-                    //                for(int i = 1; i < histos_temp.Length; i++)
-                    //                    histos_temp[i].Delete();
-                    //                int lowerIntegralBin = (int)(pedestals[channel] + (gains[channel] * fitThresh)); //truncate the value of 7.5PE for the bin # (since all histograms start at 0 and have 512 bins)
-                    //                double cmbLedIntegral = ledHistos[channel].Integral(lowerIntegralBin, upperBinInt); //Upper bound set
-                    //                //double ledIntegral = peHistos[channel].Integral(lowerIntegralBin, upperBinInt); //Also compute integral for led histogram, so we can see if the response to LED has diminished
-
-                    //                //if (PercentDifference(cmbLedIntegral, ledIntegral) > ledDifferenceThresh) //if the differnce is greater than flashGateDifferenceThresh, flashgate must not be working...
-                    //                //{
-                    //                //    cmbs[cmbNum].flagged = true;
-                    //                //    cmbs[cmbNum].failureType = (int)CMB.Failure.LED;
-                    //                //    cmbInfoLabels[cmbNum][11].Text = cmbs[cmbNum].FailType();
-                    //                //    SetRowColor((int)cmbNum, Color.MistyRose);
-                    //                //    UpdateCMBInfoLabel((int)cmbNum);
-                    //                //}
-                    //                if (cmbLedIntegral < cmbLedIntThresh)
-                    //                {
-                    //                    //cmbs[cmbNum].flagged = true;
-                    //                    //cmbs[cmbNum].failureType = (int)CMB.Failure.LED;
-                    //                    //cmbInfoLabels[cmbNum][11].Text = cmbs[cmbNum].FailType();
-                    //                    //SetRowColor((int)cmbNum, Color.MistyRose);
-                    //                    //UpdateCMBInfoLabel((int)cmbNum);
-                    //                    cmbs[flashing_cmb].flagged = true;
-                    //                    cmbs[flashing_cmb].failureType = (int)CMB.Failure.LED;
-                    //                    cmbInfoLabels[flashing_cmb][11].Text = cmbs[flashing_cmb].FailType();
-                    //                    SetRowColor(flashing_cmb, Color.MistyRose);
-                    //                    UpdateCMBInfoLabel(flashing_cmb);
-                    //                }
-                    //            }
-                    //        }
-
-                    //        Mu2e_Register.WriteAllRegRange(0x0, ref ledFlasherIntensityRegs, ref activeFEB.client); //Set all cmb flasher intensities to 0
-                    //        Mu2e_Register.WriteAllReg(0x2, ref flashGateControlReg, ref activeFEB.client); //Set all CMBs to flash gate routing (but do not enable flashgate)
-                    //    }
-                    //}
-                    #endregion hide
 
                     if (outputOpened)
                     {
@@ -3018,15 +2954,19 @@ namespace TB_mu2e
                             }
                         histo_file.Close();
                     }
-                                       
-                    cmbInfoBox.Text = ""; cmbInfoBox.Refresh();
-                    activeFEB.SetVAll(0);
-                    FEBSelectPanel.Enabled = true;
-                    return;
 
                     #endregion CMB LED Flashers
 
+                    cmbTesterProgresBar.Value = 0;
 
+                    cmbInfoBox.Text = "Done @ " + DateTime.Now.ToShortTimeString(); cmbInfoBox.Refresh();
+                    activeFEB.SetVAll(0);
+                    FEBSelectPanel.Enabled = true;
+                    cmbTestBtn.Enabled = true;
+                    return;
+
+
+                    #region hide
                     //This is used later for gathering trace data for tail-cancellation evaluation
                     //uint spill_status = 0;
                     //uint spill_num = 0;
@@ -3129,6 +3069,7 @@ namespace TB_mu2e
                     //activeFEB.SetVAll(0);
 
                     FEBSelectPanel.Enabled = true;
+                    #endregion hide
                 }
             }
             else
@@ -3361,7 +3302,7 @@ namespace TB_mu2e
                         InitializeModuleQCTab(); //reset the labels in the table
 
                         if (PP.moduleQCCurrentMeasurements == null) //if we didn't make a measurement object yet, do so, else purge the existing one of information
-                            PP.moduleQCCurrentMeasurements = new ModuleQACurrentMeasurements(PP.FEB_clients);
+                            PP.moduleQCCurrentMeasurements = new ModuleQCCurrentMeasurements(PP.FEB_clients);
                         else
                         {
                             PP.moduleQCCurrentMeasurements.Purge();
@@ -3410,7 +3351,7 @@ namespace TB_mu2e
                         InitializeModuleQCTab(); //Reset the labels in the table
 
                         if (PP.moduleQCCurrentMeasurements == null) //if we didn't make a measurement object yet, do so, else purge the existing one of information
-                            PP.moduleQCCurrentMeasurements = new ModuleQACurrentMeasurements(PP.FEB_clients);
+                            PP.moduleQCCurrentMeasurements = new ModuleQCCurrentMeasurements(PP.FEB_clients);
                         else
                         {
                             PP.moduleQCCurrentMeasurements.Purge();
@@ -3479,7 +3420,7 @@ namespace TB_mu2e
                         zerod = false;
                         stepperCheckForOK = false;
                         stepperReceivedOK = false;
-                        moduleQAHomingTimer.Enabled = true; //start the thread which moves the stepper home
+                        moduleQCHomingTimer.Enabled = true; //start the thread which moves the stepper home
                     }
                     //check status
                     ////if connected, enable the source test button
@@ -3489,13 +3430,13 @@ namespace TB_mu2e
                 {
                     MessageBox.Show("Reached timeout while communicating with controller.", "Oh shit, something went wrong", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                     comPort.Close();
-                    ModuleQCBtn.Enabled = false; //disable the QA button if we aren't connected to the stepper controller
+                    ModuleQCBtn.Enabled = false; //disable the QC button if we aren't connected to the stepper controller
                 }
                 catch
                 {
                     MessageBox.Show("Trouble communicating with controller.", "Oh shit, something went wrong", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                     //comPort.Close();
-                    //ModuleQABtn.Enabled = false; //disable the QA button if we aren't connected to the stepper controller
+                    //ModuleQCBtn.Enabled = false; //disable the QC button if we aren't connected to the stepper controller
                 }
             }
         }
@@ -3554,13 +3495,13 @@ namespace TB_mu2e
                         stepperCheckForOK = false;
                         stepperReceivedOK = false;
                         ComPortStatusBox.Text = "Zero'd";
-                        moduleQAHomingTimer.Enabled = false;
+                        moduleQCHomingTimer.Enabled = false;
                     }
                 }
             }
             catch (TimeoutException)
             {
-                moduleQAHomingTimer.Enabled = false;
+                moduleQCHomingTimer.Enabled = false;
                 MessageBox.Show("Reached timeout while communicating with controller.", "Oh shit, something went wrong", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                 comPort.Close();
                 ModuleQCBtn.Enabled = false; //disable the QA button if we aren't connected to the stepper controller
@@ -3568,7 +3509,7 @@ namespace TB_mu2e
             }
             catch
             {
-                moduleQAHomingTimer.Enabled = false;
+                moduleQCHomingTimer.Enabled = false;
                 MessageBox.Show("Trouble communicating with controller.", "Oh shit, something went wrong", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                 comPort.Close();
                 ModuleQCBtn.Enabled = false; //disable the QA button if we aren't connected to the stepper controller
@@ -3649,11 +3590,11 @@ namespace TB_mu2e
         private void ModuleQCHaltBtn_Click(object sender, EventArgs e)
         {
             //PP.moduleQACurrentMeasurements.TurnOffBias();
-            if (moduleQAHomingTimer.Enabled == false) //cannot issue a halt while it is homing, a property of the controller...
+            if (moduleQCHomingTimer.Enabled == false) //cannot issue a halt while it is homing, a property of the controller...
             {
                 moduleQCMeasurementTimer.Enabled = false;
                 ModuleQCStepTimer.Enabled = false;
-                moduleQAHomingTimer.Enabled = false;
+                moduleQCHomingTimer.Enabled = false;
                 ModuleQCBtn.Enabled = false;
                 ModuleQCHomeResetBtn.Enabled = true;
                 zerod = false;
@@ -3666,7 +3607,7 @@ namespace TB_mu2e
                 }
                 catch (TimeoutException)
                 {
-                    moduleQAHomingTimer.Enabled = false;
+                    moduleQCHomingTimer.Enabled = false;
                     MessageBox.Show("Reached timeout while communicating with controller.", "Oh shit, something went wrong", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                     comPort.Close();
                     ModuleQCBtn.Enabled = false; //disable the QA button if we aren't connected to the stepper controller
@@ -3674,7 +3615,7 @@ namespace TB_mu2e
                 }
                 catch
                 {
-                    moduleQAHomingTimer.Enabled = false;
+                    moduleQCHomingTimer.Enabled = false;
                     MessageBox.Show("Trouble communicating with controller.", "Oh shit, something went wrong", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                     comPort.Close();
                     ModuleQCBtn.Enabled = false; //disable the QA button if we aren't connected to the stepper controller
@@ -3703,7 +3644,7 @@ namespace TB_mu2e
                     stepperReceivedOK = false;
                     comPort.WriteLine("M999"); //Reset
                     StepperCheckForMessages();
-                    moduleQAHomingTimer.Enabled = true; //re-home the device
+                    moduleQCHomingTimer.Enabled = true; //re-home the device
                 }
             }
             catch { ComPortStatusBox.Text = "It's dead, Jim.";  }
@@ -3740,7 +3681,7 @@ namespace TB_mu2e
             }
             catch (TimeoutException)
             {
-                moduleQAHomingTimer.Enabled = false;
+                moduleQCHomingTimer.Enabled = false;
                 MessageBox.Show("Reached timeout while communicating with controller.", "Oh shit, something went wrong", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                 comPort.Close();
                 ModuleQCBtn.Enabled = false; //disable the QA button if we aren't connected to the stepper controller
@@ -3748,7 +3689,7 @@ namespace TB_mu2e
             catch(Exception exc)
             {
                 Console.WriteLine(exc);
-                moduleQAHomingTimer.Enabled = false;
+                moduleQCHomingTimer.Enabled = false;
                 var answer = MessageBox.Show("Trouble communicating with controller. Close connection?", "Oh shit, something went wrong", MessageBoxButtons.YesNo, MessageBoxIcon.Exclamation);
                 if(answer.Equals(DialogResult.Yes))
                     comPort.Close();
@@ -3774,7 +3715,7 @@ namespace TB_mu2e
                 }
                 catch (TimeoutException)
                 {
-                    moduleQAHomingTimer.Enabled = false;
+                    moduleQCHomingTimer.Enabled = false;
                     MessageBox.Show("Reached timeout while communicating with controller.", "Oh shit, something went wrong", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                     comPort.Close();
                     ModuleQCBtn.Enabled = false; //disable the QA button if we aren't connected to the stepper controller

@@ -382,7 +382,7 @@ namespace TB_mu2e
         {
             using (StreamWriter writer = File.AppendText(filename)) //The output file
             {
-                writer.Write("{0}\t{1}\t{2}\t", dicounter, feb.ReadTemp(0), DateTime.Now.ToString("MM/dd/yy HH:mm:ss")); //Write current time, name of module, which side, and current temperature
+                writer.Write("{0}\t{1}\t{2}\t{3}\t{4}\t", dicounter, feb.ReadTemp(0), feb.ReadTemp(1), feb.ReadTemp(2), DateTime.Now.ToString("MM/dd/yy HH:mm:ss")); //Write current time, name of module, which side, and current temperature of the first 3 CMBs
                 //foreach (KeyValuePair<int, double> channel in currentMeasurements)
                 for (int chan = 0; chan < 64; chan++)
                 {
@@ -413,7 +413,7 @@ namespace TB_mu2e
 
     //TODO: FIX THIS CLASS - To QA a module current measurements from 4 different FEBs are needed
     // Should be fixed by code below, accepts any number of FEBs, so if it is 2 or 4 or however many, it should work fine.
-    public class ModuleQACurrentMeasurements
+    public class ModuleQCCurrentMeasurements
     {
         //private List<SortedDictionary<int, double>> currentMeasurements;
         private List<ConcurrentDictionary<int, double>> currentMeasurements; //concurrent dictionary should be thread safe
@@ -421,7 +421,7 @@ namespace TB_mu2e
         private bool flipped;
         List<Mu2e_FEB_client> febs;
 
-        public ModuleQACurrentMeasurements(params Mu2e_FEB_client[] feb_clients)
+        public ModuleQCCurrentMeasurements(params Mu2e_FEB_client[] feb_clients)
         {
             febs = new List<Mu2e_FEB_client>();
             //currentMeasurements = new List<SortedDictionary<int, double>>();
@@ -554,7 +554,7 @@ namespace TB_mu2e
         public static bool glbDebug = false;
         public static Run myRun;
         public static CurrentMeasurements qcDicounterMeasurements;
-        public static ModuleQACurrentMeasurements moduleQCCurrentMeasurements;
+        public static ModuleQCCurrentMeasurements moduleQCCurrentMeasurements;
         public static CurrentMeasurements lightCheckMeasurements;
         //        public static frmTelnet myTelnet;
         //        public static Plot0 myPlot;

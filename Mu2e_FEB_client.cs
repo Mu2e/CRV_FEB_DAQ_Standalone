@@ -638,7 +638,7 @@ namespace TB_mu2e
 
         public string FailType()
         {
-            string[] failures = { "GOOD", "TEMP/ROM", "SiPMRESP", "FLASHGATE", "LED", "TAILCAN", "LEDUNTEST" };
+            string[] failures = { "UNKNWN", "TEMP/ROM", "SiPMRESP", "FLASHGATE", "LED", "TAILCAN", "LEDUNTEST" };
             return failures[failureType];
         }
     };

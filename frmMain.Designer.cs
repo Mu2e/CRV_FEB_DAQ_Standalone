@@ -141,6 +141,8 @@
             this.btnWC = new System.Windows.Forms.Button();
             this.tabQC = new System.Windows.Forms.TabPage();
             this.lightCheckGroup = new System.Windows.Forms.GroupBox();
+            this.LightCheckModuleHalf = new System.Windows.Forms.ComboBox();
+            this.LightCheckTypeLbl = new System.Windows.Forms.Label();
             this.LightCheckType = new System.Windows.Forms.ComboBox();
             this.lightNumChecks = new System.Windows.Forms.NumericUpDown();
             this.lightModuleSideLabel = new System.Windows.Forms.Label();
@@ -164,7 +166,7 @@
             this.lightGlobalThresh = new System.Windows.Forms.TextBox();
             this.lightCheckBtn = new System.Windows.Forms.Button();
             this.dicounterQCGroup = new System.Windows.Forms.GroupBox();
-            this.qaOutputFileName = new System.Windows.Forms.TextBox();
+            this.qcOutputFileName = new System.Windows.Forms.TextBox();
             this.qaOutputFileNameLabel = new System.Windows.Forms.Label();
             this.oneReadout = new System.Windows.Forms.CheckBox();
             this.qaDiNumAvgLabel = new System.Windows.Forms.Label();
@@ -181,6 +183,7 @@
             this.cmbDataGroup = new System.Windows.Forms.GroupBox();
             this.cmbDataTable = new System.Windows.Forms.TableLayoutPanel();
             this.cmbTestControl = new System.Windows.Forms.GroupBox();
+            this.cmbTesterProgresBar = new System.Windows.Forms.ProgressBar();
             this.lostCMBavgsBtn = new System.Windows.Forms.Button();
             this.updateFilesChkBox = new System.Windows.Forms.CheckBox();
             this.cmbInfoBox = new System.Windows.Forms.TextBox();
@@ -219,14 +222,12 @@
             this.ModuleQCBtn = new System.Windows.Forms.Button();
             this.FEBSelectPanel = new System.Windows.Forms.TableLayoutPanel();
             this.SpillTimer = new System.Windows.Forms.Timer(this.components);
-            this.moduleQAHomingTimer = new System.Windows.Forms.Timer(this.components);
+            this.moduleQCHomingTimer = new System.Windows.Forms.Timer(this.components);
             this.moduleQCMeasurementTimer = new System.Windows.Forms.Timer(this.components);
             this.ModuleQCStepTimer = new System.Windows.Forms.Timer(this.components);
             this.LightCheckMeasurementTimer = new System.Windows.Forms.Timer(this.components);
             this.qcDiCounterMeasurementTimer = new System.Windows.Forms.Timer(this.components);
             this.FEBClientFooterBar = new System.Windows.Forms.Label();
-            this.LightCheckTypeLbl = new System.Windows.Forms.Label();
-            this.LightCheckModuleHalf = new System.Windows.Forms.ComboBox();
             this.tabControl.SuspendLayout();
             this.tabRUN.SuspendLayout();
             this.groupBoxEvDisplay.SuspendLayout();
@@ -1599,6 +1600,28 @@
             this.lightCheckGroup.TabStop = false;
             this.lightCheckGroup.Text = "Light Check";
             // 
+            // LightCheckModuleHalf
+            // 
+            this.LightCheckModuleHalf.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.LightCheckModuleHalf.Enabled = false;
+            this.LightCheckModuleHalf.FormattingEnabled = true;
+            this.LightCheckModuleHalf.Items.AddRange(new object[] {
+            "TOP",
+            "BOTTOM"});
+            this.LightCheckModuleHalf.Location = new System.Drawing.Point(471, 36);
+            this.LightCheckModuleHalf.Name = "LightCheckModuleHalf";
+            this.LightCheckModuleHalf.Size = new System.Drawing.Size(93, 25);
+            this.LightCheckModuleHalf.TabIndex = 203;
+            // 
+            // LightCheckTypeLbl
+            // 
+            this.LightCheckTypeLbl.AutoSize = true;
+            this.LightCheckTypeLbl.Location = new System.Drawing.Point(584, 16);
+            this.LightCheckTypeLbl.Name = "LightCheckTypeLbl";
+            this.LightCheckTypeLbl.Size = new System.Drawing.Size(72, 17);
+            this.LightCheckTypeLbl.TabIndex = 202;
+            this.LightCheckTypeLbl.Text = "Test Type";
+            // 
             // LightCheckType
             // 
             this.LightCheckType.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
@@ -1845,7 +1868,7 @@
             // 
             // dicounterQCGroup
             // 
-            this.dicounterQCGroup.Controls.Add(this.qaOutputFileName);
+            this.dicounterQCGroup.Controls.Add(this.qcOutputFileName);
             this.dicounterQCGroup.Controls.Add(this.qaOutputFileNameLabel);
             this.dicounterQCGroup.Controls.Add(this.oneReadout);
             this.dicounterQCGroup.Controls.Add(this.qaDiNumAvgLabel);
@@ -1863,12 +1886,12 @@
             this.dicounterQCGroup.TabStop = false;
             this.dicounterQCGroup.Text = "DiCounter QC";
             // 
-            // qaOutputFileName
+            // qcOutputFileName
             // 
-            this.qaOutputFileName.Location = new System.Drawing.Point(759, 60);
-            this.qaOutputFileName.Name = "qaOutputFileName";
-            this.qaOutputFileName.Size = new System.Drawing.Size(112, 23);
-            this.qaOutputFileName.TabIndex = 119;
+            this.qcOutputFileName.Location = new System.Drawing.Point(759, 60);
+            this.qcOutputFileName.Name = "qcOutputFileName";
+            this.qcOutputFileName.Size = new System.Drawing.Size(112, 23);
+            this.qcOutputFileName.TabIndex = 119;
             // 
             // qaOutputFileNameLabel
             // 
@@ -2064,6 +2087,7 @@
             // 
             // cmbTestControl
             // 
+            this.cmbTestControl.Controls.Add(this.cmbTesterProgresBar);
             this.cmbTestControl.Controls.Add(this.lostCMBavgsBtn);
             this.cmbTestControl.Controls.Add(this.updateFilesChkBox);
             this.cmbTestControl.Controls.Add(this.cmbInfoBox);
@@ -2079,6 +2103,15 @@
             this.cmbTestControl.TabIndex = 0;
             this.cmbTestControl.TabStop = false;
             this.cmbTestControl.Text = "CMB Test Control";
+            // 
+            // cmbTesterProgresBar
+            // 
+            this.cmbTesterProgresBar.Location = new System.Drawing.Point(33, 141);
+            this.cmbTesterProgresBar.Maximum = 160;
+            this.cmbTesterProgresBar.Name = "cmbTesterProgresBar";
+            this.cmbTesterProgresBar.Size = new System.Drawing.Size(147, 23);
+            this.cmbTesterProgresBar.Step = 8;
+            this.cmbTesterProgresBar.TabIndex = 11;
             // 
             // lostCMBavgsBtn
             // 
@@ -2116,6 +2149,7 @@
             this.requestNumTrigsLabel.Size = new System.Drawing.Size(113, 17);
             this.requestNumTrigsLabel.TabIndex = 7;
             this.requestNumTrigsLabel.Text = "Requested Trigs";
+            this.requestNumTrigsLabel.Visible = false;
             // 
             // requestNumTrigs
             // 
@@ -2124,6 +2158,7 @@
             this.requestNumTrigs.Size = new System.Drawing.Size(73, 23);
             this.requestNumTrigs.TabIndex = 6;
             this.requestNumTrigs.Text = "100";
+            this.requestNumTrigs.Visible = false;
             // 
             // numTrigsDisp
             // 
@@ -2133,6 +2168,7 @@
             this.numTrigsDisp.Size = new System.Drawing.Size(16, 17);
             this.numTrigsDisp.TabIndex = 4;
             this.numTrigsDisp.Text = "0";
+            this.numTrigsDisp.Visible = false;
             // 
             // numTrigLabel
             // 
@@ -2142,6 +2178,7 @@
             this.numTrigLabel.Size = new System.Drawing.Size(73, 17);
             this.numTrigLabel.TabIndex = 3;
             this.numTrigLabel.Text = "Num Trigs";
+            this.numTrigLabel.Visible = false;
             // 
             // sipmControl
             // 
@@ -2519,10 +2556,10 @@
             this.SpillTimer.Interval = 1000;
             this.SpillTimer.Tick += new System.EventHandler(this.SpillTimer_Tick);
             // 
-            // moduleQAHomingTimer
+            // moduleQCHomingTimer
             // 
-            this.moduleQAHomingTimer.Interval = 200;
-            this.moduleQAHomingTimer.Tick += new System.EventHandler(this.ModuleQCHomingTimer_Tick);
+            this.moduleQCHomingTimer.Interval = 500;
+            this.moduleQCHomingTimer.Tick += new System.EventHandler(this.ModuleQCHomingTimer_Tick);
             // 
             // moduleQCMeasurementTimer
             // 
@@ -2531,7 +2568,7 @@
             // 
             // ModuleQCStepTimer
             // 
-            this.ModuleQCStepTimer.Interval = 10;
+            this.ModuleQCStepTimer.Interval = 500;
             this.ModuleQCStepTimer.Tick += new System.EventHandler(this.ModuleQCStepTimer_Tick);
             // 
             // LightCheckMeasurementTimer
@@ -2550,28 +2587,6 @@
             this.FEBClientFooterBar.Name = "FEBClientFooterBar";
             this.FEBClientFooterBar.Size = new System.Drawing.Size(1260, 2);
             this.FEBClientFooterBar.TabIndex = 47;
-            // 
-            // LightCheckTypeLbl
-            // 
-            this.LightCheckTypeLbl.AutoSize = true;
-            this.LightCheckTypeLbl.Location = new System.Drawing.Point(584, 16);
-            this.LightCheckTypeLbl.Name = "LightCheckTypeLbl";
-            this.LightCheckTypeLbl.Size = new System.Drawing.Size(72, 17);
-            this.LightCheckTypeLbl.TabIndex = 202;
-            this.LightCheckTypeLbl.Text = "Test Type";
-            // 
-            // LightCheckModuleHalf
-            // 
-            this.LightCheckModuleHalf.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.LightCheckModuleHalf.Enabled = false;
-            this.LightCheckModuleHalf.FormattingEnabled = true;
-            this.LightCheckModuleHalf.Items.AddRange(new object[] {
-            "TOP",
-            "BOTTOM"});
-            this.LightCheckModuleHalf.Location = new System.Drawing.Point(471, 36);
-            this.LightCheckModuleHalf.Name = "LightCheckModuleHalf";
-            this.LightCheckModuleHalf.Size = new System.Drawing.Size(93, 25);
-            this.LightCheckModuleHalf.TabIndex = 203;
             // 
             // frmMain
             // 
@@ -2791,7 +2806,7 @@
         private System.Windows.Forms.TextBox cmbInfoBox;
         private System.Windows.Forms.CheckBox updateFilesChkBox;
         private System.Windows.Forms.GroupBox cmbDataGroup;
-        private System.Windows.Forms.TextBox qaOutputFileName;
+        private System.Windows.Forms.TextBox qcOutputFileName;
         private System.Windows.Forms.Label qaOutputFileNameLabel;
         private System.Windows.Forms.TableLayoutPanel lightCheckFPGApanel;
         private System.Windows.Forms.CheckBox lightWriteToFileBox;
@@ -2823,7 +2838,7 @@
         private System.Windows.Forms.Button comPortConnectBtn;
         private System.Windows.Forms.Button ComPortDisconnectBtn;
         private System.Windows.Forms.Button ComPortRefresh;
-        private System.Windows.Forms.Timer moduleQAHomingTimer;
+        private System.Windows.Forms.Timer moduleQCHomingTimer;
         private System.Windows.Forms.Label ComPortStatusLbl;
         private System.Windows.Forms.TextBox ComPortStatusBox;
         private System.Windows.Forms.Timer moduleQCMeasurementTimer;
@@ -2851,5 +2866,6 @@
         private System.Windows.Forms.ComboBox LightCheckType;
         private System.Windows.Forms.Label LightCheckTypeLbl;
         private System.Windows.Forms.ComboBox LightCheckModuleHalf;
+        private System.Windows.Forms.ProgressBar cmbTesterProgresBar;
     }
 }
