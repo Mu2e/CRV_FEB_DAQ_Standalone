@@ -2631,7 +2631,7 @@ namespace TB_mu2e
                                     continue;
 
                                 histos_temp[hist].Title += "_CMB_" + cmbNum.ToString();
-                                histos_temp[hist].Name += "_" + cmbs[cmbNum].rom_id;
+                                histos_temp[hist].Name += "_cmb_" + Convert.ToString(cmbNum) + "_" + cmbs[cmbNum].rom_id;
 
                                 peHistos[channels[hist]] = histos_temp[hist];
                                 peCalibs[channels[hist]] = new ROOTNET.NTGraph();
@@ -2775,7 +2775,7 @@ namespace TB_mu2e
                                     continue;
 
                                 histos_temp[hist].Title += "_CMB_" + cmbNum.ToString();
-                                histos_temp[hist].Name += "_" + cmbs[cmbNum].rom_id;
+                                histos_temp[hist].Name += "_cmb_" + Convert.ToString(cmbNum) + "_" + cmbs[cmbNum].rom_id;
 
                                 flashHistos[channels[hist]] = histos_temp[hist];
                                 //flashHistos[channels[hist]].Fit(bulkRespFit, "CRQ+", "", gains[channels[hist]] * 7.5, 512); //Fit from 7.5 PE (in ADC) up to max of histogram (will need to adjust later)
