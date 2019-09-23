@@ -3898,6 +3898,28 @@ namespace TB_mu2e
                 loadCmdsFileDialogThread.Join();
             }
         }
+
+        private void CmbTest_ShortHelperBtn_Click(object sender, EventArgs e)
+        {
+            float currentThresh = 0.010f;
+            cmbTestBtn.Enabled = false;
+            cmbTest_ShortHelperBtn.Enabled = false;
+            FEBSelectPanel.Enabled = false;
+            string suspected_cmbs = "";
+            for(int cmb = 0; cmb < 16; cmb+=2)
+            {
+                activeFEB.SetV(Convert.ToDouble(cmbBias.Text), cmb / 4, Convert.ToSByte(((cmb % 4) / 2) + 1));
+                if(activeFEB.ReadA0(cmb / 4, cmb * 4) < currentThresh)
+                {
+                    suspected_cmbs += cmb.ToString() + "/" + (cmb + 1).ToString() + ",";
+                    cmbInfoBox.Text = suspected_cmbs;
+                }
+            }
+
+            cmbTestBtn.Enabled = true;
+            cmbTest_ShortHelperBtn.Enabled = true;
+            FEBSelectPanel.Enabled = true;
+        }
     }
 
 

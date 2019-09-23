@@ -228,6 +228,7 @@
             this.LightCheckMeasurementTimer = new System.Windows.Forms.Timer(this.components);
             this.qcDiCounterMeasurementTimer = new System.Windows.Forms.Timer(this.components);
             this.FEBClientFooterBar = new System.Windows.Forms.Label();
+            this.cmbTest_ShortHelperBtn = new System.Windows.Forms.Button();
             this.tabControl.SuspendLayout();
             this.tabRUN.SuspendLayout();
             this.groupBoxEvDisplay.SuspendLayout();
@@ -2099,7 +2100,7 @@
             this.cmbTestControl.Controls.Add(this.cmbTestBtn);
             this.cmbTestControl.Location = new System.Drawing.Point(16, 15);
             this.cmbTestControl.Name = "cmbTestControl";
-            this.cmbTestControl.Size = new System.Drawing.Size(411, 184);
+            this.cmbTestControl.Size = new System.Drawing.Size(515, 184);
             this.cmbTestControl.TabIndex = 0;
             this.cmbTestControl.TabStop = false;
             this.cmbTestControl.Text = "CMB Test Control";
@@ -2182,11 +2183,12 @@
             // 
             // sipmControl
             // 
+            this.sipmControl.Controls.Add(this.cmbTest_ShortHelperBtn);
             this.sipmControl.Controls.Add(this.cmbBias);
             this.sipmControl.Controls.Add(this.cmbBiasOverride);
             this.sipmControl.Location = new System.Drawing.Point(209, 48);
             this.sipmControl.Name = "sipmControl";
-            this.sipmControl.Size = new System.Drawing.Size(189, 55);
+            this.sipmControl.Size = new System.Drawing.Size(300, 55);
             this.sipmControl.TabIndex = 2;
             this.sipmControl.TabStop = false;
             this.sipmControl.Text = "SiPM Bias";
@@ -2588,6 +2590,17 @@
             this.FEBClientFooterBar.Size = new System.Drawing.Size(1260, 2);
             this.FEBClientFooterBar.TabIndex = 47;
             // 
+            // cmbTest_ShortHelperBtn
+            // 
+            this.cmbTest_ShortHelperBtn.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.cmbTest_ShortHelperBtn.Location = new System.Drawing.Point(187, 17);
+            this.cmbTest_ShortHelperBtn.Name = "cmbTest_ShortHelperBtn";
+            this.cmbTest_ShortHelperBtn.Size = new System.Drawing.Size(107, 32);
+            this.cmbTest_ShortHelperBtn.TabIndex = 12;
+            this.cmbTest_ShortHelperBtn.Text = "Short Suspected";
+            this.cmbTest_ShortHelperBtn.UseVisualStyleBackColor = true;
+            this.cmbTest_ShortHelperBtn.Click += new System.EventHandler(this.CmbTest_ShortHelperBtn_Click);
+            // 
             // frmMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 17F);
@@ -2867,5 +2880,6 @@
         private System.Windows.Forms.Label LightCheckTypeLbl;
         private System.Windows.Forms.ComboBox LightCheckModuleHalf;
         private System.Windows.Forms.ProgressBar cmbTesterProgresBar;
+        private System.Windows.Forms.Button cmbTest_ShortHelperBtn;
     }
 }

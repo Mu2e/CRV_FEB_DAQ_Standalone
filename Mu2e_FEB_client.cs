@@ -199,13 +199,15 @@ namespace TB_mu2e
             return cmb_temp;
         }
 
-        public void SetV(double V, int fpga = 0)
+        public void SetV(double V, int fpga = 0, short cmb_group = 3) //cmb_group is in binary (00 = first group, 10 = second group, 11 = both groups)
         {
             UInt32 counts;
             try { counts = Convert.ToUInt32(System.Math.Round(V / 5.12/*5.38*/ * 256)); }
             catch { counts = 0; }
-            SendStr("wr " + Convert.ToString(4 * fpga, 16) + "44 " + Convert.ToString(counts, 16));
-            SendStr("wr " + Convert.ToString(4 * fpga, 16) + "45 " + Convert.ToString(counts, 16));
+            if((cmb_group & 0x1) == 1)
+                SendStr("wr " + Convert.ToString(4 * fpga, 16) + "44 " + Convert.ToString(counts, 16));
+            if((cmb_group & 0x2) == 1)
+                SendStr("wr " + Convert.ToString(4 * fpga, 16) + "45 " + Convert.ToString(counts, 16));
             Thread.Sleep((int)(Math.Ceiling(V / 10.0)*1000) + 500); //Wait for the bias to come up
         }
 
