@@ -51,7 +51,7 @@ namespace TB_mu2e
         private DateTime runStart;
         private bool first_spill_taken;
         private bool waiting_for_data;
-        private double spill_record_delay = 0.1;
+        private double spill_record_delay = 0.5;
 
         public void AddConsoleMessage(string msg)
         {
@@ -509,7 +509,10 @@ namespace TB_mu2e
             //string name = tabControl.SelectedTab.Text;
             //if (name.Contains("FEB"))
             //{
-            //    //Console.WriteLine("NEW READING");
+            //    //Console.
+            //
+            //
+            //    Line("NEW READING");
             //    //for (int t = 0; t < 300; t++)
             //    //{
             //    //    for (int i = 0; i < 8; i++)
@@ -614,10 +617,14 @@ namespace TB_mu2e
 
         private void BtnScan_Click(object sender, EventArgs e)
         {
+            bool flgBreak;
+            double prevV;
+            prevV = 0;
 
             if (activeFEB != null)
             {
-                //zedFEB1.GraphPane.CurveList.Clear();
+                flgBreak = false;
+                zedFEB1.GraphPane.CurveList.Clear();
                 //switch (_ActiveFEB)
                 //{
                 //    case 1:
@@ -627,292 +634,330 @@ namespace TB_mu2e
                 //        FEB = PP.FEB2;
                 //        break;
                 //}
+                
+                if (btnScan.Text != "SCAN")
+                { flgBreak = true; }
 
-                //if (btnScan.Text != "SCAN")
-                //{ flgBreak = true; return; }
+                int fpga = (int)udFPGA.Value;
+                if (activeFEB != null)
+                {
+                    if (activeFEB.ClientOpen)
+                    {
+                        txtV.Text = activeFEB.ReadV(fpga).ToString("0.000");
+                        prevV = activeFEB.ReadV(fpga);
+                        txtI.Text = activeFEB.ReadA0(fpga, (int)udChan.Value).ToString("0.0000");
+                    }
+                }
+                
+                if (ShowIV.Visible == true) { return; }
 
-                #region Broken code - needs to be made compatible with new register map
-                //if (ShowSpect.Visible)
-                //{
-                //    IV_curve myIV = new IV_curve();
-                //    UdChan_ValueChanged(null, null);
-                //    myIV.min_v = (double)udStart.Value;
-                //    myIV.max_v = (double)udStop.Value;
-                //    myIV.chan = (Int32)udChan.Value;
-                //    myIV.board = _ActiveFEB;
-                //    decimal v = udStart.Value;
-                //    if (!scanAllChanBox.Checked) //Normal usage
-                //    {
-                //        while ((v < udStop.Value) & !flgBreak)
-                //        {
-                //            txtV.Text = v.ToString("0.000");
-                //            BtnBiasWRITE_Click(null, null);
-                //            Application.DoEvents();
-                //            double I = Convert.ToDouble(txtI.Text);
-                //            myIV.AddPoint((double)v, (double)I);
+                btnScan.Text = "STOP";
+                IV_curve myIV = new IV_curve();
+                myIV.min_v = (double)udStart.Value;
+                myIV.max_v = (double)udStop.Value;
+                myIV.chan = (Int32)udChan.Value;
+                myIV.board = _ActiveFEB;
+                decimal v = udStart.Value;
+                decimal dv = udInterval.Value/1000;
+                if (!scanAllChanBox.Checked) //Normal usage
+                {
+                    while ((v < udStop.Value) & !flgBreak)
+                    {
+                        txtV.Text = v.ToString("0.000");
+                        BtnBiasWRITE_Click(null, null);
+                        Application.DoEvents();
+                        double I = Convert.ToDouble(txtI.Text);
+                        myIV.AddPoint((double)v, (double)I *1000);
+                        v = v + dv;
+                        UpdateDisplay_IV(myIV);
+                    }
+                }
+
+                        #region Broken code - needs to be made compatible with new register map
+                        //if (ShowSpect.Visible)
+                        //{
+                        //    IV_curve myIV = new IV_curve();
+                        //    UdChan_ValueChanged(null, null);
+                        //    myIV.min_v = (double)udStart.Value;
+                        //    myIV.max_v = (double)udStop.Value;
+                        //    myIV.chan = (Int32)udChan.Value;
+                        //    myIV.board = _ActiveFEB;
+                        //    decimal v = udStart.Value;
+                        //    if (!scanAllChanBox.Checked) //Normal usage
+                        //    {
+                        //        while ((v < udStop.Value) & !flgBreak)
+                        //        {
+                        //            txtV.Text = v.ToString("0.000");
+                        //            BtnBiasWRITE_Click(null, null);
+                        //            Application.DoEvents();
+                        //            double I = Convert.ToDouble(txtI.Text);
+                        //            myIV.AddPoint((double)v, (double)I);
 
 
-                //            //plot
-                //            UpdateDisplay_IV(myIV);
-                //            btnScan.Text = v.ToString("0.00") + "V";
-                //            v += udInterval.Value / 1000;
-                //            System.Threading.Thread.Sleep(10);
-                //            Application.DoEvents();
-                //        }
+                        //            //plot
+                        //            UpdateDisplay_IV(myIV);
+                        //            btnScan.Text = v.ToString("0.00") + "V";
+                        //            v += udInterval.Value / 1000;
+                        //            System.Threading.Thread.Sleep(10);
+                        //            Application.DoEvents();
+                        //        }
 
-                //        //Cole's Determination of Breakdown Voltage
-                //        List<double> voltages = new List<double>();
-                //        List<double> logCurrents = new List<double>();
-                //        int ptCount = 0;
-                //        foreach (PointPair p in myIV.loglist)
-                //        {
-                //            if (p.Y < 0.000001 || p.Y > 120)
-                //            {
-                //                continue;
-                //            }
-                //            voltages.Add(p.X);
-                //            logCurrents.Add(p.Y);
-                //            ptCount++;
-                //        }
-                //        //Take derivatives, find max
-                //        List<double> dLogCurrents = new List<double>();
-                //        for (int n = 0; n < ptCount - 2; n++)
-                //        {
-                //            dLogCurrents.Add((logCurrents[n + 2] - logCurrents[n]) / (voltages[n + 2] - voltages[n]));
-                //        }
-                //        double breakDownVolts = voltages[dLogCurrents.IndexOf(dLogCurrents.Max()) + 1];
-                //        BDVoltLabels[myIV.chan].Text = breakDownVolts.ToString() + " V";
+                        //        //Cole's Determination of Breakdown Voltage
+                        //        List<double> voltages = new List<double>();
+                        //        List<double> logCurrents = new List<double>();
+                        //        int ptCount = 0;
+                        //        foreach (PointPair p in myIV.loglist)
+                        //        {
+                        //            if (p.Y < 0.000001 || p.Y > 120)
+                        //            {
+                        //                continue;
+                        //            }
+                        //            voltages.Add(p.X);
+                        //            logCurrents.Add(p.Y);
+                        //            ptCount++;
+                        //        }
+                        //        //Take derivatives, find max
+                        //        List<double> dLogCurrents = new List<double>();
+                        //        for (int n = 0; n < ptCount - 2; n++)
+                        //        {
+                        //            dLogCurrents.Add((logCurrents[n + 2] - logCurrents[n]) / (voltages[n + 2] - voltages[n]));
+                        //        }
+                        //        double breakDownVolts = voltages[dLogCurrents.IndexOf(dLogCurrents.Max()) + 1];
+                        //        BDVoltLabels[myIV.chan].Text = breakDownVolts.ToString() + " V";
 
-                //        if (myIV.saved == false) { myIV.Save(); }
-                //        myIV.saved = true;
-                //        myIV.saved_time = DateTime.Now;
-                //    }
-                //    else //Find breakdown voltage of all 16 channels
-                //    {
-                //        List<double>[] chanVolts = new List<double>[num_chans];
-                //        List<double>[] chanCurrents = new List<double>[num_chans];
-                //        List<double>[] chanLogCurrents = new List<double>[num_chans];
-                //        //Initialize all the lists
-                //        for (int i = 0; i < num_chans; i++)
-                //        {
-                //            chanVolts[i] = new List<double>();
-                //            chanCurrents[i] = new List<double>();
-                //            chanLogCurrents[i] = new List<double>();
-                //        }
+                        //        if (myIV.saved == false) { myIV.Save(); }
+                        //        myIV.saved = true;
+                        //        myIV.saved_time = DateTime.Now;
+                        //    }
+                        //    else //Find breakdown voltage of all 16 channels
+                        //    {
+                        //        List<double>[] chanVolts = new List<double>[num_chans];
+                        //        List<double>[] chanCurrents = new List<double>[num_chans];
+                        //        List<double>[] chanLogCurrents = new List<double>[num_chans];
+                        //        //Initialize all the lists
+                        //        for (int i = 0; i < num_chans; i++)
+                        //        {
+                        //            chanVolts[i] = new List<double>();
+                        //            chanCurrents[i] = new List<double>();
+                        //            chanLogCurrents[i] = new List<double>();
+                        //        }
 
-                //        //Perform the scan
-                //        while ((v < udStop.Value) & !flgBreak)
-                //        {
-                //            txtV.Text = v.ToString("0.000");
-                //            BtnBiasWRITE_Click(null, null);
-                //            Application.DoEvents();
+                        //        //Perform the scan
+                        //        while ((v < udStop.Value) & !flgBreak)
+                        //        {
+                        //            txtV.Text = v.ToString("0.000");
+                        //            BtnBiasWRITE_Click(null, null);
+                        //            Application.DoEvents();
 
-                //            //Read in all voltages/currents
-                //            for (int i = 0; i < num_chans; i++)
-                //            {
-                //                double chanI = PP.FEB1.ReadA0((int)udFPGA.Value, i);
-                //                //Console.WriteLine("Current of Chan {0}: {1}", i.ToString(), chanI.ToString("0.00000"));
-                //                if (chanI < 0.00001 || chanI > 120) //Ignore weird spikes in current
-                //                {
-                //                    continue;
-                //                }
-                //                chanVolts[i].Add((double)v);
-                //                chanCurrents[i].Add(chanI);
-                //                chanLogCurrents[i].Add(Math.Log(chanI));
-                //            }
+                        //            //Read in all voltages/currents
+                        //            for (int i = 0; i < num_chans; i++)
+                        //            {
+                        //                double chanI = PP.FEB1.ReadA0((int)udFPGA.Value, i);
+                        //                //Console.WriteLine("Current of Chan {0}: {1}", i.ToString(), chanI.ToString("0.00000"));
+                        //                if (chanI < 0.00001 || chanI > 120) //Ignore weird spikes in current
+                        //                {
+                        //                    continue;
+                        //                }
+                        //                chanVolts[i].Add((double)v);
+                        //                chanCurrents[i].Add(chanI);
+                        //                chanLogCurrents[i].Add(Math.Log(chanI));
+                        //            }
 
-                //            btnScan.Text = v.ToString("0.00") + "V";
+                        //            btnScan.Text = v.ToString("0.00") + "V";
 
-                //            v += udInterval.Value / 1000;
+                        //            v += udInterval.Value / 1000;
 
-                //            System.Threading.Thread.Sleep(10);
-                //            Application.DoEvents();
-                //        }
+                        //            System.Threading.Thread.Sleep(10);
+                        //            Application.DoEvents();
+                        //        }
 
-                //        //Calculate and display all the breakdown voltages
-                //        for (int i = 0; i < num_chans; i++)
-                //        {
-                //            List<double> voltages = chanVolts[i];
-                //            List<double> logCurrents = chanLogCurrents[i];
-                //            List<double> dLogCurrents = new List<double>();
-                //            for (int n = 0; n < voltages.Count - 2; n++)
-                //            {
-                //                dLogCurrents.Add((logCurrents[n + 2] - logCurrents[n]) / (voltages[n + 2] - voltages[n]));
-                //            }
-                //            double breakDownVolts = voltages[dLogCurrents.IndexOf(dLogCurrents.Max()) + 1];
-                //            BDVoltLabels[i].Text = breakDownVolts.ToString() + " V";
-                //        }
+                        //        //Calculate and display all the breakdown voltages
+                        //        for (int i = 0; i < num_chans; i++)
+                        //        {
+                        //            List<double> voltages = chanVolts[i];
+                        //            List<double> logCurrents = chanLogCurrents[i];
+                        //            List<double> dLogCurrents = new List<double>();
+                        //            for (int n = 0; n < voltages.Count - 2; n++)
+                        //            {
+                        //                dLogCurrents.Add((logCurrents[n + 2] - logCurrents[n]) / (voltages[n + 2] - voltages[n]));
+                        //            }
+                        //            double breakDownVolts = voltages[dLogCurrents.IndexOf(dLogCurrents.Max()) + 1];
+                        //            BDVoltLabels[i].Text = breakDownVolts.ToString() + " V";
+                        //        }
 
-                //        //Save data to file
-                //        string fileName = "C:\\data\\IV_FEB";
-                //        fileName += _ActiveFEB.ToString();
-                //        fileName += "_allChs";
-                //        DateTime date = DateTime.Now;
-                //        fileName += "_" + date.Year.ToString("0000");
-                //        fileName += date.Month.ToString("00");
-                //        fileName += date.Day.ToString("00");
-                //        fileName += "_" + date.Hour.ToString("00");
-                //        fileName += date.Minute.ToString("00");
-                //        fileName += date.Second.ToString("00") + ".IV";
-                //        StreamWriter sw = new StreamWriter(fileName);
+                        //        //Save data to file
+                        //        string fileName = "C:\\data\\IV_FEB";
+                        //        fileName += _ActiveFEB.ToString();
+                        //        fileName += "_allChs";
+                        //        DateTime date = DateTime.Now;
+                        //        fileName += "_" + date.Year.ToString("0000");
+                        //        fileName += date.Month.ToString("00");
+                        //        fileName += date.Day.ToString("00");
+                        //        fileName += "_" + date.Hour.ToString("00");
+                        //        fileName += date.Minute.ToString("00");
+                        //        fileName += date.Second.ToString("00") + ".IV";
+                        //        StreamWriter sw = new StreamWriter(fileName);
 
-                //        sw.Write("-- created_time "); sw.WriteLine(date);
-                //        sw.Write("-- num_point "); sw.WriteLine(chanVolts[0].Count);
-                //        sw.Write("-- min_V "); sw.WriteLine(((double)udStart.Value).ToString());
-                //        sw.Write("-- max_V "); sw.WriteLine(((double)udStop.Value).ToString());
-                //        sw.Write("-- board "); sw.WriteLine(_ActiveFEB.ToString());
-                //        sw.WriteLine("-----------------------");
-                //        for (int i = 0; i < chanVolts[0].Count; i++)
-                //        {
-                //            sw.Write(chanVolts[0][i].ToString("0.000") + ",");
-                //            for (int j = 0; j < num_chans; j++)
-                //            {
-                //                sw.Write(chanCurrents[j][i].ToString("0.000000"));
-                //                if (j != num_chans - 1)
-                //                {
-                //                    sw.Write(",");
-                //                }
-                //            }
-                //            sw.WriteLine();
-                //        }
-                //        sw.Close();
-                //    }
-                //    //End Cole's Stuff
-                //    //This resets to voltage to 0 after, don't touch
-                //    if (_ActiveFEB == 1) { PP.FEB1IVs.Add(myIV); }
-                //    if (_ActiveFEB == 2) { PP.FEB2IVs.Add(myIV); }
-                //    v = udStart.Value;
-                //    txtV.Text = v.ToString("0.000");
-                //    BtnBiasWRITE_Click(null, null);
-                //}
+                        //        sw.Write("-- created_time "); sw.WriteLine(date);
+                        //        sw.Write("-- num_point "); sw.WriteLine(chanVolts[0].Count);
+                        //        sw.Write("-- min_V "); sw.WriteLine(((double)udStart.Value).ToString());
+                        //        sw.Write("-- max_V "); sw.WriteLine(((double)udStop.Value).ToString());
+                        //        sw.Write("-- board "); sw.WriteLine(_ActiveFEB.ToString());
+                        //        sw.WriteLine("-----------------------");
+                        //        for (int i = 0; i < chanVolts[0].Count; i++)
+                        //        {
+                        //            sw.Write(chanVolts[0][i].ToString("0.000") + ",");
+                        //            for (int j = 0; j < num_chans; j++)
+                        //            {
+                        //                sw.Write(chanCurrents[j][i].ToString("0.000000"));
+                        //                if (j != num_chans - 1)
+                        //                {
+                        //                    sw.Write(",");
+                        //                }
+                        //            }
+                        //            sw.WriteLine();
+                        //        }
+                        //        sw.Close();
+                        //    }
+                        //    //End Cole's Stuff
+                        //    //This resets to voltage to 0 after, don't touch
+                        //    if (_ActiveFEB == 1) { PP.FEB1IVs.Add(myIV); }
+                        //    if (_ActiveFEB == 2) { PP.FEB2IVs.Add(myIV); }
+                        //    v = udStart.Value;
+                        //    txtV.Text = v.ToString("0.000");
+                        //    BtnBiasWRITE_Click(null, null);
+                        //}
 
-                //if (ShowIV.Visible)
-                //{
-                //    #region ShowSpect
-                //    //create new histo
-                //    HISTO_curve myHisto = new HISTO_curve()
-                //    {
-                //        list = new PointPairList(),
-                //        loglist = new PointPairList(),
-                //        created_time = DateTime.Now,
-                //        min_thresh = (int)udStart.Value,
-                //        max_thresh = (int)udStop.Value,
-                //        interval = (int)udInterval.Value,
-                //        chan = (int)udChan.Value,
-                //        integral = _IntegralScan,
-                //        board = _ActiveFEB
-                //    };
-                //    UdChan_ValueChanged(null, null);
-                //    System.Threading.Thread.Sleep(100);
-                //    BtnBIAS_MON_Click(null, null);
-                //    Application.DoEvents();
-                //    myHisto.V = Convert.ToDouble(txtV.Text);
-                //    myHisto.I = Convert.ToDouble(txtI.Text);
-                //    //Fetch registers
-                //    int FPGA_index = (int)udFPGA.Value;
+                        //if (ShowIV.Visible)
+                        //{
+                        //    #region ShowSpect
+                        //    //create new histo
+                        //    HISTO_curve myHisto = new HISTO_curve()
+                        //    {
+                        //        list = new PointPairList(),
+                        //        loglist = new PointPairList(),
+                        //        created_time = DateTime.Now,
+                        //        min_thresh = (int)udStart.Value,
+                        //        max_thresh = (int)udStop.Value,
+                        //        interval = (int)udInterval.Value,
+                        //        chan = (int)udChan.Value,
+                        //        integral = _IntegralScan,
+                        //        board = _ActiveFEB
+                        //    };
+                        //    UdChan_ValueChanged(null, null);
+                        //    System.Threading.Thread.Sleep(100);
+                        //    BtnBIAS_MON_Click(null, null);
+                        //    Application.DoEvents();
+                        //    myHisto.V = Convert.ToDouble(txtV.Text);
+                        //    myHisto.I = Convert.ToDouble(txtI.Text);
+                        //    //Fetch registers
+                        //    int FPGA_index = (int)udFPGA.Value;
 
-                //    Mu2e_Register.FindAddr(0x20, ref FEB.arrReg, out Mu2e_Register r_mux);
-                //    Mu2e_Register.FindName("HISTO_CHAN_SEL", ref FEB.arrReg, out Mu2e_Register r_ch);
-                //    Mu2e_Register.FindName("HISTO_COUNT_INTERVAL", ref FEB.arrReg, out Mu2e_Register r_interval);
-                //    Mu2e_Register.FindName("HISTO_THRESH_AFE0", ref FEB.arrReg, out Mu2e_Register r_th0);
-                //    Mu2e_Register.FindName("HISTO_COUNT0", ref FEB.arrReg, out Mu2e_Register r_count0);
-                //    Mu2e_Register.FindName("HISTO_THRESH_AFE1", ref FEB.arrReg, out Mu2e_Register r_th1);
-                //    Mu2e_Register.FindName("HISTO_COUNT1", ref FEB.arrReg, out Mu2e_Register r_count1);
+                        //    Mu2e_Register.FindAddr(0x20, ref FEB.arrReg, out Mu2e_Register r_mux);
+                        //    Mu2e_Register.FindName("HISTO_CHAN_SEL", ref FEB.arrReg, out Mu2e_Register r_ch);
+                        //    Mu2e_Register.FindName("HISTO_COUNT_INTERVAL", ref FEB.arrReg, out Mu2e_Register r_interval);
+                        //    Mu2e_Register.FindName("HISTO_THRESH_AFE0", ref FEB.arrReg, out Mu2e_Register r_th0);
+                        //    Mu2e_Register.FindName("HISTO_COUNT0", ref FEB.arrReg, out Mu2e_Register r_count0);
+                        //    Mu2e_Register.FindName("HISTO_THRESH_AFE1", ref FEB.arrReg, out Mu2e_Register r_th1);
+                        //    Mu2e_Register.FindName("HISTO_COUNT1", ref FEB.arrReg, out Mu2e_Register r_count1);
 
-                //    r_ch.fpga_index = (ushort)FPGA_index;
-                //    r_interval.fpga_index = (ushort)FPGA_index;
-                //    r_th0.fpga_index = (ushort)FPGA_index;
-                //    r_count0.fpga_index = (ushort)FPGA_index;
-                //    r_th1.fpga_index = (ushort)FPGA_index;
-                //    r_count1.fpga_index = (ushort)FPGA_index;
+                        //    r_ch.fpga_index = (ushort)FPGA_index;
+                        //    r_interval.fpga_index = (ushort)FPGA_index;
+                        //    r_th0.fpga_index = (ushort)FPGA_index;
+                        //    r_count0.fpga_index = (ushort)FPGA_index;
+                        //    r_th1.fpga_index = (ushort)FPGA_index;
+                        //    r_count1.fpga_index = (ushort)FPGA_index;
 
-                //    //set interval & ch & stop
-                //    UInt32 v = (UInt32)(myHisto.chan);
-                //    if (v > 7) { v = v - 8; }
-                //    if (_IntegralScan) { v = v + 8; }
-                //    Mu2e_Register.WriteReg(0, ref r_mux, ref FEB.client);
-                //    Mu2e_Register.WriteReg(v, ref r_ch, ref FEB.client);
-                //    v = (UInt32)(myHisto.interval);
-                //    Mu2e_Register.WriteReg(v, ref r_interval, ref FEB.client);
+                        //    //set interval & ch & stop
+                        //    UInt32 v = (UInt32)(myHisto.chan);
+                        //    if (v > 7) { v = v - 8; }
+                        //    if (_IntegralScan) { v = v + 8; }
+                        //    Mu2e_Register.WriteReg(0, ref r_mux, ref FEB.client);
+                        //    Mu2e_Register.WriteReg(v, ref r_ch, ref FEB.client);
+                        //    v = (UInt32)(myHisto.interval);
+                        //    Mu2e_Register.WriteReg(v, ref r_interval, ref FEB.client);
 
-                //    myHisto.min_count = 0;
+                        //    myHisto.min_count = 0;
 
-                //    //loop over th
-                //    zedFEB1.GraphPane.XAxis.Scale.Max = myHisto.max_thresh;
-                //    zedFEB1.GraphPane.XAxis.Scale.Min = myHisto.min_thresh;
-                //    zedFEB1.GraphPane.YAxis.Scale.Max = 100;
-                //    zedFEB1.GraphPane.YAxis.Scale.Min = 0;
+                        //    //loop over th
+                        //    zedFEB1.GraphPane.XAxis.Scale.Max = myHisto.max_thresh;
+                        //    zedFEB1.GraphPane.XAxis.Scale.Min = myHisto.min_thresh;
+                        //    zedFEB1.GraphPane.YAxis.Scale.Max = 100;
+                        //    zedFEB1.GraphPane.YAxis.Scale.Min = 0;
 
-                //    for (int i = myHisto.min_thresh; i < myHisto.max_thresh; i++)
-                //    {
-                //        if (flgBreak) { i = myHisto.max_thresh; }
-                //        UInt32 th = (UInt32)i;
-                //        Mu2e_Register.WriteReg(th, ref r_th0, ref FEB.client);
-                //        System.Threading.Thread.Sleep(1);
-                //        Mu2e_Register.WriteReg(th, ref r_th1, ref FEB.client);
-                //        System.Threading.Thread.Sleep(2 * myHisto.interval);
+                        //    for (int i = myHisto.min_thresh; i < myHisto.max_thresh; i++)
+                        //    {
+                        //        if (flgBreak) { i = myHisto.max_thresh; }
+                        //        UInt32 th = (UInt32)i;
+                        //        Mu2e_Register.WriteReg(th, ref r_th0, ref FEB.client);
+                        //        System.Threading.Thread.Sleep(1);
+                        //        Mu2e_Register.WriteReg(th, ref r_th1, ref FEB.client);
+                        //        System.Threading.Thread.Sleep(2 * myHisto.interval);
 
-                //        Mu2e_Register.ReadReg(ref r_count0, ref FEB.client);
-                //        System.Threading.Thread.Sleep(1);
-                //        Mu2e_Register.ReadReg(ref r_count1, ref FEB.client);
-                //        UInt32 count = 0;
-                //        if (myHisto.chan > 7) { count = r_count1.val; }
-                //        else { count = r_count0.val; }
+                        //        Mu2e_Register.ReadReg(ref r_count0, ref FEB.client);
+                        //        System.Threading.Thread.Sleep(1);
+                        //        Mu2e_Register.ReadReg(ref r_count1, ref FEB.client);
+                        //        UInt32 count = 0;
+                        //        if (myHisto.chan > 7) { count = r_count1.val; }
+                        //        else { count = r_count0.val; }
 
-                //        if (count > myHisto.max_count) { myHisto.max_count = count; }
+                        //        if (count > myHisto.max_count) { myHisto.max_count = count; }
 
-                //        myHisto.AddPoint((int)th, (int)count);
-                //        //myCurve.AddPoint(th, count);
+                        //        myHisto.AddPoint((int)th, (int)count);
+                        //        //myCurve.AddPoint(th, count);
 
-                //        btnScan.Text = i.ToString();
-                //        Application.DoEvents();
+                        //        btnScan.Text = i.ToString();
+                        //        Application.DoEvents();
 
-                //    }
-                //    if (_ActiveFEB == 1) { PP.FEB1Histo.Add(myHisto); }
-                //    if (_ActiveFEB == 2) { PP.FEB2Histo.Add(myHisto); }
+                        //    }
+                        //    if (_ActiveFEB == 1) { PP.FEB1Histo.Add(myHisto); }
+                        //    if (_ActiveFEB == 2) { PP.FEB2Histo.Add(myHisto); }
 
-                //    Application.DoEvents();
-                //    UpdateDisplay();
-                //    #endregion ShowSpect
-                //}
-                #endregion Broken code - needs to be made compatible with new register map
+                        //    Application.DoEvents();
+                        //    UpdateDisplay();
+                        //    #endregion ShowSpect
+                        //}
+                        #endregion Broken code - needs to be made compatible with new register map
 
                 btnScan.Text = "SCAN";
+                txtV.Text = prevV.ToString("0.000");
+                BtnBiasWRITE_Click(null, null);
                 Application.DoEvents();
+                if (flgBreak) { return; }
             }
         }
 
         private void UpdateDisplay_IV(IV_curve myIV)
         {
-            //zedFEB1.GraphPane.CurveList.Clear();
-            //if (chkLogY.Checked)
-            //{
-            //    if (Math.Round((double)(Math.Log10(myIV.min_I))) < -2)
-            //    { zedFEB1.GraphPane.YAxis.Scale.Min = -2; }
-            //    else
-            //    { zedFEB1.GraphPane.YAxis.Scale.Min = Math.Round((double)(Math.Log10(myIV.min_I))) - .1; }
-            //    zedFEB1.GraphPane.YAxis.Scale.Max = Math.Round((double)(Math.Log10(myIV.max_I * 1000)), 0);
-            //    if (zedFEB1.GraphPane.YAxis.Scale.Max < 0.1) { zedFEB1.GraphPane.YAxis.Scale.Max = 0.1; }
-            //    zedFEB1.GraphPane.AddCurve(myIV.chan.ToString(), myIV.loglist, Color.DarkRed, SymbolType.None);
-            //    zedFEB1.GraphPane.YAxis.Scale.MajorStep = .1 * (double)(Math.Log10(myIV.max_I * 1000));
-            //}
-            //else
-            //{
-            //    zedFEB1.GraphPane.YAxis.Scale.Min = 0.0;
-            //    zedFEB1.GraphPane.YAxis.Scale.Max = Math.Round((double)(myIV.max_I + 0.1 * (myIV.max_I - myIV.min_I)), 0);
-            //    zedFEB1.GraphPane.AddCurve(myIV.chan.ToString(), myIV.list, Color.DarkRed, SymbolType.None);
-            //}
-            //double s = Math.Round((double)(myIV.max_v - myIV.min_v) / 10.0, 0);
-            //if (zedFEB1.GraphPane.XAxis.Scale.MajorStep < s) { zedFEB1.GraphPane.XAxis.Scale.MajorStep = s; }
-            //zedFEB1.GraphPane.XAxis.Scale.MinorStep = zedFEB1.GraphPane.XAxis.Scale.MajorStep / 4;
-            //zedFEB1.GraphPane.XAxis.Scale.Min = (double)udStart.Value - .2;
-            //zedFEB1.GraphPane.XAxis.Scale.Max = (double)udStop.Value + .2;
+            zedFEB1.GraphPane.CurveList.Clear();
+            if (chkLogY.Checked)
+            {
+                if (Math.Round((double)(Math.Log10(myIV.min_I))) < -2)
+                { zedFEB1.GraphPane.YAxis.Scale.Min = -2; }
+                else
+                { zedFEB1.GraphPane.YAxis.Scale.Min = Math.Round((double)(Math.Log10(myIV.min_I))) - .1; }
+                zedFEB1.GraphPane.YAxis.Scale.Max = Math.Round((double)(Math.Log10(myIV.max_I * 1000)), 0);
+                if (zedFEB1.GraphPane.YAxis.Scale.Max < 0.1) { zedFEB1.GraphPane.YAxis.Scale.Max = 0.1; }
+                zedFEB1.GraphPane.AddCurve(myIV.chan.ToString(), myIV.loglist, Color.DarkRed, SymbolType.None);
+                zedFEB1.GraphPane.YAxis.Scale.MajorStep = .1 * (double)(Math.Log10(myIV.max_I * 1000));
+            }
+            else
+            {
+                zedFEB1.GraphPane.YAxis.Scale.Min = 0.0;
+                zedFEB1.GraphPane.YAxis.Scale.Max = Math.Round((double)(myIV.max_I + 0.1 * (myIV.max_I - myIV.min_I)), 0);
+                zedFEB1.GraphPane.AddCurve(myIV.chan.ToString(), myIV.list, Color.DarkRed, SymbolType.None);
+            }
+            double s = Math.Round((double)(myIV.max_v - myIV.min_v) / 10.0, 0);
+            if (zedFEB1.GraphPane.XAxis.Scale.MajorStep < s) { zedFEB1.GraphPane.XAxis.Scale.MajorStep = s; }
+            zedFEB1.GraphPane.XAxis.Scale.MinorStep = zedFEB1.GraphPane.XAxis.Scale.MajorStep / 4;
+            zedFEB1.GraphPane.XAxis.Scale.Min = (double)udStart.Value - 2;
+            zedFEB1.GraphPane.XAxis.Scale.Max = (double)udStop.Value + 2;
 
-            //s = Math.Round((myIV.max_I - myIV.min_I) / 10.0, 0);
-            //zedFEB1.GraphPane.YAxis.Scale.MinorStep = zedFEB1.GraphPane.YAxis.Scale.MajorStep / 4;
+            s = Math.Round((myIV.max_I - myIV.min_I) / 100.0, 0)*10;
+            zedFEB1.GraphPane.YAxis.Scale.MinorStep = zedFEB1.GraphPane.YAxis.Scale.MajorStep / 4;
 
-            //zedFEB1.Invalidate(true);
-            //Application.DoEvents();
+            zedFEB1.Invalidate(true);
+            Application.DoEvents();
         }
 
         private void UpdateDisplay()
@@ -1112,18 +1157,35 @@ namespace TB_mu2e
 
         private void BtnSaveHistos_Click(object sender, EventArgs e)
         {
-            //if (ShowIV.Visible)
-            //{
-            //    List<HISTO_curve> myHistoList = null;
+            if (ShowIV.Visible)
+            {
+                List<HISTO_curve> myHistoList = null;
             //    if (_ActiveFEB == 1) { myHistoList = PP.FEB1Histo; }
             //    if (_ActiveFEB == 2) { myHistoList = PP.FEB2Histo; }
 
-            //    foreach (HISTO_curve h1 in myHistoList)
-            //    {
-            //        if (h1.saved) { }
-            //        else { h1.Save(); }
-            //    }
-            //}
+                foreach (HISTO_curve h1 in myHistoList)
+                {
+                    if (h1.saved) { }
+                    else { h1.Save(); }
+                }
+            }
+            else
+            {
+                if (zedFEB1.GraphPane.CurveList.Count > 0)
+                {
+                    int n;
+                    double x, y; 
+                    n=zedFEB1.GraphPane.CurveList[0].Points.Count;
+                    IV_curve myIV = new IV_curve();
+                    for (int i = 0; i < n; i++)
+                    {
+                        x = zedFEB1.GraphPane.CurveList[0].Points[i].X;
+                        y = zedFEB1.GraphPane.CurveList[0].Points[i].Y;
+                        myIV.AddPoint(x, y);
+                    }
+                    myIV.Save();
+                }
+            }
         }
 
         private void Disconnect_Click(object sender, EventArgs e)
@@ -1149,12 +1211,12 @@ namespace TB_mu2e
             udStart.DecimalPlaces = 1;
             udStart.Minimum = 0;
             udStart.Maximum = 80;
-            udStart.Value = 60;
+            udStart.Value = 45;
             udStart.Increment = (decimal)0.1;
             udStop.DecimalPlaces = 1;
             udStop.Minimum = 1;
-            udStop.Maximum = 80;
-            udStop.Value = 70;
+            udStop.Maximum = 60;
+            udStop.Value = 58;
             udStop.Increment = (decimal)0.1;
             lblInc.Text = "Step (mv)";
             udInterval.Minimum = (decimal)50;
@@ -1230,7 +1292,7 @@ namespace TB_mu2e
                         if(feb.ClientOpen)
                         {
                             feb.CheckStatus(out uint spill_status, out uint spill_num, out uint trig_num);
-                            if (spill_status == 4)
+                            if (spill_status == 4 || spill_status == 5) //spill status 5 is DDR sequencer busy, for which the FEB should not be asked for data yet
                                 in_spill_any_feb = true;
                             SpillStatusTable.GetControlFromPosition(1, feb.clientNum+1).Text = spill_status.ToString();
                             SpillStatusTable.GetControlFromPosition(2, feb.clientNum+1).Text = trig_num.ToString();
@@ -1264,8 +1326,21 @@ namespace TB_mu2e
                             first_spill_taken = true;
                             PP.myRun.UpdateStatus("First Spill Synchronization");
                         }
-                        PP.myRun.timeLastSpill = DateTime.Now;
-                        PP.myRun.UpdateStatus("Detected spill. Run file is " + PP.myRun.OutFileName);
+                        if (!waiting_for_data)
+                        {
+                            PP.myRun.timeLastSpill = DateTime.Now;
+                            PP.myRun.UpdateStatus("Detected spill. Run file is " + PP.myRun.OutFileName);
+
+                            try
+                            {
+                                using (StreamWriter sw = new StreamWriter(PP.myRun.OutFileName, true))
+                                {
+                                    sw.Write("timestamp " + DateTime.Now.ToString() + "\r\n");
+                                }
+                            }
+                            catch { PP.myRun.UpdateStatus("Trouble saving timestamp to file!"); }
+
+                        }
                         PP.myRun.spill_complete = false;
                         waiting_for_data = true;
                     }
@@ -1671,7 +1746,9 @@ namespace TB_mu2e
                     using (StreamWriter stabStream = new StreamWriter(PP.myRun.OutFileName, true))
                     {
                         byte[] buff;
-                        byte[] stab = PP.GetBytes("stab 2\r\n"); //Get the info for the first two FPGAs
+                        // changed 04/15/2021 by Ralf
+                        // byte[] stab = PP.GetBytes("stab 2\r\n"); //Get the info for the first two FPGAs
+                        byte[] stab = PP.GetBytes("stab\rcmb\radc\r\n"); //Get the info for all FPGAs
                         List<System.Net.Sockets.Socket> sockets = new List<System.Net.Sockets.Socket>();// = { PP.FEB1.TNETSocket, PP.FEB2.TNETSocket };
                         foreach(Mu2e_FEB_client feb in PP.FEB_clients)
                             sockets.Add(feb.TNETSocket);
@@ -1685,8 +1762,11 @@ namespace TB_mu2e
                                     buff = new byte[socket.Available];
                                     socket.Receive(buff);
                                 }
+                                
+                                socket.Send(PP.GetBytes("cmbena 1\r\n")); //make sure temp mon is enabled (added Rubinov, 11jun23)
+                                Thread.Sleep(250);
                                 socket.Send(stab); //ask it about the current settings for the first two FPGAs
-                                System.Threading.Thread.Sleep(10);
+                                System.Threading.Thread.Sleep(100);
                                 buff = new byte[socket.Available];
                                 socket.Receive(buff);
                                 stabStream.WriteLine(Encoding.ASCII.GetString(buff));
@@ -2046,66 +2126,180 @@ namespace TB_mu2e
 
         }
 
+
+        private void numButton_Click(object sender, EventArgs e)
+        {
+
+
+            Int16 numChannels = 4;
+            numButton.Enabled = false;  //prevents multiple clicks of the button
+            autoThreshBtn.Enabled = false;
+            lightCheckResetThresh.Enabled = false;
+            lightCheckBtn.Enabled = false;
+            RadioButton[] statusButtons = { but0, but1, but2, but3, but4, but5, but6, but7,
+                                            but8, but9, but10, but11, but12, but13, but14, but15,
+                                            but16, but17, but18, but19, but20, but21, but22, but23,
+                                            but24, but25, but26, but27, but28, but29, but30, but31}; //holds the 32 buttons
+
+
+
+            string[] chanOuts = new string[numChannels];
+
+
+
+            for (uint nCount = 0; nCount < numMeasure.Value; nCount++) //Take measurements up to N times or until the stop button is pressed
+            {
+
+                uint startV = 49;
+                uint stopV = 55;
+                double stepV = 0.2;
+
+                double v = startV;
+                while (v < stopV)
+                {
+
+                    activeFEB.SetV(v);
+
+                    using (StreamWriter writer = File.AppendText("C:\\data\\ScanningData\\ScanningData_" + outFileName.Text + ".txt"))
+                    using (StreamWriter writer_conf = File.AppendText("C:\\data\\ScanningData\\ScanningData_Config.txt"))
+
+
+                    {
+                        string dicountNumber = numTextBox.Text;
+                        writer.Write("{0}\t", dicountNumber);
+                        DateTime today = DateTime.Now;
+                        writer.Write("{0}\t", today.ToString("g"));
+                        writer_conf.Write("{0}\t", today.ToString("g"));
+
+                        Console.WriteLine(stopMeasureBtn.Enabled);
+                        Console.WriteLine(DateTime.Now.ToString("g"));
+
+                        //initially set to green
+                        for (int i = 0; i < 32; i++)
+                        {
+                            statusButtons[i].BackColor = Color.Green;
+                            statusButtons[i].Update();
+                        }
+
+                        for (int i = 0; i < numChannels; i++)
+                        {
+
+                            Console.WriteLine(stopMeasureBtn.Enabled);
+                            Console.WriteLine(numChannels);
+
+                            double average = Convert.ToDouble(activeFEB.ReadA0((int)(i / 16), i % 16));
+                            Console.WriteLine("Channel: " + i + ", FPGA: " + (int)(i / 16) + " " + average + "");
+
+                            if (i < 32) //temp fix
+                            {
+                                if (average < Convert.ToDouble(iWarningThresh.Text)) //if the current was less than warning thresh && we still have current, update the color of the lamp
+                                    statusButtons[i].BackColor = Color.Red;
+                                if (average < 0.025) //if there was no current then
+                                    statusButtons[i].BackColor = Color.Blue; //set lamp color to blue "cold-no-current"
+                                                                             //statusButtons[i].Text = "" + Math.Round(average,2);
+                                statusButtons[i].Update();
+                            }
+                            chanOuts[i] = average.ToString("0.0000");
+                            writer.Write("{0}\t", chanOuts[i]);
+                            autoDataProgress.Increment(1);
+                            writer_conf.Write("{0}\t", PP.FEB1.ReadV(i).ToString("0"));
+
+                        }
+
+
+                        writer.Write("{0}\t", activeFEB.ReadTemp(0));
+                        writer.Write("{0}\t", activeFEB.ReadV((int)udFPGA.Value).ToString("0.000"));
+                        writer.Write("{0}\t", nCount);
+                        writer.WriteLine();
+                        writer_conf.WriteLine();
+                        autoDataProgress.Increment(-31);
+                    }
+                        v = v + stepV;  
+                }       
+            }
+                    
+            numButton.Enabled = true;
+            autoThreshBtn.Enabled = true;
+            lightCheckResetThresh.Enabled = true;
+            lightCheckBtn.Enabled = true;
+        }
+
+
         private void QcStartButton_Click(object sender, EventArgs e)
         {
-            if (activeFEB != null)
-            {
-                if (activeFEB.ClientOpen)
-                {
-                    if (qcDiCounterMeasurementTimer.Enabled)
-                    {
-                        qcDiCounterMeasurementTimer.Enabled = false;
-                        PP.qcDicounterMeasurements.TurnOffBias();
-                        PP.qcDicounterMeasurements.Purge();
-                        qcStartButton.Text = "Auto Data";
-                        qcStartButton.BackColor = SystemColors.Control;
-                        qcStartButton.Update();
-                        lightCheckGroup.Enabled = true;
-                        FEBSelectPanel.Enabled = true;
-                        dicounterNumberTextBox.Enabled = true;
-                    }
-                    else
-                    {
-                        //qcStartButton.Enabled = false;  //prevents multiple clicks of the buttons
-                        qcStartButton.Text = "STOP";
-                        qcStartButton.BackColor = Color.Red;
-                        qcStartButton.Update();
-                        using (System.Media.SoundPlayer soundPlayer = new System.Media.SoundPlayer(Environment.GetFolderPath(Environment.SpecialFolder.Windows) + "\\media\\chord.wav"))// "C:\\Windows\\media\\Windows Proximity Notification.wav"))
-                        {
-                            soundPlayer.Play();
-                        }
-                        FEBSelectPanel.Enabled = false;
-                        autoThreshBtn.Enabled = false;
-                        lightCheckResetThresh.Enabled = false;
-                        lightCheckBtn.Enabled = false;
-                        //string[] chanOuts = new string[qcDiButtons.Length];
-                        autoDataProgress.Maximum = qcDiButtons.Length; //set the max of the progress bar
 
-                        if (PP.qcDicounterMeasurements == null)
-                            PP.qcDicounterMeasurements = new CurrentMeasurements(activeFEB, Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) + "\\Google Drive\\CRV Fabrication Documents\\Data\\QA\\Dicounter Source Testing\\ScanningData_" + qaOutputFileName.Text + ".txt");
+//            for (int v = 54; v < 56; v++)
+//            {
+                if (activeFEB != null)
+                {
+                    if (activeFEB.ClientOpen)
+                    {
+                        if (qcDiCounterMeasurementTimer.Enabled)
+                        {
+                            qcDiCounterMeasurementTimer.Enabled = false;
+                            PP.qcDicounterMeasurements.TurnOffBias();
+                            PP.qcDicounterMeasurements.Purge();
+                            qcStartButton.Text = "Auto Data";
+                            qcStartButton.BackColor = SystemColors.Control;
+                            qcStartButton.Update();
+                            lightCheckGroup.Enabled = true;
+                            FEBSelectPanel.Enabled = true;
+                            dicounterNumberTextBox.Enabled = true;
+                        }
                         else
                         {
-                            PP.qcDicounterMeasurements.Purge();
-                            PP.qcDicounterMeasurements.ChangeClient(activeFEB);
+
+
+
+                            qcStartButton.Text = "STOP";
+                            qcStartButton.BackColor = Color.Red;
+                            qcStartButton.Update();
+                            using (System.Media.SoundPlayer soundPlayer = new System.Media.SoundPlayer(Environment.GetFolderPath(Environment.SpecialFolder.Windows) + "\\media\\chord.wav"))// "C:\\Windows\\media\\Windows Proximity Notification.wav"))
+                            {
+                                soundPlayer.Play();
+                            }
+                            FEBSelectPanel.Enabled = false;
+                            autoThreshBtn.Enabled = false;
+                            lightCheckResetThresh.Enabled = false;
+                            lightCheckBtn.Enabled = false;
+                            //string[] chanOuts = new string[qcDiButtons.Length];
+                            autoDataProgress.Maximum = qcDiButtons.Length; //set the max of the progress bar
+
+                            if (PP.qcDicounterMeasurements == null)
+                                //                            PP.qcDicounterMeasurements = new CurrentMeasurements(activeFEB, Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) + "\\Google Drive\\CRV Fabrication Documents\\Data\\QA\\Dicounter Source Testing\\ScanningData_" + qaOutputFileName.Text + ".txt");
+                                PP.qcDicounterMeasurements = new CurrentMeasurements(activeFEB, "C:/data\\ScanningData_" + qaOutputFileName.Text + ".txt");
+
+                            else
+                            {
+                                PP.qcDicounterMeasurements.Purge();
+                                PP.qcDicounterMeasurements.ChangeClient(activeFEB);
+                            }
+
+                            // PP.qcDicounterMeasurements.SetBias(v);
+
+                            foreach (var btn in qcDiButtons) { if (!btn.Checked) { btn.BackColor = Color.Green; btn.Update(); } } //Reset all active channel indicators to green
+
+
+                            currentChannel = 0; //Set the current channel being measured to 0
+                            dicounterNumberTextBox.Enabled = false;
+                            lightCheckGroup.Enabled = false;
+
+                                                        activeFEB.SetV(Convert.ToDouble(qcBias.Text)); //Turn on the bias
+                            //activeFEB.SetV(Convert.ToDouble(v)); //Turn on the bias
+                            PP.qcDicounterMeasurements.WriteMeasurements(dicounterNumberTextBox.Text);
+
+                            qcDiCounterMeasurementTimer.Enabled = true;
+
+
+
                         }
 
-                        foreach (var btn in qcDiButtons) { if (!btn.Checked) { btn.BackColor = Color.Green; btn.Update(); } } //Reset all active channel indicators to green
-
-
-                        currentChannel = 0; //Set the current channel being measured to 0
-                        dicounterNumberTextBox.Enabled = false;
-                        lightCheckGroup.Enabled = false;
-
-                        activeFEB.SetV(Convert.ToDouble(qcBias.Text)); //Turn on the bias
-
-                        qcDiCounterMeasurementTimer.Enabled = true;
+                        ////Data are written to the Google Drive, CRV Fabrication Documents folder ScanningData, subfolder DicounterQA
+                        ////'using' will ensure the writer is closed/destroyed if the scope of the structure is left due to code-completion or a thrown exception
+                        //using (StreamWriter writer = File.AppendText("C:\\Users\\Boi\\Desktop\\ScanningData_test.txt"))//"C:\\Users\\FEB-Laptop-1\\Google Drive\\CRV Fabrication Documents\\Data\\QA\\Dicounter Source Testing\\ScanningData_" + qaOutputFileName.Text + ".txt")) //The output file
                     }
-
-                    ////Data are written to the Google Drive, CRV Fabrication Documents folder ScanningData, subfolder DicounterQA
-                    ////'using' will ensure the writer is closed/destroyed if the scope of the structure is left due to code-completion or a thrown exception
-                    //using (StreamWriter writer = File.AppendText("C:\\Users\\Boi\\Desktop\\ScanningData_test.txt"))//"C:\\Users\\FEB-Laptop-1\\Google Drive\\CRV Fabrication Documents\\Data\\QA\\Dicounter Source Testing\\ScanningData_" + qaOutputFileName.Text + ".txt")) //The output file
                 }
-            }
+//            }
         }
 
         private void AutoThreshBtn_Click(object sender, EventArgs e)
@@ -2263,7 +2457,7 @@ namespace TB_mu2e
             }
             else if (!parsed || isNumber < 0 || isNumber > 80)
             {
-                qcBias.Text = "57.0";
+                qcBias.Text = "56.0";
                 qcBias.BackColor = Color.LightGray;
                 qcStartButton.Enabled = true;
                 lightCheckBtn.Enabled = true;
@@ -3272,7 +3466,7 @@ namespace TB_mu2e
                 //Autoscroll to the end of the text box
                 runLog.SelectionStart = runLog.TextLength;
                 runLog.SelectionLength = 0;
-                runLog.ScrollToCaret();
+                //runLog.ScrollToCaret();
             }
             catch { }
         }
@@ -3713,53 +3907,57 @@ namespace TB_mu2e
         {
             System.Threading.Thread.Sleep(1); //yield
             ComPortStatusBox.Text = "Moving";
-            try
+            if (ModuleQCStepTimer.Enabled)
             {
-                StepperCheckForMessages();
-
-                comPort.WriteLine("get pos");
-                System.Threading.Thread.Sleep(100); //wait for it to reply
-                List<string> positionInfo = new List<string>();
-                while (comPort.BytesToRead > 0)
+                try
                 {
-                    string s = comPort.ReadLine(); //grab the positions
-                    if (s.Contains("last") || s.Contains("realtime")) //if it contains last or realtime, this holds the information we are interested in
-                        positionInfo.Add(s);
-                }
-                if (positionInfo.Count == 2) //Double check that we only have the strings for current and destination positions
-                {
-                    double destination_xPos = Convert.ToDouble(positionInfo[0].Split(new char[] { ' ', ':' })[4]); //split the string and extract the destination X position
-                    double current_xPos = Convert.ToDouble(positionInfo[1].Split(new char[] { ' ', ':' })[4]); //split the string and extract the current X position
+                    StepperCheckForMessages();
 
-                    if (Math.Abs(destination_xPos - current_xPos) < 0.01) //arbitrary threshold, if the current position is at the destination, we are done moving
+                    comPort.WriteLine("get pos");
+                    System.Threading.Thread.Sleep(100); //wait for it to reply
+                    List<string> positionInfo = new List<string>();
+                    while (comPort.BytesToRead > 0)
                     {
-                        ModuleQCStepTimer.Enabled = false;
-                        ComPortStatusBox.Text = "";
+                        string s = comPort.ReadLine(); //grab the positions
+                        if (s.Contains("last") || s.Contains("realtime")) //if it contains last or realtime, this holds the information we are interested in
+                            positionInfo.Add(s);
+                    }
+                    if (positionInfo.Count == 2) //Double check that we only have the strings for current and destination positions
+                    {
+                        double destination_xPos = Convert.ToDouble(positionInfo[0].Split(new char[] { ' ', ':' })[4]); //split the string and extract the destination X position
+                        double current_xPos = Convert.ToDouble(positionInfo[1].Split(new char[] { ' ', ':' })[4]); //split the string and extract the current X position
+
+                        if (Math.Abs(destination_xPos - current_xPos) < 0.01) //arbitrary threshold, if the current position is at the destination, we are done moving
+                        {
+                            ModuleQCStepTimer.Enabled = false;
+                            ComPortStatusBox.Text = "";
+                        }
                     }
                 }
-            }
-            catch (TimeoutException)
-            {
-                moduleQAHomingTimer.Enabled = false;
-                MessageBox.Show("Reached timeout while communicating with controller.", "Oh shit, something went wrong", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
-                comPort.Close();
-                ModuleQCBtn.Enabled = false; //disable the QA button if we aren't connected to the stepper controller
-            }
-            catch(Exception exc)
-            {
-                Console.WriteLine(exc);
-                moduleQAHomingTimer.Enabled = false;
-                var answer = MessageBox.Show("Trouble communicating with controller. Close connection?", "Oh shit, something went wrong", MessageBoxButtons.YesNo, MessageBoxIcon.Exclamation);
-                if(answer.Equals(DialogResult.Yes))
+                catch (TimeoutException)
+                {
+                    ModuleQCStepTimer.Enabled = false;
+                    moduleQAHomingTimer.Enabled = false;
+                    MessageBox.Show("Reached timeout while communicating with controller.", "Oh shit, something went wrong", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                     comPort.Close();
-                ModuleQCBtn.Enabled = false; //disable the QA button if we aren't connected to the stepper controller
+                    ModuleQCBtn.Enabled = false; //disable the QA button if we aren't connected to the stepper controller
+                }
+                catch (Exception exc)
+                {
+                    Console.WriteLine(exc);
+                    moduleQAHomingTimer.Enabled = false;
+                    ModuleQCStepTimer.Enabled = false;
+                    var answer = MessageBox.Show("Trouble communicating with controller. Close connection?", "Oh shit, something went wrong", MessageBoxButtons.YesNo, MessageBoxIcon.Exclamation);
+                    if (answer.Equals(DialogResult.Yes))
+                        comPort.Close();
+                    ModuleQCBtn.Enabled = false; //disable the QA button if we aren't connected to the stepper controller
+                }
             }
-
         }
 
         private void StepperCheckForMessages()
         {
-            if (comPort != null)
+            if (comPort != null && (moduleQAHomingTimer.Enabled || ModuleQCStepTimer.Enabled))
             {
                 try
                 {
@@ -3775,6 +3973,7 @@ namespace TB_mu2e
                 catch (TimeoutException)
                 {
                     moduleQAHomingTimer.Enabled = false;
+                    ModuleQCStepTimer.Enabled = false;
                     MessageBox.Show("Reached timeout while communicating with controller.", "Oh shit, something went wrong", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                     comPort.Close();
                     ModuleQCBtn.Enabled = false; //disable the QA button if we aren't connected to the stepper controller
@@ -3784,43 +3983,45 @@ namespace TB_mu2e
 
         private void QcDiCounterMeasurementTimer_Tick(object sender, EventArgs e)
         {
-            System.Threading.Thread.Sleep(1); //yield
-            if (currentChannel < qcDiButtons.Length)
-            {
-                if (!qcDiButtons[currentChannel].Checked)
+            //System.Threading.Thread.Sleep(0.1); //yield
+
+
+                if (currentChannel < qcDiButtons.Length)
                 {
-                    double measurement = PP.qcDicounterMeasurements.TakeMeasurement(currentChannel);
-                    if (measurement < Convert.ToDouble(qcDiIWarningThresh.Text)) //Low current
-                        qcDiButtons[currentChannel].BackColor = Color.Red;
-                    if (measurement < NO_CURRENT_THRESH) //No Current
-                        qcDiButtons[currentChannel].BackColor = Color.Blue;
-                    qcDiButtons[currentChannel].Update();
+                    if (!qcDiButtons[currentChannel].Checked)
+                    {
+                        double measurement = PP.qcDicounterMeasurements.TakeMeasurement(currentChannel);
+                        if (measurement < Convert.ToDouble(qcDiIWarningThresh.Text)) //Low current
+                            qcDiButtons[currentChannel].BackColor = Color.Red;
+                        if (measurement < NO_CURRENT_THRESH) //No Current
+                            qcDiButtons[currentChannel].BackColor = Color.Blue;
+                        qcDiButtons[currentChannel].Update();
+                    }
+                    currentChannel++;
+                    autoDataProgress.Increment(1);
                 }
-                currentChannel++;
-                autoDataProgress.Increment(1);
-            }
-            else
-            {
-                qcDiCounterMeasurementTimer.Enabled = false;
-                PP.qcDicounterMeasurements.WriteMeasurements(dicounterNumberTextBox.Text);//PP.FEB1.ReadTemp(0));
-                PP.qcDicounterMeasurements.TurnOffBias();
-                currentChannel = 0;
-                autoDataProgress.Value = 0;
-                autoDataProgress.Update();
-                using (System.Media.SoundPlayer soundPlayer = new System.Media.SoundPlayer(Environment.GetFolderPath(Environment.SpecialFolder.Windows) + "\\media\\chord.wav"))// "C:\\Windows\\media\\Windows Proximity Notification.wav"))
+                else
                 {
-                    soundPlayer.Play();
+                    qcDiCounterMeasurementTimer.Enabled = false;
+                    PP.qcDicounterMeasurements.WriteMeasurements(dicounterNumberTextBox.Text);//PP.FEB1.ReadTemp(0));
+                                                                                              // PP.qcDicounterMeasurements.TurnOffBias();
+                    currentChannel = 0;
+                    autoDataProgress.Value = 0;
+                    autoDataProgress.Update();
+                    using (System.Media.SoundPlayer soundPlayer = new System.Media.SoundPlayer(Environment.GetFolderPath(Environment.SpecialFolder.Windows) + "\\media\\chord.wav"))// "C:\\Windows\\media\\Windows Proximity Notification.wav"))
+                    {
+                        soundPlayer.Play();
+                    }
+                    FEBSelectPanel.Enabled = true;
+                    autoThreshBtn.Enabled = true;
+                    lightCheckResetThresh.Enabled = true;
+                    lightCheckBtn.Enabled = true;
+                    dicounterNumberTextBox.Enabled = true;
+                    lightCheckGroup.Enabled = true;
+                    qcStartButton.Text = "Auto Data";
+                    qcStartButton.BackColor = SystemColors.Control;
+                    qcStartButton.Update();
                 }
-                FEBSelectPanel.Enabled = true;
-                autoThreshBtn.Enabled = true;
-                lightCheckResetThresh.Enabled = true;
-                lightCheckBtn.Enabled = true;
-                dicounterNumberTextBox.Enabled = true;
-                lightCheckGroup.Enabled = true;
-                qcStartButton.Text = "Auto Data";
-                qcStartButton.BackColor = SystemColors.Control;
-                qcStartButton.Update();
-            }
         }
 
         private void ValidateParseChkBox_CheckedChanged(object sender, EventArgs e)
@@ -3943,6 +4144,436 @@ namespace TB_mu2e
                 loadCmdsFileDialogThread.Start();
                 loadCmdsFileDialogThread.Join();
             }
+        }
+
+        private void label10_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void chkLast_CheckedChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void btnDisplaySpill_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void btnNextDisp_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void btnPrevDisp_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void btnTimerFix_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void btnOneSpill_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void btnChangeName_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void chkFakeIt_CheckedChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void btnStopRun_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void btnStartRun_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void btnPrepare_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void btnConnectAll_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void dbgFEB_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void btnDebugLogging_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void textBox1_TextChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void textBox1_KeyPress(object sender, KeyPressEventArgs e)
+        {
+
+        }
+
+        private void label15_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void btnTestSpill_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void btnSpillMON_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void btnSpillWRITE_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void btnSpillREAD_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void btnCHANGE_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void btnRegMONITOR_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void btnRegWRITE_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void btnRegREAD_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void btnErase_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void udChan_ValueChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void btnSaveHistos_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void btnScan_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void chkIntegral_CheckedChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void chkLogY_CheckedChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void btnBiasREAD_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void btnBiasWRITE_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void btnBIAS_MON_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void label23_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void j18_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void j17_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void j16_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void j15_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void j14_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void j13_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void j12_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void j11_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void lightCheckResetThresh_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void lightCheckChanThreshBtn_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void lightCheckChanSelec_ValueChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void autoThreshBtn_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void lightBut31_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void lightBut0_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void lightCheckBtn_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void lightBut1_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void lightBut2_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void lightBut3_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void lightBut4_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void lightBut30_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void lightBut5_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void lightBut29_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void lightBut6_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void lightBut28_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void lightBut7_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void lightBut27_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void lightBut8_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void lightBut26_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void lightBut9_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void lightBut25_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void lightBut10_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void lightBut24_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void lightBut11_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void lightBut23_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void lightBut12_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void lightBut22_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void lightBut13_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void lightBut21_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void lightBut14_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void lightBut20_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void lightBut15_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void lightBut19_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void lightBut16_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void lightBut18_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void lightBut17_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void stopMeasure_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void label22_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void but0_CheckedChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void qaBias_TextChanged(object sender, EventArgs e)
+        {
+
         }
     }
 

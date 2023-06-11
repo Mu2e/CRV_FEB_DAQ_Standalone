@@ -21,7 +21,9 @@ namespace TB_mu2e
         public static string source_name;
 
         //To save data in "binary"
-        private static void Save(byte[] buf, string source)
+        //changed by Ralf 5/18/21
+        //private static void Save(byte[] buf, string source)
+        private static void Save(byte[] buf, string source, System.Net.Sockets.Socket feb_socket)
         {
             ReaderWriterLock locker = new ReaderWriterLock();
             try
@@ -34,6 +36,26 @@ namespace TB_mu2e
                         int i = 0;
 
                         bw.Write("--Begin of spill\r\n");
+
+                        //copied from frmMain.cs by Ralf 5/18/21 to get the stab at every spill
+                        if (feb_socket != null)
+                        {
+                            byte[] buff;
+                            if (feb_socket.Available > 0) //discard any junk before asking it about the current settings
+                            {
+                                buff = new byte[feb_socket.Available];
+                                feb_socket.Receive(buff);
+                            }
+//                            socket.Send(stab); //ask it about the current settings for the first two FPGAs
+                            byte[] stab = Encoding.ASCII.GetBytes("stab\r\n");
+                            feb_socket.Send(stab); //ask it about the current settings for the first two FPGAs
+                            System.Threading.Thread.Sleep(10);
+                            buff = new byte[feb_socket.Available];
+                            feb_socket.Receive(buff);
+                            bw.Write("stab\r\n");
+                            bw.Write(Encoding.ASCII.GetString(buff));
+                        }                            
+
                         bw.Write("--** SOURCE = " + source + "\r\n");
                         foreach (byte b in buf)
                         {
@@ -56,7 +78,10 @@ namespace TB_mu2e
                     }
                     catch { Console.WriteLine("bad break"); }
                 }
-
+            }
+            catch
+            {
+                Console.WriteLine("File stream error");
             }
             finally
             {
@@ -71,6 +96,8 @@ namespace TB_mu2e
             try
             {
                 locker.AcquireWriterLock(10000);//timeout of 10 seconds,
+                Console.WriteLine("PP.myRun.OutFileName: " + PP.myRun.OutFileName);
+
                 using (sw = new StreamWriter(PP.myRun.OutFileName, true))
                 {
                     try
@@ -141,14 +168,24 @@ namespace TB_mu2e
             byte[] b = PP.GetBytes("RDB 1\r\n"); //get the spill header (and 1 word) & reset read pointers
             byte[] hdr_buf = new byte[18];
             long spillwrdcnt = 0; //spill word count will be the total spill count for the FEB (which means BOTH FPGAs)
-            feb.TNETSocket.Send(b);
-            Thread.Sleep(50);
-            if (feb.TNETSocket.Available > 0) //if we can snag the wordcount from the spill header, then we know how much we should be reading
+            int readattempts = 0;
+            do 
+            {
+                feb.TNETSocket.Send(b);
+                Thread.Sleep(50);
+                if(feb.TNETSocket.Available > 0)
+                    feb.TNETSocket.Receive(hdr_buf);
+                readattempts++;
+                Console.WriteLine(readattempts);
+            } while ((hdr_buf[10] != 255 || hdr_buf[11] != 255 || hdr_buf[16] != 8 || hdr_buf[17] != 8) && readattempts < 3); //10 and 11 are channel mask, but have always been FFFF. 16 and 17 are always 8 8
+
+
+            if (hdr_buf[10] == 255 || hdr_buf[11] == 255 || hdr_buf[16] == 8 || hdr_buf[17] == 8) //if we can snag the wordcount from the spill header, then we know how much we should be reading
             {
                 PP.myRun.READING = true;
                 Console.WriteLine("+ READ");
 
-                feb.TNETSocket.Receive(hdr_buf);
+                //feb.TNETSocket.Receive(hdr_buf);
                 spillwrdcnt = (hdr_buf[0] * 256 * 256 * 256 + //spillwrdcnt is how many words there are for ALL fpgas in a given spill
                                hdr_buf[1] * 256 * 256 +
                                hdr_buf[2] * 256 +
@@ -162,7 +199,7 @@ namespace TB_mu2e
                     b = PP.GetBytes("RDB\r\n");
                     feb.TNETSocket.Send(b);
                     Thread.Sleep(100);
-                    int readattempts = 0;
+                    readattempts = 0;
                     do
                     {
                         int bytes_now = feb.stream.Read(mem_buff, bytesread, feb.TNETSocket.Available);
@@ -173,7 +210,7 @@ namespace TB_mu2e
                         else
                             readattempts = 0;
                         Console.WriteLine("  READ " + readattempts);
-                        //Console.WriteLine(source_name + " got " + bytesread + " / " + spillwrdcnt * 2);
+                        Console.WriteLine(source_name + " got " + bytesread + " / " + spillwrdcnt * 2);
                         Thread.Sleep(100);
                     } while (feb.stream.DataAvailable || (bytesleft > 0 && readattempts < 3));
 
@@ -183,6 +220,12 @@ namespace TB_mu2e
                 {
                     PP.myRun.UpdateStatus(feb.name + " took too long to respond, continuing.");
                 } //something went wrong skip spill
+                catch (System.ArgumentOutOfRangeException)
+                {
+                    PP.myRun.UpdateStatus(feb.name + " got more data than specified in spill header.");
+                }
+
+
 
                 TimeSpan elapsed = DateTime.Now.Subtract(time_start);
                 PP.myRun.UpdateStatus(source_name + " read: " + bytesread.ToString() + " bytes out of " + (spillwrdcnt * 2).ToString() + " bytes in " + elapsed.TotalMilliseconds + " ms");
@@ -207,8 +250,11 @@ namespace TB_mu2e
                             }
                             else
                             {
+                                //changed by Ralf 5/18/21
                                 string savename = feb.name;
-                                Thread save = new Thread(() => Save(mem_buff, savename)); //Spawn a thread that will take care of writing the data to file
+                                System.Net.Sockets.Socket feb_socket = feb.TNETSocket;
+                                //Thread save = new Thread(() => Save(mem_buff, savename)); //Spawn a thread that will take care of writing the data to file
+                                Thread save = new Thread(() => Save(mem_buff, savename, feb_socket)); //Spawn a thread that will take care of writing the data to file
                                 save.Start();
                             }
 
@@ -231,7 +277,10 @@ namespace TB_mu2e
                         else
                         {
                             string savename = feb.name;
-                            Thread save = new Thread(() => Save(mem_buff, savename)); //Spawn a thread that will take care of writing the data to file
+                            //changed by Ralf 5/18/21
+                            System.Net.Sockets.Socket feb_socket = feb.TNETSocket;
+                            //Thread save = new Thread(() => Save(mem_buff, savename)); //Spawn a thread that will take care of writing the data to file
+                            Thread save = new Thread(() => Save(mem_buff, savename, feb_socket)); //Spawn a thread that will take care of writing the data to file
                             save.Start();
                         }
 

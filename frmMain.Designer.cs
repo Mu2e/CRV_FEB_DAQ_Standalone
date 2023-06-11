@@ -141,6 +141,8 @@
             this.btnWC = new System.Windows.Forms.Button();
             this.tabQC = new System.Windows.Forms.TabPage();
             this.lightCheckGroup = new System.Windows.Forms.GroupBox();
+            this.LightCheckModuleHalf = new System.Windows.Forms.ComboBox();
+            this.LightCheckTypeLbl = new System.Windows.Forms.Label();
             this.LightCheckType = new System.Windows.Forms.ComboBox();
             this.lightNumChecks = new System.Windows.Forms.NumericUpDown();
             this.lightModuleSideLabel = new System.Windows.Forms.Label();
@@ -217,6 +219,58 @@
             this.ModuleQAFEB1Box = new System.Windows.Forms.GroupBox();
             this.ModuleQCTableFEB1 = new System.Windows.Forms.TableLayoutPanel();
             this.ModuleQCBtn = new System.Windows.Forms.Button();
+            this.tabPage1 = new System.Windows.Forms.TabPage();
+            this.label3 = new System.Windows.Forms.Label();
+            this.outFileName = new System.Windows.Forms.TextBox();
+            this.label4 = new System.Windows.Forms.Label();
+            this.qaBias = new System.Windows.Forms.TextBox();
+            this.dicounterQAGroup = new System.Windows.Forms.GroupBox();
+            this.stopMeasureBtn = new System.Windows.Forms.Button();
+            this.measIntervalLabel = new System.Windows.Forms.Label();
+            this.numMeasureLabel = new System.Windows.Forms.Label();
+            this.measInterval = new System.Windows.Forms.NumericUpDown();
+            this.numMeasure = new System.Windows.Forms.NumericUpDown();
+            this.sourceRunFlag = new System.Windows.Forms.CheckBox();
+            this.but31 = new System.Windows.Forms.RadioButton();
+            this.but30 = new System.Windows.Forms.RadioButton();
+            this.but29 = new System.Windows.Forms.RadioButton();
+            this.but28 = new System.Windows.Forms.RadioButton();
+            this.but27 = new System.Windows.Forms.RadioButton();
+            this.but26 = new System.Windows.Forms.RadioButton();
+            this.but25 = new System.Windows.Forms.RadioButton();
+            this.but24 = new System.Windows.Forms.RadioButton();
+            this.but23 = new System.Windows.Forms.RadioButton();
+            this.but19 = new System.Windows.Forms.RadioButton();
+            this.but18 = new System.Windows.Forms.RadioButton();
+            this.but17 = new System.Windows.Forms.RadioButton();
+            this.but16 = new System.Windows.Forms.RadioButton();
+            this.but21 = new System.Windows.Forms.RadioButton();
+            this.but20 = new System.Windows.Forms.RadioButton();
+            this.but22 = new System.Windows.Forms.RadioButton();
+            this.numAvg = new System.Windows.Forms.NumericUpDown();
+            this.label22 = new System.Windows.Forms.Label();
+            this.but15 = new System.Windows.Forms.RadioButton();
+            this.but14 = new System.Windows.Forms.RadioButton();
+            this.but13 = new System.Windows.Forms.RadioButton();
+            this.but12 = new System.Windows.Forms.RadioButton();
+            this.but11 = new System.Windows.Forms.RadioButton();
+            this.but10 = new System.Windows.Forms.RadioButton();
+            this.but9 = new System.Windows.Forms.RadioButton();
+            this.but8 = new System.Windows.Forms.RadioButton();
+            this.but7 = new System.Windows.Forms.RadioButton();
+            this.but3 = new System.Windows.Forms.RadioButton();
+            this.but2 = new System.Windows.Forms.RadioButton();
+            this.but1 = new System.Windows.Forms.RadioButton();
+            this.but0 = new System.Windows.Forms.RadioButton();
+            this.but5 = new System.Windows.Forms.RadioButton();
+            this.but4 = new System.Windows.Forms.RadioButton();
+            this.but6 = new System.Windows.Forms.RadioButton();
+            this.label21 = new System.Windows.Forms.Label();
+            this.iWarningThresh = new System.Windows.Forms.TextBox();
+            this.progressBar1 = new System.Windows.Forms.ProgressBar();
+            this.numButton = new System.Windows.Forms.Button();
+            this.label2 = new System.Windows.Forms.Label();
+            this.numTextBox = new System.Windows.Forms.TextBox();
             this.FEBSelectPanel = new System.Windows.Forms.TableLayoutPanel();
             this.SpillTimer = new System.Windows.Forms.Timer(this.components);
             this.moduleQAHomingTimer = new System.Windows.Forms.Timer(this.components);
@@ -225,8 +279,6 @@
             this.LightCheckMeasurementTimer = new System.Windows.Forms.Timer(this.components);
             this.qcDiCounterMeasurementTimer = new System.Windows.Forms.Timer(this.components);
             this.FEBClientFooterBar = new System.Windows.Forms.Label();
-            this.LightCheckTypeLbl = new System.Windows.Forms.Label();
-            this.LightCheckModuleHalf = new System.Windows.Forms.ComboBox();
             this.tabControl.SuspendLayout();
             this.tabRUN.SuspendLayout();
             this.groupBoxEvDisplay.SuspendLayout();
@@ -263,6 +315,11 @@
             ((System.ComponentModel.ISupportInitialize)(this.ModuleQC_Offset)).BeginInit();
             this.ModuleQAFEB2Box.SuspendLayout();
             this.ModuleQAFEB1Box.SuspendLayout();
+            this.tabPage1.SuspendLayout();
+            this.dicounterQAGroup.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.measInterval)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numMeasure)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numAvg)).BeginInit();
             this.SuspendLayout();
             // 
             // tabControl
@@ -275,6 +332,7 @@
             this.tabControl.Controls.Add(this.tabQC);
             this.tabControl.Controls.Add(this.tabCMBTester);
             this.tabControl.Controls.Add(this.tabModuleQC);
+            this.tabControl.Controls.Add(this.tabPage1);
             this.tabControl.Location = new System.Drawing.Point(1, 0);
             this.tabControl.Name = "tabControl";
             this.tabControl.SelectedIndex = 0;
@@ -296,10 +354,10 @@
             this.tabRUN.Controls.Add(this.groupBoxEvDisplay);
             this.tabRUN.Controls.Add(this.groupBox1);
             this.tabRUN.Controls.Add(this.zg1);
-            this.tabRUN.Location = new System.Drawing.Point(4, 29);
+            this.tabRUN.Location = new System.Drawing.Point(4, 32);
             this.tabRUN.Name = "tabRUN";
             this.tabRUN.Padding = new System.Windows.Forms.Padding(3);
-            this.tabRUN.Size = new System.Drawing.Size(1255, 653);
+            this.tabRUN.Size = new System.Drawing.Size(1255, 650);
             this.tabRUN.TabIndex = 0;
             this.tabRUN.Text = "RUN";
             this.tabRUN.UseVisualStyleBackColor = true;
@@ -307,7 +365,7 @@
             // runLog
             // 
             this.runLog.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.runLog.Location = new System.Drawing.Point(3, 479);
+            this.runLog.Location = new System.Drawing.Point(3, 476);
             this.runLog.MaxLength = 10240;
             this.runLog.Name = "runLog";
             this.runLog.ReadOnly = true;
@@ -323,7 +381,7 @@
             this.label14.AutoSize = true;
             this.label14.Location = new System.Drawing.Point(715, 131);
             this.label14.Name = "label14";
-            this.label14.Size = new System.Drawing.Size(89, 17);
+            this.label14.Size = new System.Drawing.Size(110, 20);
             this.label14.TabIndex = 45;
             this.label14.Text = "<maxADC3>:";
             // 
@@ -332,7 +390,7 @@
             this.label13.AutoSize = true;
             this.label13.Location = new System.Drawing.Point(715, 113);
             this.label13.Name = "label13";
-            this.label13.Size = new System.Drawing.Size(89, 17);
+            this.label13.Size = new System.Drawing.Size(110, 20);
             this.label13.TabIndex = 44;
             this.label13.Text = "<maxADC2>:";
             // 
@@ -341,7 +399,7 @@
             this.label12.AutoSize = true;
             this.label12.Location = new System.Drawing.Point(715, 95);
             this.label12.Name = "label12";
-            this.label12.Size = new System.Drawing.Size(89, 17);
+            this.label12.Size = new System.Drawing.Size(110, 20);
             this.label12.TabIndex = 43;
             this.label12.Text = "<maxADC1>:";
             // 
@@ -350,7 +408,7 @@
             this.label10.AutoSize = true;
             this.label10.Location = new System.Drawing.Point(715, 77);
             this.label10.Name = "label10";
-            this.label10.Size = new System.Drawing.Size(89, 17);
+            this.label10.Size = new System.Drawing.Size(110, 20);
             this.label10.TabIndex = 36;
             this.label10.Text = "<maxADC0>:";
             // 
@@ -359,7 +417,7 @@
             this.lblMaxADC3.AutoSize = true;
             this.lblMaxADC3.Location = new System.Drawing.Point(810, 131);
             this.lblMaxADC3.Name = "lblMaxADC3";
-            this.lblMaxADC3.Size = new System.Drawing.Size(54, 17);
+            this.lblMaxADC3.Size = new System.Drawing.Size(62, 20);
             this.lblMaxADC3.TabIndex = 42;
             this.lblMaxADC3.Text = "label14";
             // 
@@ -368,7 +426,7 @@
             this.lblMaxADC2.AutoSize = true;
             this.lblMaxADC2.Location = new System.Drawing.Point(810, 113);
             this.lblMaxADC2.Name = "lblMaxADC2";
-            this.lblMaxADC2.Size = new System.Drawing.Size(54, 17);
+            this.lblMaxADC2.Size = new System.Drawing.Size(62, 20);
             this.lblMaxADC2.TabIndex = 41;
             this.lblMaxADC2.Text = "label14";
             // 
@@ -377,7 +435,7 @@
             this.lblMaxADC1.AutoSize = true;
             this.lblMaxADC1.Location = new System.Drawing.Point(810, 95);
             this.lblMaxADC1.Name = "lblMaxADC1";
-            this.lblMaxADC1.Size = new System.Drawing.Size(54, 17);
+            this.lblMaxADC1.Size = new System.Drawing.Size(62, 20);
             this.lblMaxADC1.TabIndex = 40;
             this.lblMaxADC1.Text = "label14";
             // 
@@ -386,7 +444,7 @@
             this.lblMaxADC0.AutoSize = true;
             this.lblMaxADC0.Location = new System.Drawing.Point(810, 77);
             this.lblMaxADC0.Name = "lblMaxADC0";
-            this.lblMaxADC0.Size = new System.Drawing.Size(54, 17);
+            this.lblMaxADC0.Size = new System.Drawing.Size(62, 20);
             this.lblMaxADC0.TabIndex = 36;
             this.lblMaxADC0.Text = "label14";
             // 
@@ -413,7 +471,7 @@
             this.chkLast.AutoSize = true;
             this.chkLast.Location = new System.Drawing.Point(407, 43);
             this.chkLast.Name = "chkLast";
-            this.chkLast.Size = new System.Drawing.Size(54, 21);
+            this.chkLast.Size = new System.Drawing.Size(64, 24);
             this.chkLast.TabIndex = 41;
             this.chkLast.Text = "Last";
             this.chkLast.UseVisualStyleBackColor = true;
@@ -424,7 +482,7 @@
             this.chkPersist.AutoSize = true;
             this.chkPersist.Location = new System.Drawing.Point(407, 9);
             this.chkPersist.Name = "chkPersist";
-            this.chkPersist.Size = new System.Drawing.Size(70, 21);
+            this.chkPersist.Size = new System.Drawing.Size(84, 24);
             this.chkPersist.TabIndex = 36;
             this.chkPersist.Text = "Persist";
             this.chkPersist.UseVisualStyleBackColor = true;
@@ -443,7 +501,7 @@
             // 
             this.txtEvent.Location = new System.Drawing.Point(517, 40);
             this.txtEvent.Name = "txtEvent";
-            this.txtEvent.Size = new System.Drawing.Size(44, 23);
+            this.txtEvent.Size = new System.Drawing.Size(44, 27);
             this.txtEvent.TabIndex = 38;
             // 
             // btnNextDisp
@@ -485,7 +543,7 @@
             0,
             -2147483648});
             this.ud_VertMin.Name = "ud_VertMin";
-            this.ud_VertMin.Size = new System.Drawing.Size(66, 23);
+            this.ud_VertMin.Size = new System.Drawing.Size(66, 27);
             this.ud_VertMin.TabIndex = 35;
             this.ud_VertMin.Value = new decimal(new int[] {
             100,
@@ -507,7 +565,7 @@
             0,
             0});
             this.ud_VertMax.Name = "ud_VertMax";
-            this.ud_VertMax.Size = new System.Drawing.Size(66, 23);
+            this.ud_VertMax.Size = new System.Drawing.Size(66, 27);
             this.ud_VertMax.TabIndex = 34;
             this.ud_VertMax.Value = new decimal(new int[] {
             1000,
@@ -555,7 +613,7 @@
             this.lblSpillsNum.AutoSize = true;
             this.lblSpillsNum.Location = new System.Drawing.Point(94, 140);
             this.lblSpillsNum.Name = "lblSpillsNum";
-            this.lblSpillsNum.Size = new System.Drawing.Size(84, 17);
+            this.lblSpillsNum.Size = new System.Drawing.Size(102, 20);
             this.lblSpillsNum.TabIndex = 41;
             this.lblSpillsNum.Text = "(Num Spills)";
             // 
@@ -564,7 +622,7 @@
             this.lblNumSpills.AutoSize = true;
             this.lblNumSpills.Location = new System.Drawing.Point(9, 140);
             this.lblNumSpills.Name = "lblNumSpills";
-            this.lblNumSpills.Size = new System.Drawing.Size(74, 17);
+            this.lblNumSpills.Size = new System.Drawing.Size(90, 20);
             this.lblNumSpills.TabIndex = 40;
             this.lblNumSpills.Text = "Num Spills";
             this.lblNumSpills.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -641,7 +699,7 @@
             this.lblTimeInSpill.AutoSize = true;
             this.lblTimeInSpill.Location = new System.Drawing.Point(90, 113);
             this.lblTimeInSpill.Name = "lblTimeInSpill";
-            this.lblTimeInSpill.Size = new System.Drawing.Size(92, 17);
+            this.lblTimeInSpill.Size = new System.Drawing.Size(111, 20);
             this.lblTimeInSpill.TabIndex = 38;
             this.lblTimeInSpill.Text = "(Time in spill)";
             // 
@@ -651,7 +709,7 @@
             this.validateParseChkBox.Enabled = false;
             this.validateParseChkBox.Location = new System.Drawing.Point(46, 22);
             this.validateParseChkBox.Name = "validateParseChkBox";
-            this.validateParseChkBox.Size = new System.Drawing.Size(78, 21);
+            this.validateParseChkBox.Size = new System.Drawing.Size(91, 24);
             this.validateParseChkBox.TabIndex = 37;
             this.validateParseChkBox.Text = "Validate";
             this.validateParseChkBox.UseVisualStyleBackColor = true;
@@ -663,7 +721,7 @@
             this.saveAsciiBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.saveAsciiBox.Location = new System.Drawing.Point(164, 22);
             this.saveAsciiBox.Name = "saveAsciiBox";
-            this.saveAsciiBox.Size = new System.Drawing.Size(226, 21);
+            this.saveAsciiBox.Size = new System.Drawing.Size(262, 24);
             this.saveAsciiBox.TabIndex = 36;
             this.saveAsciiBox.Text = "Save data as human-readable?";
             this.saveAsciiBox.UseVisualStyleBackColor = true;
@@ -673,7 +731,7 @@
             this.lblRunName.AutoSize = true;
             this.lblRunName.Location = new System.Drawing.Point(8, 59);
             this.lblRunName.Name = "lblRunName";
-            this.lblRunName.Size = new System.Drawing.Size(75, 17);
+            this.lblRunName.Size = new System.Drawing.Size(88, 20);
             this.lblRunName.TabIndex = 9;
             this.lblRunName.Text = "Run Name";
             // 
@@ -682,7 +740,7 @@
             this.lblTimeInRun.AutoSize = true;
             this.lblTimeInRun.Location = new System.Drawing.Point(92, 86);
             this.lblTimeInRun.Name = "lblTimeInRun";
-            this.lblTimeInRun.Size = new System.Drawing.Size(89, 17);
+            this.lblTimeInRun.Size = new System.Drawing.Size(105, 20);
             this.lblTimeInRun.TabIndex = 11;
             this.lblTimeInRun.Text = "(Time in run)";
             // 
@@ -691,7 +749,7 @@
             this.lblTxtRunName.AutoSize = true;
             this.lblTxtRunName.Location = new System.Drawing.Point(96, 59);
             this.lblTxtRunName.Name = "lblTxtRunName";
-            this.lblTxtRunName.Size = new System.Drawing.Size(81, 17);
+            this.lblTxtRunName.Size = new System.Drawing.Size(95, 20);
             this.lblTxtRunName.TabIndex = 5;
             this.lblTxtRunName.Text = "(RunName)";
             // 
@@ -700,7 +758,7 @@
             this.lblRunTime.AutoSize = true;
             this.lblRunTime.Location = new System.Drawing.Point(18, 86);
             this.lblRunTime.Name = "lblRunTime";
-            this.lblRunTime.Size = new System.Drawing.Size(65, 17);
+            this.lblRunTime.Size = new System.Drawing.Size(76, 20);
             this.lblRunTime.TabIndex = 12;
             this.lblRunTime.Text = "RunTime";
             // 
@@ -709,7 +767,7 @@
             this.lblSpillTime.AutoSize = true;
             this.lblSpillTime.Location = new System.Drawing.Point(18, 113);
             this.lblSpillTime.Name = "lblSpillTime";
-            this.lblSpillTime.Size = new System.Drawing.Size(65, 17);
+            this.lblSpillTime.Size = new System.Drawing.Size(78, 20);
             this.lblSpillTime.TabIndex = 21;
             this.lblSpillTime.Text = "SpillTime";
             // 
@@ -791,9 +849,9 @@
             this.tabConsole.Controls.Add(this.btnDebugLogging);
             this.tabConsole.Controls.Add(this.ConsoleBox);
             this.tabConsole.Controls.Add(this.groupBox3);
-            this.tabConsole.Location = new System.Drawing.Point(4, 29);
+            this.tabConsole.Location = new System.Drawing.Point(4, 32);
             this.tabConsole.Name = "tabConsole";
-            this.tabConsole.Size = new System.Drawing.Size(1255, 653);
+            this.tabConsole.Size = new System.Drawing.Size(1255, 650);
             this.tabConsole.TabIndex = 7;
             this.tabConsole.Text = "Debug Console";
             this.tabConsole.UseVisualStyleBackColor = true;
@@ -840,11 +898,11 @@
             // console_Disp
             // 
             this.console_Disp.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.console_Disp.Location = new System.Drawing.Point(3, 19);
+            this.console_Disp.Location = new System.Drawing.Point(3, 23);
             this.console_Disp.Name = "console_Disp";
             this.console_Disp.ReadOnly = true;
             this.console_Disp.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.ForcedVertical;
-            this.console_Disp.Size = new System.Drawing.Size(1243, 593);
+            this.console_Disp.Size = new System.Drawing.Size(1243, 589);
             this.console_Disp.TabIndex = 2;
             this.console_Disp.Text = "";
             this.console_Disp.TextChanged += new System.EventHandler(this.Console_Disp_TextChanged);
@@ -876,9 +934,9 @@
             this.tabFEB1.Controls.Add(this.panel2);
             this.tabFEB1.Controls.Add(this.panel1);
             this.tabFEB1.Controls.Add(this.groupBox7);
-            this.tabFEB1.Location = new System.Drawing.Point(4, 29);
+            this.tabFEB1.Location = new System.Drawing.Point(4, 32);
             this.tabFEB1.Name = "tabFEB1";
-            this.tabFEB1.Size = new System.Drawing.Size(1255, 653);
+            this.tabFEB1.Size = new System.Drawing.Size(1255, 650);
             this.tabFEB1.TabIndex = 3;
             this.tabFEB1.Text = "FEB";
             this.tabFEB1.UseVisualStyleBackColor = true;
@@ -889,7 +947,7 @@
             this.BDVoltsLabel15.BackColor = System.Drawing.SystemColors.InactiveCaption;
             this.BDVoltsLabel15.Location = new System.Drawing.Point(1202, 612);
             this.BDVoltsLabel15.Name = "BDVoltsLabel15";
-            this.BDVoltsLabel15.Size = new System.Drawing.Size(45, 17);
+            this.BDVoltsLabel15.Size = new System.Drawing.Size(51, 20);
             this.BDVoltsLabel15.TabIndex = 99;
             this.BDVoltsLabel15.Text = "0.00V";
             // 
@@ -899,7 +957,7 @@
             this.BDVoltsLabel14.BackColor = System.Drawing.SystemColors.InactiveCaption;
             this.BDVoltsLabel14.Location = new System.Drawing.Point(1151, 612);
             this.BDVoltsLabel14.Name = "BDVoltsLabel14";
-            this.BDVoltsLabel14.Size = new System.Drawing.Size(45, 17);
+            this.BDVoltsLabel14.Size = new System.Drawing.Size(51, 20);
             this.BDVoltsLabel14.TabIndex = 98;
             this.BDVoltsLabel14.Text = "0.00V";
             // 
@@ -909,7 +967,7 @@
             this.BDVoltsLabel13.BackColor = System.Drawing.SystemColors.InactiveCaption;
             this.BDVoltsLabel13.Location = new System.Drawing.Point(1100, 612);
             this.BDVoltsLabel13.Name = "BDVoltsLabel13";
-            this.BDVoltsLabel13.Size = new System.Drawing.Size(45, 17);
+            this.BDVoltsLabel13.Size = new System.Drawing.Size(51, 20);
             this.BDVoltsLabel13.TabIndex = 97;
             this.BDVoltsLabel13.Text = "0.00V";
             // 
@@ -919,7 +977,7 @@
             this.BDVoltsLabel12.BackColor = System.Drawing.SystemColors.InactiveCaption;
             this.BDVoltsLabel12.Location = new System.Drawing.Point(1049, 612);
             this.BDVoltsLabel12.Name = "BDVoltsLabel12";
-            this.BDVoltsLabel12.Size = new System.Drawing.Size(45, 17);
+            this.BDVoltsLabel12.Size = new System.Drawing.Size(51, 20);
             this.BDVoltsLabel12.TabIndex = 96;
             this.BDVoltsLabel12.Text = "0.00V";
             // 
@@ -929,7 +987,7 @@
             this.BDVoltsLabel7.BackColor = System.Drawing.SystemColors.InactiveCaption;
             this.BDVoltsLabel7.Location = new System.Drawing.Point(1202, 578);
             this.BDVoltsLabel7.Name = "BDVoltsLabel7";
-            this.BDVoltsLabel7.Size = new System.Drawing.Size(45, 17);
+            this.BDVoltsLabel7.Size = new System.Drawing.Size(51, 20);
             this.BDVoltsLabel7.TabIndex = 95;
             this.BDVoltsLabel7.Text = "0.00V";
             // 
@@ -939,7 +997,7 @@
             this.BDVoltsLabel6.BackColor = System.Drawing.SystemColors.InactiveCaption;
             this.BDVoltsLabel6.Location = new System.Drawing.Point(1151, 578);
             this.BDVoltsLabel6.Name = "BDVoltsLabel6";
-            this.BDVoltsLabel6.Size = new System.Drawing.Size(45, 17);
+            this.BDVoltsLabel6.Size = new System.Drawing.Size(51, 20);
             this.BDVoltsLabel6.TabIndex = 94;
             this.BDVoltsLabel6.Text = "0.00V";
             // 
@@ -949,7 +1007,7 @@
             this.BDVoltsLabel5.BackColor = System.Drawing.SystemColors.InactiveCaption;
             this.BDVoltsLabel5.Location = new System.Drawing.Point(1100, 578);
             this.BDVoltsLabel5.Name = "BDVoltsLabel5";
-            this.BDVoltsLabel5.Size = new System.Drawing.Size(45, 17);
+            this.BDVoltsLabel5.Size = new System.Drawing.Size(51, 20);
             this.BDVoltsLabel5.TabIndex = 93;
             this.BDVoltsLabel5.Text = "0.00V";
             // 
@@ -959,7 +1017,7 @@
             this.BDVoltsLabel8.BackColor = System.Drawing.SystemColors.InactiveCaption;
             this.BDVoltsLabel8.Location = new System.Drawing.Point(1049, 595);
             this.BDVoltsLabel8.Name = "BDVoltsLabel8";
-            this.BDVoltsLabel8.Size = new System.Drawing.Size(45, 17);
+            this.BDVoltsLabel8.Size = new System.Drawing.Size(51, 20);
             this.BDVoltsLabel8.TabIndex = 92;
             this.BDVoltsLabel8.Text = "0.00V";
             // 
@@ -969,7 +1027,7 @@
             this.BDVoltsLabel11.BackColor = System.Drawing.SystemColors.InactiveCaption;
             this.BDVoltsLabel11.Location = new System.Drawing.Point(1202, 595);
             this.BDVoltsLabel11.Name = "BDVoltsLabel11";
-            this.BDVoltsLabel11.Size = new System.Drawing.Size(45, 17);
+            this.BDVoltsLabel11.Size = new System.Drawing.Size(51, 20);
             this.BDVoltsLabel11.TabIndex = 91;
             this.BDVoltsLabel11.Text = "0.00V";
             // 
@@ -979,7 +1037,7 @@
             this.BDVoltsLabel9.BackColor = System.Drawing.SystemColors.InactiveCaption;
             this.BDVoltsLabel9.Location = new System.Drawing.Point(1100, 595);
             this.BDVoltsLabel9.Name = "BDVoltsLabel9";
-            this.BDVoltsLabel9.Size = new System.Drawing.Size(45, 17);
+            this.BDVoltsLabel9.Size = new System.Drawing.Size(51, 20);
             this.BDVoltsLabel9.TabIndex = 90;
             this.BDVoltsLabel9.Text = "0.00V";
             // 
@@ -989,7 +1047,7 @@
             this.BDVoltsLabel10.BackColor = System.Drawing.SystemColors.InactiveCaption;
             this.BDVoltsLabel10.Location = new System.Drawing.Point(1151, 595);
             this.BDVoltsLabel10.Name = "BDVoltsLabel10";
-            this.BDVoltsLabel10.Size = new System.Drawing.Size(45, 17);
+            this.BDVoltsLabel10.Size = new System.Drawing.Size(51, 20);
             this.BDVoltsLabel10.TabIndex = 89;
             this.BDVoltsLabel10.Text = "0.00V";
             // 
@@ -999,7 +1057,7 @@
             this.BDVoltsLabel4.BackColor = System.Drawing.SystemColors.InactiveCaption;
             this.BDVoltsLabel4.Location = new System.Drawing.Point(1049, 578);
             this.BDVoltsLabel4.Name = "BDVoltsLabel4";
-            this.BDVoltsLabel4.Size = new System.Drawing.Size(45, 17);
+            this.BDVoltsLabel4.Size = new System.Drawing.Size(51, 20);
             this.BDVoltsLabel4.TabIndex = 88;
             this.BDVoltsLabel4.Text = "0.00V";
             // 
@@ -1009,7 +1067,7 @@
             this.BDVoltsLabel3.BackColor = System.Drawing.SystemColors.InactiveCaption;
             this.BDVoltsLabel3.Location = new System.Drawing.Point(1202, 561);
             this.BDVoltsLabel3.Name = "BDVoltsLabel3";
-            this.BDVoltsLabel3.Size = new System.Drawing.Size(45, 17);
+            this.BDVoltsLabel3.Size = new System.Drawing.Size(51, 20);
             this.BDVoltsLabel3.TabIndex = 87;
             this.BDVoltsLabel3.Text = "0.00V";
             // 
@@ -1019,7 +1077,7 @@
             this.BDVoltsLabel2.BackColor = System.Drawing.SystemColors.InactiveCaption;
             this.BDVoltsLabel2.Location = new System.Drawing.Point(1151, 561);
             this.BDVoltsLabel2.Name = "BDVoltsLabel2";
-            this.BDVoltsLabel2.Size = new System.Drawing.Size(45, 17);
+            this.BDVoltsLabel2.Size = new System.Drawing.Size(51, 20);
             this.BDVoltsLabel2.TabIndex = 86;
             this.BDVoltsLabel2.Text = "0.00V";
             // 
@@ -1029,7 +1087,7 @@
             this.BDVoltsLabel1.BackColor = System.Drawing.SystemColors.InactiveCaption;
             this.BDVoltsLabel1.Location = new System.Drawing.Point(1100, 561);
             this.BDVoltsLabel1.Name = "BDVoltsLabel1";
-            this.BDVoltsLabel1.Size = new System.Drawing.Size(45, 17);
+            this.BDVoltsLabel1.Size = new System.Drawing.Size(51, 20);
             this.BDVoltsLabel1.TabIndex = 85;
             this.BDVoltsLabel1.Text = "0.00V";
             // 
@@ -1039,7 +1097,7 @@
             this.BDVoltsLabel0.BackColor = System.Drawing.SystemColors.InactiveCaption;
             this.BDVoltsLabel0.Location = new System.Drawing.Point(1049, 561);
             this.BDVoltsLabel0.Name = "BDVoltsLabel0";
-            this.BDVoltsLabel0.Size = new System.Drawing.Size(45, 17);
+            this.BDVoltsLabel0.Size = new System.Drawing.Size(51, 20);
             this.BDVoltsLabel0.TabIndex = 84;
             this.BDVoltsLabel0.Text = "0.00V";
             // 
@@ -1048,7 +1106,7 @@
             this.scanAllChanBox.AutoSize = true;
             this.scanAllChanBox.Location = new System.Drawing.Point(902, 598);
             this.scanAllChanBox.Name = "scanAllChanBox";
-            this.scanAllChanBox.Size = new System.Drawing.Size(141, 21);
+            this.scanAllChanBox.Size = new System.Drawing.Size(168, 24);
             this.scanAllChanBox.TabIndex = 83;
             this.scanAllChanBox.Text = "Scan All Channels";
             this.scanAllChanBox.UseVisualStyleBackColor = true;
@@ -1059,7 +1117,7 @@
             this.label23.BackColor = System.Drawing.SystemColors.Menu;
             this.label23.Location = new System.Drawing.Point(903, 578);
             this.label23.Name = "label23";
-            this.label23.Size = new System.Drawing.Size(137, 17);
+            this.label23.Size = new System.Drawing.Size(162, 20);
             this.label23.TabIndex = 66;
             this.label23.Text = "Breakdown Voltages";
             // 
@@ -1121,7 +1179,7 @@
             this.lblFPGA.AutoSize = true;
             this.lblFPGA.Location = new System.Drawing.Point(10, 426);
             this.lblFPGA.Name = "lblFPGA";
-            this.lblFPGA.Size = new System.Drawing.Size(45, 17);
+            this.lblFPGA.Size = new System.Drawing.Size(54, 20);
             this.lblFPGA.TabIndex = 63;
             this.lblFPGA.Text = "FPGA";
             // 
@@ -1146,7 +1204,7 @@
             0,
             0});
             this.udFPGA.Name = "udFPGA";
-            this.udFPGA.Size = new System.Drawing.Size(46, 23);
+            this.udFPGA.Size = new System.Drawing.Size(46, 27);
             this.udFPGA.TabIndex = 13;
             this.udFPGA.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
             this.udFPGA.ValueChanged += new System.EventHandler(this.UdFPGA_ValueChanged);
@@ -1209,7 +1267,7 @@
             this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label1.Location = new System.Drawing.Point(0, 83);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(39, 16);
+            this.label1.Size = new System.Drawing.Size(48, 20);
             this.label1.TabIndex = 57;
             this.label1.Text = "Chan";
             // 
@@ -1222,7 +1280,7 @@
             0,
             0});
             this.udChan.Name = "udChan";
-            this.udChan.Size = new System.Drawing.Size(57, 23);
+            this.udChan.Size = new System.Drawing.Size(57, 27);
             this.udChan.TabIndex = 56;
             this.udChan.ValueChanged += new System.EventHandler(this.UdChan_ValueChanged);
             // 
@@ -1232,7 +1290,7 @@
             this.lblInc.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lblInc.Location = new System.Drawing.Point(0, 56);
             this.lblInc.Name = "lblInc";
-            this.lblInc.Size = new System.Drawing.Size(68, 16);
+            this.lblInc.Size = new System.Drawing.Size(86, 20);
             this.lblInc.TabIndex = 53;
             this.lblInc.Text = "Time (ms)";
             // 
@@ -1245,7 +1303,7 @@
             0,
             0});
             this.udInterval.Name = "udInterval";
-            this.udInterval.Size = new System.Drawing.Size(57, 23);
+            this.udInterval.Size = new System.Drawing.Size(57, 27);
             this.udInterval.TabIndex = 52;
             this.udInterval.Value = new decimal(new int[] {
             10,
@@ -1270,7 +1328,7 @@
             this.lblStop.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lblStop.Location = new System.Drawing.Point(2, 29);
             this.lblStop.Name = "lblStop";
-            this.lblStop.Size = new System.Drawing.Size(36, 16);
+            this.lblStop.Size = new System.Drawing.Size(43, 20);
             this.lblStop.TabIndex = 51;
             this.lblStop.Text = "Stop";
             // 
@@ -1299,7 +1357,7 @@
             0,
             0});
             this.udStop.Name = "udStop";
-            this.udStop.Size = new System.Drawing.Size(57, 23);
+            this.udStop.Size = new System.Drawing.Size(57, 27);
             this.udStop.TabIndex = 50;
             this.udStop.Value = new decimal(new int[] {
             2100,
@@ -1313,7 +1371,7 @@
             this.lblStart.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lblStart.Location = new System.Drawing.Point(2, 3);
             this.lblStart.Name = "lblStart";
-            this.lblStart.Size = new System.Drawing.Size(35, 16);
+            this.lblStart.Size = new System.Drawing.Size(45, 20);
             this.lblStart.TabIndex = 49;
             this.lblStart.Text = "Start";
             // 
@@ -1331,7 +1389,7 @@
             0,
             0});
             this.udStart.Name = "udStart";
-            this.udStart.Size = new System.Drawing.Size(56, 23);
+            this.udStart.Size = new System.Drawing.Size(56, 27);
             this.udStart.TabIndex = 48;
             this.udStart.Value = new decimal(new int[] {
             2020,
@@ -1355,7 +1413,7 @@
             this.chkIntegral.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.chkIntegral.Location = new System.Drawing.Point(3, 36);
             this.chkIntegral.Name = "chkIntegral";
-            this.chkIntegral.Size = new System.Drawing.Size(123, 20);
+            this.chkIntegral.Size = new System.Drawing.Size(148, 24);
             this.chkIntegral.TabIndex = 57;
             this.chkIntegral.Text = "Integral Spect";
             this.chkIntegral.UseVisualStyleBackColor = true;
@@ -1367,7 +1425,7 @@
             this.chkLogY.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.chkLogY.Location = new System.Drawing.Point(3, 4);
             this.chkLogY.Name = "chkLogY";
-            this.chkLogY.Size = new System.Drawing.Size(63, 20);
+            this.chkLogY.Size = new System.Drawing.Size(73, 24);
             this.chkLogY.TabIndex = 55;
             this.chkLogY.Text = "LogY";
             this.chkLogY.UseVisualStyleBackColor = true;
@@ -1411,7 +1469,7 @@
             this.txtCMB_Temp4.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.830189F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.txtCMB_Temp4.Location = new System.Drawing.Point(318, 56);
             this.txtCMB_Temp4.Name = "txtCMB_Temp4";
-            this.txtCMB_Temp4.Size = new System.Drawing.Size(47, 21);
+            this.txtCMB_Temp4.Size = new System.Drawing.Size(47, 24);
             this.txtCMB_Temp4.TabIndex = 69;
             this.txtCMB_Temp4.Text = "0.000";
             // 
@@ -1421,7 +1479,7 @@
             this.txtCMB_Temp3.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.830189F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.txtCMB_Temp3.Location = new System.Drawing.Point(265, 56);
             this.txtCMB_Temp3.Name = "txtCMB_Temp3";
-            this.txtCMB_Temp3.Size = new System.Drawing.Size(47, 21);
+            this.txtCMB_Temp3.Size = new System.Drawing.Size(47, 24);
             this.txtCMB_Temp3.TabIndex = 68;
             this.txtCMB_Temp3.Text = "0.000";
             // 
@@ -1431,7 +1489,7 @@
             this.txtCMB_Temp2.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.830189F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.txtCMB_Temp2.Location = new System.Drawing.Point(212, 56);
             this.txtCMB_Temp2.Name = "txtCMB_Temp2";
-            this.txtCMB_Temp2.Size = new System.Drawing.Size(47, 21);
+            this.txtCMB_Temp2.Size = new System.Drawing.Size(47, 24);
             this.txtCMB_Temp2.TabIndex = 67;
             this.txtCMB_Temp2.Text = "0.000";
             // 
@@ -1441,7 +1499,7 @@
             this.txtCMB_Temp1.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.830189F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.txtCMB_Temp1.Location = new System.Drawing.Point(159, 56);
             this.txtCMB_Temp1.Name = "txtCMB_Temp1";
-            this.txtCMB_Temp1.Size = new System.Drawing.Size(47, 21);
+            this.txtCMB_Temp1.Size = new System.Drawing.Size(47, 24);
             this.txtCMB_Temp1.TabIndex = 66;
             this.txtCMB_Temp1.Text = "0.000";
             // 
@@ -1450,7 +1508,7 @@
             this.label9.AutoSize = true;
             this.label9.Location = new System.Drawing.Point(99, 58);
             this.label9.Name = "label9";
-            this.label9.Size = new System.Drawing.Size(54, 17);
+            this.label9.Size = new System.Drawing.Size(65, 20);
             this.label9.TabIndex = 65;
             this.label9.Text = "TEMP=";
             // 
@@ -1460,7 +1518,7 @@
             this.txtI.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.830189F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.txtI.Location = new System.Drawing.Point(32, 56);
             this.txtI.Name = "txtI";
-            this.txtI.Size = new System.Drawing.Size(55, 21);
+            this.txtI.Size = new System.Drawing.Size(55, 24);
             this.txtI.TabIndex = 62;
             this.txtI.Text = "0.000";
             // 
@@ -1469,7 +1527,7 @@
             this.txtV.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.830189F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.txtV.Location = new System.Drawing.Point(32, 29);
             this.txtV.Name = "txtV";
-            this.txtV.Size = new System.Drawing.Size(55, 21);
+            this.txtV.Size = new System.Drawing.Size(55, 24);
             this.txtV.TabIndex = 61;
             this.txtV.Text = "0.000";
             // 
@@ -1500,7 +1558,7 @@
             this.lblI.AutoSize = true;
             this.lblI.Location = new System.Drawing.Point(10, 58);
             this.lblI.Name = "lblI";
-            this.lblI.Size = new System.Drawing.Size(19, 17);
+            this.lblI.Size = new System.Drawing.Size(23, 20);
             this.lblI.TabIndex = 5;
             this.lblI.Text = "I=";
             // 
@@ -1509,16 +1567,16 @@
             this.lblV.AutoSize = true;
             this.lblV.Location = new System.Drawing.Point(7, 31);
             this.lblV.Name = "lblV";
-            this.lblV.Size = new System.Drawing.Size(25, 17);
+            this.lblV.Size = new System.Drawing.Size(30, 20);
             this.lblV.TabIndex = 4;
             this.lblV.Text = "V=";
             // 
             // tabWC
             // 
             this.tabWC.Controls.Add(this.groupBox6);
-            this.tabWC.Location = new System.Drawing.Point(4, 29);
+            this.tabWC.Location = new System.Drawing.Point(4, 32);
             this.tabWC.Name = "tabWC";
-            this.tabWC.Size = new System.Drawing.Size(1255, 653);
+            this.tabWC.Size = new System.Drawing.Size(1255, 650);
             this.tabWC.TabIndex = 6;
             this.tabWC.Text = "WC";
             this.tabWC.UseVisualStyleBackColor = true;
@@ -1539,7 +1597,7 @@
             this.lblWCmessage.AutoSize = true;
             this.lblWCmessage.Location = new System.Drawing.Point(-1, 87);
             this.lblWCmessage.Name = "lblWCmessage";
-            this.lblWCmessage.Size = new System.Drawing.Size(46, 34);
+            this.lblWCmessage.Size = new System.Drawing.Size(53, 40);
             this.lblWCmessage.TabIndex = 2;
             this.lblWCmessage.Text = "label1\r\nlabel2";
             // 
@@ -1559,9 +1617,9 @@
             this.tabQC.Controls.Add(this.dicounterQCGroup);
             this.tabQC.Controls.Add(this.qaBiasLbl);
             this.tabQC.Controls.Add(this.qcBias);
-            this.tabQC.Location = new System.Drawing.Point(4, 29);
+            this.tabQC.Location = new System.Drawing.Point(4, 32);
             this.tabQC.Name = "tabQC";
-            this.tabQC.Size = new System.Drawing.Size(1255, 653);
+            this.tabQC.Size = new System.Drawing.Size(1255, 650);
             this.tabQC.TabIndex = 0;
             this.tabQC.Text = "QC";
             this.tabQC.UseVisualStyleBackColor = true;
@@ -1599,6 +1657,28 @@
             this.lightCheckGroup.TabStop = false;
             this.lightCheckGroup.Text = "Light Check";
             // 
+            // LightCheckModuleHalf
+            // 
+            this.LightCheckModuleHalf.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.LightCheckModuleHalf.Enabled = false;
+            this.LightCheckModuleHalf.FormattingEnabled = true;
+            this.LightCheckModuleHalf.Items.AddRange(new object[] {
+            "TOP",
+            "BOTTOM"});
+            this.LightCheckModuleHalf.Location = new System.Drawing.Point(471, 36);
+            this.LightCheckModuleHalf.Name = "LightCheckModuleHalf";
+            this.LightCheckModuleHalf.Size = new System.Drawing.Size(93, 28);
+            this.LightCheckModuleHalf.TabIndex = 203;
+            // 
+            // LightCheckTypeLbl
+            // 
+            this.LightCheckTypeLbl.AutoSize = true;
+            this.LightCheckTypeLbl.Location = new System.Drawing.Point(584, 16);
+            this.LightCheckTypeLbl.Name = "LightCheckTypeLbl";
+            this.LightCheckTypeLbl.Size = new System.Drawing.Size(83, 20);
+            this.LightCheckTypeLbl.TabIndex = 202;
+            this.LightCheckTypeLbl.Text = "Test Type";
+            // 
             // LightCheckType
             // 
             this.LightCheckType.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
@@ -1609,7 +1689,7 @@
             "LIGHT"});
             this.LightCheckType.Location = new System.Drawing.Point(584, 36);
             this.LightCheckType.Name = "LightCheckType";
-            this.LightCheckType.Size = new System.Drawing.Size(72, 25);
+            this.LightCheckType.Size = new System.Drawing.Size(72, 28);
             this.LightCheckType.TabIndex = 201;
             // 
             // lightNumChecks
@@ -1626,7 +1706,7 @@
             0,
             0});
             this.lightNumChecks.Name = "lightNumChecks";
-            this.lightNumChecks.Size = new System.Drawing.Size(63, 23);
+            this.lightNumChecks.Size = new System.Drawing.Size(63, 27);
             this.lightNumChecks.TabIndex = 200;
             this.lightNumChecks.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             this.lightNumChecks.UpDownAlign = System.Windows.Forms.LeftRightAlignment.Left;
@@ -1642,7 +1722,7 @@
             this.lightModuleSideLabel.AutoSize = true;
             this.lightModuleSideLabel.Location = new System.Drawing.Point(402, 16);
             this.lightModuleSideLabel.Name = "lightModuleSideLabel";
-            this.lightModuleSideLabel.Size = new System.Drawing.Size(36, 17);
+            this.lightModuleSideLabel.Size = new System.Drawing.Size(42, 20);
             this.lightModuleSideLabel.TabIndex = 199;
             this.lightModuleSideLabel.Text = "Side";
             // 
@@ -1651,7 +1731,7 @@
             this.LightCheckModuleHalfLbl.AutoSize = true;
             this.LightCheckModuleHalfLbl.Location = new System.Drawing.Point(471, 16);
             this.LightCheckModuleHalfLbl.Name = "LightCheckModuleHalfLbl";
-            this.LightCheckModuleHalfLbl.Size = new System.Drawing.Size(83, 17);
+            this.LightCheckModuleHalfLbl.Size = new System.Drawing.Size(99, 20);
             this.LightCheckModuleHalfLbl.TabIndex = 198;
             this.LightCheckModuleHalfLbl.Text = "Module Half";
             // 
@@ -1675,7 +1755,7 @@
             "B"});
             this.lightModuleSide.Location = new System.Drawing.Point(402, 36);
             this.lightModuleSide.Name = "lightModuleSide";
-            this.lightModuleSide.Size = new System.Drawing.Size(49, 25);
+            this.lightModuleSide.Size = new System.Drawing.Size(49, 28);
             this.lightModuleSide.TabIndex = 196;
             // 
             // lightModuleLabelLabel
@@ -1683,7 +1763,7 @@
             this.lightModuleLabelLabel.AutoSize = true;
             this.lightModuleLabelLabel.Location = new System.Drawing.Point(287, 16);
             this.lightModuleLabelLabel.Name = "lightModuleLabelLabel";
-            this.lightModuleLabelLabel.Size = new System.Drawing.Size(93, 17);
+            this.lightModuleLabelLabel.Size = new System.Drawing.Size(109, 20);
             this.lightModuleLabelLabel.TabIndex = 195;
             this.lightModuleLabelLabel.Text = "Module Label";
             // 
@@ -1692,7 +1772,7 @@
             this.lightModuleLabel.BackColor = System.Drawing.Color.Yellow;
             this.lightModuleLabel.Location = new System.Drawing.Point(287, 38);
             this.lightModuleLabel.Name = "lightModuleLabel";
-            this.lightModuleLabel.Size = new System.Drawing.Size(95, 23);
+            this.lightModuleLabel.Size = new System.Drawing.Size(95, 27);
             this.lightModuleLabel.TabIndex = 194;
             this.lightModuleLabel.TextChanged += new System.EventHandler(this.LightModuleLabel_TextChanged);
             // 
@@ -1703,7 +1783,7 @@
             this.lightWriteToFileBox.Enabled = false;
             this.lightWriteToFileBox.Location = new System.Drawing.Point(676, 22);
             this.lightWriteToFileBox.Name = "lightWriteToFileBox";
-            this.lightWriteToFileBox.Size = new System.Drawing.Size(87, 35);
+            this.lightWriteToFileBox.Size = new System.Drawing.Size(104, 41);
             this.lightWriteToFileBox.TabIndex = 193;
             this.lightWriteToFileBox.Text = "Write to File";
             this.lightWriteToFileBox.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
@@ -1728,7 +1808,7 @@
             this.label16.AutoSize = true;
             this.label16.Location = new System.Drawing.Point(43, 91);
             this.label16.Name = "label16";
-            this.label16.Size = new System.Drawing.Size(168, 17);
+            this.label16.Size = new System.Drawing.Size(201, 20);
             this.label16.TabIndex = 191;
             this.label16.Text = "Number of times to check";
             this.label16.Visible = false;
@@ -1768,7 +1848,7 @@
             this.lightCheckChanThreshLbl.AutoSize = true;
             this.lightCheckChanThreshLbl.Location = new System.Drawing.Point(113, 148);
             this.lightCheckChanThreshLbl.Name = "lightCheckChanThreshLbl";
-            this.lightCheckChanThreshLbl.Size = new System.Drawing.Size(53, 17);
+            this.lightCheckChanThreshLbl.Size = new System.Drawing.Size(61, 20);
             this.lightCheckChanThreshLbl.TabIndex = 176;
             this.lightCheckChanThreshLbl.Text = "Thresh";
             // 
@@ -1776,7 +1856,7 @@
             // 
             this.lightCheckChanThresh.Location = new System.Drawing.Point(112, 167);
             this.lightCheckChanThresh.Name = "lightCheckChanThresh";
-            this.lightCheckChanThresh.Size = new System.Drawing.Size(79, 23);
+            this.lightCheckChanThresh.Size = new System.Drawing.Size(79, 27);
             this.lightCheckChanThresh.TabIndex = 175;
             this.lightCheckChanThresh.Text = "0.2500";
             // 
@@ -1785,7 +1865,7 @@
             this.lightCheckChanSelecLbl.AutoSize = true;
             this.lightCheckChanSelecLbl.Location = new System.Drawing.Point(48, 148);
             this.lightCheckChanSelecLbl.Name = "lightCheckChanSelecLbl";
-            this.lightCheckChanSelecLbl.Size = new System.Drawing.Size(41, 17);
+            this.lightCheckChanSelecLbl.Size = new System.Drawing.Size(48, 20);
             this.lightCheckChanSelecLbl.TabIndex = 174;
             this.lightCheckChanSelecLbl.Text = "Chan";
             // 
@@ -1798,7 +1878,7 @@
             0,
             0});
             this.lightCheckChanSelec.Name = "lightCheckChanSelec";
-            this.lightCheckChanSelec.Size = new System.Drawing.Size(56, 23);
+            this.lightCheckChanSelec.Size = new System.Drawing.Size(56, 27);
             this.lightCheckChanSelec.TabIndex = 173;
             this.lightCheckChanSelec.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             this.lightCheckChanSelec.UpDownAlign = System.Windows.Forms.LeftRightAlignment.Left;
@@ -1809,7 +1889,7 @@
             this.globalThreshChkBox.AutoSize = true;
             this.globalThreshChkBox.Location = new System.Drawing.Point(109, 57);
             this.globalThreshChkBox.Name = "globalThreshChkBox";
-            this.globalThreshChkBox.Size = new System.Drawing.Size(154, 21);
+            this.globalThreshChkBox.Size = new System.Drawing.Size(180, 24);
             this.globalThreshChkBox.TabIndex = 171;
             this.globalThreshChkBox.Text = "Use Global Thresh?";
             this.globalThreshChkBox.UseVisualStyleBackColor = true;
@@ -1819,7 +1899,7 @@
             this.lightGlobalThreshLbl.AutoSize = true;
             this.lightGlobalThreshLbl.Location = new System.Drawing.Point(25, 37);
             this.lightGlobalThreshLbl.Name = "lightGlobalThreshLbl";
-            this.lightGlobalThreshLbl.Size = new System.Drawing.Size(117, 17);
+            this.lightGlobalThreshLbl.Size = new System.Drawing.Size(136, 20);
             this.lightGlobalThreshLbl.TabIndex = 169;
             this.lightGlobalThreshLbl.Text = "Global Threshold";
             // 
@@ -1827,7 +1907,7 @@
             // 
             this.lightGlobalThresh.Location = new System.Drawing.Point(31, 56);
             this.lightGlobalThresh.Name = "lightGlobalThresh";
-            this.lightGlobalThresh.Size = new System.Drawing.Size(61, 23);
+            this.lightGlobalThresh.Size = new System.Drawing.Size(61, 27);
             this.lightGlobalThresh.TabIndex = 167;
             this.lightGlobalThresh.Text = "0.25";
             this.lightGlobalThresh.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
@@ -1867,7 +1947,7 @@
             // 
             this.qaOutputFileName.Location = new System.Drawing.Point(759, 60);
             this.qaOutputFileName.Name = "qaOutputFileName";
-            this.qaOutputFileName.Size = new System.Drawing.Size(112, 23);
+            this.qaOutputFileName.Size = new System.Drawing.Size(112, 27);
             this.qaOutputFileName.TabIndex = 119;
             // 
             // qaOutputFileNameLabel
@@ -1875,7 +1955,7 @@
             this.qaOutputFileNameLabel.AutoSize = true;
             this.qaOutputFileNameLabel.Location = new System.Drawing.Point(532, 64);
             this.qaOutputFileNameLabel.Name = "qaOutputFileNameLabel";
-            this.qaOutputFileNameLabel.Size = new System.Drawing.Size(371, 17);
+            this.qaOutputFileNameLabel.Size = new System.Drawing.Size(448, 20);
             this.qaOutputFileNameLabel.TabIndex = 118;
             this.qaOutputFileNameLabel.Text = "Output File Name: \"ScanningData_                              .txt\"\r\n";
             // 
@@ -1884,7 +1964,7 @@
             this.oneReadout.AutoSize = true;
             this.oneReadout.Location = new System.Drawing.Point(535, 30);
             this.oneReadout.Name = "oneReadout";
-            this.oneReadout.Size = new System.Drawing.Size(153, 21);
+            this.oneReadout.Size = new System.Drawing.Size(180, 24);
             this.oneReadout.TabIndex = 117;
             this.oneReadout.Text = "First Readout Only?";
             this.oneReadout.UseVisualStyleBackColor = true;
@@ -1896,7 +1976,7 @@
             this.qaDiNumAvgLabel.Enabled = false;
             this.qaDiNumAvgLabel.Location = new System.Drawing.Point(253, 30);
             this.qaDiNumAvgLabel.Name = "qaDiNumAvgLabel";
-            this.qaDiNumAvgLabel.Size = new System.Drawing.Size(61, 17);
+            this.qaDiNumAvgLabel.Size = new System.Drawing.Size(72, 20);
             this.qaDiNumAvgLabel.TabIndex = 114;
             this.qaDiNumAvgLabel.Text = "NumAvg";
             // 
@@ -1905,7 +1985,7 @@
             this.qaDiIWarningThreshLabel.AutoSize = true;
             this.qaDiIWarningThreshLabel.Location = new System.Drawing.Point(320, 31);
             this.qaDiIWarningThreshLabel.Name = "qaDiIWarningThreshLabel";
-            this.qaDiIWarningThreshLabel.Size = new System.Drawing.Size(59, 17);
+            this.qaDiIWarningThreshLabel.Size = new System.Drawing.Size(69, 20);
             this.qaDiIWarningThreshLabel.TabIndex = 105;
             this.qaDiIWarningThreshLabel.Text = "I_thresh";
             // 
@@ -1924,7 +2004,7 @@
             0,
             0});
             this.qaDiNumAvg.Name = "qaDiNumAvg";
-            this.qaDiNumAvg.Size = new System.Drawing.Size(57, 23);
+            this.qaDiNumAvg.Size = new System.Drawing.Size(57, 27);
             this.qaDiNumAvg.TabIndex = 115;
             this.qaDiNumAvg.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             this.qaDiNumAvg.Value = new decimal(new int[] {
@@ -1937,7 +2017,7 @@
             // 
             this.qcDiIWarningThresh.Location = new System.Drawing.Point(317, 53);
             this.qcDiIWarningThresh.Name = "qcDiIWarningThresh";
-            this.qcDiIWarningThresh.Size = new System.Drawing.Size(62, 23);
+            this.qcDiIWarningThresh.Size = new System.Drawing.Size(62, 27);
             this.qcDiIWarningThresh.TabIndex = 104;
             this.qcDiIWarningThresh.Text = "0.1";
             this.qcDiIWarningThresh.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
@@ -1968,7 +2048,7 @@
             this.numLabel.AutoSize = true;
             this.numLabel.Location = new System.Drawing.Point(13, 32);
             this.numLabel.Name = "numLabel";
-            this.numLabel.Size = new System.Drawing.Size(123, 17);
+            this.numLabel.Size = new System.Drawing.Size(146, 20);
             this.numLabel.TabIndex = 99;
             this.numLabel.Text = "Dicounter Number";
             // 
@@ -1976,7 +2056,7 @@
             // 
             this.dicounterNumberTextBox.Location = new System.Drawing.Point(16, 53);
             this.dicounterNumberTextBox.Name = "dicounterNumberTextBox";
-            this.dicounterNumberTextBox.Size = new System.Drawing.Size(112, 23);
+            this.dicounterNumberTextBox.Size = new System.Drawing.Size(112, 27);
             this.dicounterNumberTextBox.TabIndex = 98;
             // 
             // qaBiasLbl
@@ -1985,7 +2065,7 @@
             this.qaBiasLbl.Font = new System.Drawing.Font("Consolas", 15.75F, ((System.Drawing.FontStyle)((System.Drawing.FontStyle.Bold | System.Drawing.FontStyle.Underline))), System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.qaBiasLbl.Location = new System.Drawing.Point(34, 18);
             this.qaBiasLbl.Name = "qaBiasLbl";
-            this.qaBiasLbl.Size = new System.Drawing.Size(82, 24);
+            this.qaBiasLbl.Size = new System.Drawing.Size(104, 32);
             this.qaBiasLbl.TabIndex = 132;
             this.qaBiasLbl.Text = "Bias V";
             // 
@@ -1995,7 +2075,7 @@
             this.qcBias.Font = new System.Drawing.Font("Consolas", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.qcBias.Location = new System.Drawing.Point(133, 21);
             this.qcBias.Name = "qcBias";
-            this.qcBias.Size = new System.Drawing.Size(79, 23);
+            this.qcBias.Size = new System.Drawing.Size(79, 27);
             this.qcBias.TabIndex = 131;
             this.qcBias.Text = "57.0";
             this.qcBias.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
@@ -2005,10 +2085,10 @@
             // 
             this.tabCMBTester.Controls.Add(this.cmbDataGroup);
             this.tabCMBTester.Controls.Add(this.cmbTestControl);
-            this.tabCMBTester.Location = new System.Drawing.Point(4, 29);
+            this.tabCMBTester.Location = new System.Drawing.Point(4, 32);
             this.tabCMBTester.Name = "tabCMBTester";
             this.tabCMBTester.Padding = new System.Windows.Forms.Padding(3);
-            this.tabCMBTester.Size = new System.Drawing.Size(1255, 653);
+            this.tabCMBTester.Size = new System.Drawing.Size(1255, 650);
             this.tabCMBTester.TabIndex = 8;
             this.tabCMBTester.Text = "CMB Tester";
             this.tabCMBTester.UseVisualStyleBackColor = true;
@@ -2039,7 +2119,7 @@
             this.cmbDataTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 8.333333F));
             this.cmbDataTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 8.333333F));
             this.cmbDataTable.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.cmbDataTable.Location = new System.Drawing.Point(3, 19);
+            this.cmbDataTable.Location = new System.Drawing.Point(3, 23);
             this.cmbDataTable.Margin = new System.Windows.Forms.Padding(0);
             this.cmbDataTable.Name = "cmbDataTable";
             this.cmbDataTable.RowCount = 16;
@@ -2059,7 +2139,7 @@
             this.cmbDataTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 6.25F));
             this.cmbDataTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 6.25F));
             this.cmbDataTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 6.25F));
-            this.cmbDataTable.Size = new System.Drawing.Size(1217, 388);
+            this.cmbDataTable.Size = new System.Drawing.Size(1217, 384);
             this.cmbDataTable.TabIndex = 0;
             // 
             // cmbTestControl
@@ -2095,7 +2175,7 @@
             this.updateFilesChkBox.AutoSize = true;
             this.updateFilesChkBox.Location = new System.Drawing.Point(209, 21);
             this.updateFilesChkBox.Name = "updateFilesChkBox";
-            this.updateFilesChkBox.Size = new System.Drawing.Size(114, 21);
+            this.updateFilesChkBox.Size = new System.Drawing.Size(134, 24);
             this.updateFilesChkBox.TabIndex = 9;
             this.updateFilesChkBox.Text = "Update Files?";
             this.updateFilesChkBox.UseVisualStyleBackColor = true;
@@ -2105,7 +2185,7 @@
             this.cmbInfoBox.Location = new System.Drawing.Point(33, 108);
             this.cmbInfoBox.Name = "cmbInfoBox";
             this.cmbInfoBox.ReadOnly = true;
-            this.cmbInfoBox.Size = new System.Drawing.Size(147, 23);
+            this.cmbInfoBox.Size = new System.Drawing.Size(147, 27);
             this.cmbInfoBox.TabIndex = 8;
             // 
             // requestNumTrigsLabel
@@ -2113,7 +2193,7 @@
             this.requestNumTrigsLabel.AutoSize = true;
             this.requestNumTrigsLabel.Location = new System.Drawing.Point(206, 120);
             this.requestNumTrigsLabel.Name = "requestNumTrigsLabel";
-            this.requestNumTrigsLabel.Size = new System.Drawing.Size(113, 17);
+            this.requestNumTrigsLabel.Size = new System.Drawing.Size(132, 20);
             this.requestNumTrigsLabel.TabIndex = 7;
             this.requestNumTrigsLabel.Text = "Requested Trigs";
             // 
@@ -2121,7 +2201,7 @@
             // 
             this.requestNumTrigs.Location = new System.Drawing.Point(325, 117);
             this.requestNumTrigs.Name = "requestNumTrigs";
-            this.requestNumTrigs.Size = new System.Drawing.Size(73, 23);
+            this.requestNumTrigs.Size = new System.Drawing.Size(73, 27);
             this.requestNumTrigs.TabIndex = 6;
             this.requestNumTrigs.Text = "100";
             // 
@@ -2130,7 +2210,7 @@
             this.numTrigsDisp.AutoSize = true;
             this.numTrigsDisp.Location = new System.Drawing.Point(325, 147);
             this.numTrigsDisp.Name = "numTrigsDisp";
-            this.numTrigsDisp.Size = new System.Drawing.Size(16, 17);
+            this.numTrigsDisp.Size = new System.Drawing.Size(18, 20);
             this.numTrigsDisp.TabIndex = 4;
             this.numTrigsDisp.Text = "0";
             // 
@@ -2139,7 +2219,7 @@
             this.numTrigLabel.AutoSize = true;
             this.numTrigLabel.Location = new System.Drawing.Point(206, 147);
             this.numTrigLabel.Name = "numTrigLabel";
-            this.numTrigLabel.Size = new System.Drawing.Size(73, 17);
+            this.numTrigLabel.Size = new System.Drawing.Size(87, 20);
             this.numTrigLabel.TabIndex = 3;
             this.numTrigLabel.Text = "Num Trigs";
             // 
@@ -2159,7 +2239,7 @@
             this.cmbBias.Enabled = false;
             this.cmbBias.Location = new System.Drawing.Point(14, 22);
             this.cmbBias.Name = "cmbBias";
-            this.cmbBias.Size = new System.Drawing.Size(65, 23);
+            this.cmbBias.Size = new System.Drawing.Size(65, 27);
             this.cmbBias.TabIndex = 1;
             this.cmbBias.Text = "53.7";
             this.cmbBias.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
@@ -2170,7 +2250,7 @@
             this.cmbBiasOverride.AutoSize = true;
             this.cmbBiasOverride.Location = new System.Drawing.Point(99, 24);
             this.cmbBiasOverride.Name = "cmbBiasOverride";
-            this.cmbBiasOverride.Size = new System.Drawing.Size(82, 21);
+            this.cmbBiasOverride.Size = new System.Drawing.Size(95, 24);
             this.cmbBiasOverride.TabIndex = 0;
             this.cmbBiasOverride.Text = "Override";
             this.cmbBiasOverride.UseVisualStyleBackColor = true;
@@ -2210,10 +2290,10 @@
             this.tabModuleQC.Controls.Add(this.ModuleQAFEB2Box);
             this.tabModuleQC.Controls.Add(this.ModuleQAFEB1Box);
             this.tabModuleQC.Controls.Add(this.ModuleQCBtn);
-            this.tabModuleQC.Location = new System.Drawing.Point(4, 29);
+            this.tabModuleQC.Location = new System.Drawing.Point(4, 32);
             this.tabModuleQC.Name = "tabModuleQC";
             this.tabModuleQC.Padding = new System.Windows.Forms.Padding(3);
-            this.tabModuleQC.Size = new System.Drawing.Size(1255, 653);
+            this.tabModuleQC.Size = new System.Drawing.Size(1255, 650);
             this.tabModuleQC.TabIndex = 9;
             this.tabModuleQC.Text = "Module QC";
             this.tabModuleQC.UseVisualStyleBackColor = true;
@@ -2222,7 +2302,7 @@
             // 
             this.ModuleQCModuleNameBox.Location = new System.Drawing.Point(234, 35);
             this.ModuleQCModuleNameBox.Name = "ModuleQCModuleNameBox";
-            this.ModuleQCModuleNameBox.Size = new System.Drawing.Size(100, 23);
+            this.ModuleQCModuleNameBox.Size = new System.Drawing.Size(100, 27);
             this.ModuleQCModuleNameBox.TabIndex = 23;
             // 
             // ModuleQAModuleNameLbl
@@ -2230,7 +2310,7 @@
             this.ModuleQAModuleNameLbl.AutoSize = true;
             this.ModuleQAModuleNameLbl.Location = new System.Drawing.Point(231, 17);
             this.ModuleQAModuleNameLbl.Name = "ModuleQAModuleNameLbl";
-            this.ModuleQAModuleNameLbl.Size = new System.Drawing.Size(54, 17);
+            this.ModuleQAModuleNameLbl.Size = new System.Drawing.Size(63, 20);
             this.ModuleQAModuleNameLbl.TabIndex = 22;
             this.ModuleQAModuleNameLbl.Text = "Module";
             // 
@@ -2239,7 +2319,7 @@
             this.ModuleQA_OffsetLbl.AutoSize = true;
             this.ModuleQA_OffsetLbl.Location = new System.Drawing.Point(1074, 31);
             this.ModuleQA_OffsetLbl.Name = "ModuleQA_OffsetLbl";
-            this.ModuleQA_OffsetLbl.Size = new System.Drawing.Size(100, 17);
+            this.ModuleQA_OffsetLbl.Size = new System.Drawing.Size(120, 20);
             this.ModuleQA_OffsetLbl.TabIndex = 21;
             this.ModuleQA_OffsetLbl.Text = "Position Offset";
             // 
@@ -2252,7 +2332,7 @@
             0,
             0});
             this.ModuleQC_Offset.Name = "ModuleQC_Offset";
-            this.ModuleQC_Offset.Size = new System.Drawing.Size(54, 23);
+            this.ModuleQC_Offset.Size = new System.Drawing.Size(54, 27);
             this.ModuleQC_Offset.TabIndex = 20;
             // 
             // ModuleQC_flipped_Chkbox
@@ -2260,7 +2340,7 @@
             this.ModuleQC_flipped_Chkbox.AutoSize = true;
             this.ModuleQC_flipped_Chkbox.Location = new System.Drawing.Point(361, 66);
             this.ModuleQC_flipped_Chkbox.Name = "ModuleQC_flipped_Chkbox";
-            this.ModuleQC_flipped_Chkbox.Size = new System.Drawing.Size(81, 21);
+            this.ModuleQC_flipped_Chkbox.Size = new System.Drawing.Size(94, 24);
             this.ModuleQC_flipped_Chkbox.TabIndex = 19;
             this.ModuleQC_flipped_Chkbox.Text = "Flipped?";
             this.ModuleQC_flipped_Chkbox.UseVisualStyleBackColor = true;
@@ -2303,7 +2383,7 @@
             this.ComPortStatusLbl.AutoSize = true;
             this.ComPortStatusLbl.Location = new System.Drawing.Point(831, 61);
             this.ComPortStatusLbl.Name = "ComPortStatusLbl";
-            this.ComPortStatusLbl.Size = new System.Drawing.Size(52, 17);
+            this.ComPortStatusLbl.Size = new System.Drawing.Size(62, 20);
             this.ComPortStatusLbl.TabIndex = 15;
             this.ComPortStatusLbl.Text = "Status:";
             // 
@@ -2312,7 +2392,7 @@
             this.ComPortStatusBox.Location = new System.Drawing.Point(885, 58);
             this.ComPortStatusBox.Name = "ComPortStatusBox";
             this.ComPortStatusBox.ReadOnly = true;
-            this.ComPortStatusBox.Size = new System.Drawing.Size(109, 23);
+            this.ComPortStatusBox.Size = new System.Drawing.Size(109, 27);
             this.ComPortStatusBox.TabIndex = 14;
             // 
             // ComPortRefresh
@@ -2350,7 +2430,7 @@
             this.ComPortLbl.AutoSize = true;
             this.ComPortLbl.Location = new System.Drawing.Point(744, 9);
             this.ComPortLbl.Name = "ComPortLbl";
-            this.ComPortLbl.Size = new System.Drawing.Size(76, 17);
+            this.ComPortLbl.Size = new System.Drawing.Size(93, 20);
             this.ComPortLbl.TabIndex = 10;
             this.ComPortLbl.Text = "COM Ports";
             this.ComPortLbl.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -2360,14 +2440,14 @@
             this.comPortBox.FormattingEnabled = true;
             this.comPortBox.Location = new System.Drawing.Point(747, 28);
             this.comPortBox.Name = "comPortBox";
-            this.comPortBox.Size = new System.Drawing.Size(73, 25);
+            this.comPortBox.Size = new System.Drawing.Size(73, 28);
             this.comPortBox.TabIndex = 9;
             // 
             // ModuleQCFilenameBox
             // 
             this.ModuleQCFilenameBox.Location = new System.Drawing.Point(575, 33);
             this.ModuleQCFilenameBox.Name = "ModuleQCFilenameBox";
-            this.ModuleQCFilenameBox.Size = new System.Drawing.Size(117, 23);
+            this.ModuleQCFilenameBox.Size = new System.Drawing.Size(117, 27);
             this.ModuleQCFilenameBox.TabIndex = 2;
             this.ModuleQCFilenameBox.Text = "ModuleQC";
             // 
@@ -2376,7 +2456,7 @@
             this.ModuleQAFileLbl.AutoSize = true;
             this.ModuleQAFileLbl.Location = new System.Drawing.Point(468, 17);
             this.ModuleQAFileLbl.Name = "ModuleQAFileLbl";
-            this.ModuleQAFileLbl.Size = new System.Drawing.Size(253, 34);
+            this.ModuleQAFileLbl.Size = new System.Drawing.Size(307, 40);
             this.ModuleQAFileLbl.TabIndex = 8;
             this.ModuleQAFileLbl.Text = "Output File Name:\r\n\"ScanningData_                              .txt\"";
             // 
@@ -2385,7 +2465,7 @@
             this.ModuleQASideLbl.AutoSize = true;
             this.ModuleQASideLbl.Location = new System.Drawing.Point(358, 17);
             this.ModuleQASideLbl.Name = "ModuleQASideLbl";
-            this.ModuleQASideLbl.Size = new System.Drawing.Size(36, 17);
+            this.ModuleQASideLbl.Size = new System.Drawing.Size(42, 20);
             this.ModuleQASideLbl.TabIndex = 6;
             this.ModuleQASideLbl.Text = "Side";
             // 
@@ -2398,7 +2478,7 @@
             "Middle"});
             this.ModuleQCSide.Location = new System.Drawing.Point(361, 35);
             this.ModuleQCSide.Name = "ModuleQCSide";
-            this.ModuleQCSide.Size = new System.Drawing.Size(91, 25);
+            this.ModuleQCSide.Size = new System.Drawing.Size(91, 28);
             this.ModuleQCSide.TabIndex = 1;
             // 
             // ModuleQAFEB2Box
@@ -2432,14 +2512,14 @@
             this.ModuleQCTableFEB2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 6.25F));
             this.ModuleQCTableFEB2.Dock = System.Windows.Forms.DockStyle.Fill;
             this.ModuleQCTableFEB2.GrowStyle = System.Windows.Forms.TableLayoutPanelGrowStyle.FixedSize;
-            this.ModuleQCTableFEB2.Location = new System.Drawing.Point(3, 19);
+            this.ModuleQCTableFEB2.Location = new System.Drawing.Point(3, 23);
             this.ModuleQCTableFEB2.Name = "ModuleQCTableFEB2";
             this.ModuleQCTableFEB2.RowCount = 4;
             this.ModuleQCTableFEB2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 25F));
             this.ModuleQCTableFEB2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 25F));
             this.ModuleQCTableFEB2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 25F));
             this.ModuleQCTableFEB2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 25F));
-            this.ModuleQCTableFEB2.Size = new System.Drawing.Size(1236, 173);
+            this.ModuleQCTableFEB2.Size = new System.Drawing.Size(1236, 169);
             this.ModuleQCTableFEB2.TabIndex = 2;
             // 
             // ModuleQAFEB1Box
@@ -2473,14 +2553,14 @@
             this.ModuleQCTableFEB1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 6.25F));
             this.ModuleQCTableFEB1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.ModuleQCTableFEB1.GrowStyle = System.Windows.Forms.TableLayoutPanelGrowStyle.FixedSize;
-            this.ModuleQCTableFEB1.Location = new System.Drawing.Point(3, 19);
+            this.ModuleQCTableFEB1.Location = new System.Drawing.Point(3, 23);
             this.ModuleQCTableFEB1.Name = "ModuleQCTableFEB1";
             this.ModuleQCTableFEB1.RowCount = 4;
             this.ModuleQCTableFEB1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 25F));
             this.ModuleQCTableFEB1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 25F));
             this.ModuleQCTableFEB1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 25F));
             this.ModuleQCTableFEB1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 25F));
-            this.ModuleQCTableFEB1.Size = new System.Drawing.Size(1236, 173);
+            this.ModuleQCTableFEB1.Size = new System.Drawing.Size(1236, 169);
             this.ModuleQCTableFEB1.TabIndex = 1;
             // 
             // ModuleQCBtn
@@ -2493,6 +2573,724 @@
             this.ModuleQCBtn.Text = "Source Test";
             this.ModuleQCBtn.UseVisualStyleBackColor = true;
             this.ModuleQCBtn.Click += new System.EventHandler(this.ModuleQCBtn_Click);
+            // 
+            // tabPage1
+            // 
+            this.tabPage1.Controls.Add(this.label3);
+            this.tabPage1.Controls.Add(this.outFileName);
+            this.tabPage1.Controls.Add(this.label4);
+            this.tabPage1.Controls.Add(this.qaBias);
+            this.tabPage1.Controls.Add(this.dicounterQAGroup);
+            this.tabPage1.Location = new System.Drawing.Point(4, 32);
+            this.tabPage1.Name = "tabPage1";
+            this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPage1.Size = new System.Drawing.Size(1255, 650);
+            this.tabPage1.TabIndex = 10;
+            this.tabPage1.Text = "tabPage1";
+            this.tabPage1.UseVisualStyleBackColor = true;
+            // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Font = new System.Drawing.Font("Consolas", 15.75F, ((System.Drawing.FontStyle)((System.Drawing.FontStyle.Bold | System.Drawing.FontStyle.Underline))), System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label3.Location = new System.Drawing.Point(306, 9);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(164, 32);
+            this.label3.TabIndex = 141;
+            this.label3.Text = "File name:";
+            // 
+            // outFileName
+            // 
+            this.outFileName.BackColor = System.Drawing.Color.White;
+            this.outFileName.Font = new System.Drawing.Font("Consolas", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.outFileName.Location = new System.Drawing.Point(493, 15);
+            this.outFileName.Name = "outFileName";
+            this.outFileName.Size = new System.Drawing.Size(135, 27);
+            this.outFileName.TabIndex = 140;
+            this.outFileName.Text = "NaturalAgingXXX";
+            this.outFileName.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            // 
+            // label4
+            // 
+            this.label4.AutoSize = true;
+            this.label4.Font = new System.Drawing.Font("Consolas", 15.75F, ((System.Drawing.FontStyle)((System.Drawing.FontStyle.Bold | System.Drawing.FontStyle.Underline))), System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label4.Location = new System.Drawing.Point(72, 9);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(104, 32);
+            this.label4.TabIndex = 139;
+            this.label4.Text = "Bias V";
+            // 
+            // qaBias
+            // 
+            this.qaBias.BackColor = System.Drawing.Color.Red;
+            this.qaBias.Font = new System.Drawing.Font("Consolas", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.qaBias.Location = new System.Drawing.Point(182, 14);
+            this.qaBias.Name = "qaBias";
+            this.qaBias.Size = new System.Drawing.Size(79, 27);
+            this.qaBias.TabIndex = 138;
+            this.qaBias.Text = "57.00";
+            this.qaBias.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            // 
+            // dicounterQAGroup
+            // 
+            this.dicounterQAGroup.Controls.Add(this.stopMeasureBtn);
+            this.dicounterQAGroup.Controls.Add(this.measIntervalLabel);
+            this.dicounterQAGroup.Controls.Add(this.numMeasureLabel);
+            this.dicounterQAGroup.Controls.Add(this.measInterval);
+            this.dicounterQAGroup.Controls.Add(this.numMeasure);
+            this.dicounterQAGroup.Controls.Add(this.sourceRunFlag);
+            this.dicounterQAGroup.Controls.Add(this.but31);
+            this.dicounterQAGroup.Controls.Add(this.but30);
+            this.dicounterQAGroup.Controls.Add(this.but29);
+            this.dicounterQAGroup.Controls.Add(this.but28);
+            this.dicounterQAGroup.Controls.Add(this.but27);
+            this.dicounterQAGroup.Controls.Add(this.but26);
+            this.dicounterQAGroup.Controls.Add(this.but25);
+            this.dicounterQAGroup.Controls.Add(this.but24);
+            this.dicounterQAGroup.Controls.Add(this.but23);
+            this.dicounterQAGroup.Controls.Add(this.but19);
+            this.dicounterQAGroup.Controls.Add(this.but18);
+            this.dicounterQAGroup.Controls.Add(this.but17);
+            this.dicounterQAGroup.Controls.Add(this.but16);
+            this.dicounterQAGroup.Controls.Add(this.but21);
+            this.dicounterQAGroup.Controls.Add(this.but20);
+            this.dicounterQAGroup.Controls.Add(this.but22);
+            this.dicounterQAGroup.Controls.Add(this.numAvg);
+            this.dicounterQAGroup.Controls.Add(this.label22);
+            this.dicounterQAGroup.Controls.Add(this.but15);
+            this.dicounterQAGroup.Controls.Add(this.but14);
+            this.dicounterQAGroup.Controls.Add(this.but13);
+            this.dicounterQAGroup.Controls.Add(this.but12);
+            this.dicounterQAGroup.Controls.Add(this.but11);
+            this.dicounterQAGroup.Controls.Add(this.but10);
+            this.dicounterQAGroup.Controls.Add(this.but9);
+            this.dicounterQAGroup.Controls.Add(this.but8);
+            this.dicounterQAGroup.Controls.Add(this.but7);
+            this.dicounterQAGroup.Controls.Add(this.but3);
+            this.dicounterQAGroup.Controls.Add(this.but2);
+            this.dicounterQAGroup.Controls.Add(this.but1);
+            this.dicounterQAGroup.Controls.Add(this.but0);
+            this.dicounterQAGroup.Controls.Add(this.but5);
+            this.dicounterQAGroup.Controls.Add(this.but4);
+            this.dicounterQAGroup.Controls.Add(this.but6);
+            this.dicounterQAGroup.Controls.Add(this.label21);
+            this.dicounterQAGroup.Controls.Add(this.iWarningThresh);
+            this.dicounterQAGroup.Controls.Add(this.progressBar1);
+            this.dicounterQAGroup.Controls.Add(this.numButton);
+            this.dicounterQAGroup.Controls.Add(this.label2);
+            this.dicounterQAGroup.Controls.Add(this.numTextBox);
+            this.dicounterQAGroup.Location = new System.Drawing.Point(67, 65);
+            this.dicounterQAGroup.Name = "dicounterQAGroup";
+            this.dicounterQAGroup.Size = new System.Drawing.Size(840, 237);
+            this.dicounterQAGroup.TabIndex = 135;
+            this.dicounterQAGroup.TabStop = false;
+            this.dicounterQAGroup.Text = "DiCounter QA";
+            // 
+            // stopMeasureBtn
+            // 
+            this.stopMeasureBtn.BackColor = System.Drawing.Color.Red;
+            this.stopMeasureBtn.Enabled = false;
+            this.stopMeasureBtn.Location = new System.Drawing.Point(34, 123);
+            this.stopMeasureBtn.Name = "stopMeasureBtn";
+            this.stopMeasureBtn.Size = new System.Drawing.Size(75, 26);
+            this.stopMeasureBtn.TabIndex = 146;
+            this.stopMeasureBtn.Text = "Stop";
+            this.stopMeasureBtn.UseVisualStyleBackColor = false;
+            // 
+            // measIntervalLabel
+            // 
+            this.measIntervalLabel.AutoSize = true;
+            this.measIntervalLabel.Location = new System.Drawing.Point(212, 123);
+            this.measIntervalLabel.Name = "measIntervalLabel";
+            this.measIntervalLabel.Size = new System.Drawing.Size(170, 40);
+            this.measIntervalLabel.TabIndex = 145;
+            this.measIntervalLabel.Text = "Measurement Interval\r\n(min)";
+            // 
+            // numMeasureLabel
+            // 
+            this.numMeasureLabel.AutoSize = true;
+            this.numMeasureLabel.Location = new System.Drawing.Point(212, 91);
+            this.numMeasureLabel.Name = "numMeasureLabel";
+            this.numMeasureLabel.Size = new System.Drawing.Size(160, 20);
+            this.numMeasureLabel.TabIndex = 144;
+            this.numMeasureLabel.Text = "Num Measurements";
+            // 
+            // measInterval
+            // 
+            this.measInterval.Location = new System.Drawing.Point(149, 123);
+            this.measInterval.Maximum = new decimal(new int[] {
+            11340,
+            0,
+            0,
+            0});
+            this.measInterval.Name = "measInterval";
+            this.measInterval.Size = new System.Drawing.Size(54, 27);
+            this.measInterval.TabIndex = 143;
+            this.measInterval.Value = new decimal(new int[] {
+            2,
+            0,
+            0,
+            0});
+            // 
+            // numMeasure
+            // 
+            this.numMeasure.Location = new System.Drawing.Point(134, 89);
+            this.numMeasure.Maximum = new decimal(new int[] {
+            10000,
+            0,
+            0,
+            0});
+            this.numMeasure.Minimum = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+            this.numMeasure.Name = "numMeasure";
+            this.numMeasure.Size = new System.Drawing.Size(69, 27);
+            this.numMeasure.TabIndex = 142;
+            this.numMeasure.Value = new decimal(new int[] {
+            100,
+            0,
+            0,
+            0});
+            // 
+            // sourceRunFlag
+            // 
+            this.sourceRunFlag.AutoSize = true;
+            this.sourceRunFlag.Location = new System.Drawing.Point(21, 91);
+            this.sourceRunFlag.Name = "sourceRunFlag";
+            this.sourceRunFlag.Size = new System.Drawing.Size(119, 24);
+            this.sourceRunFlag.TabIndex = 141;
+            this.sourceRunFlag.Text = "Source Run";
+            this.sourceRunFlag.UseVisualStyleBackColor = true;
+            // 
+            // but31
+            // 
+            this.but31.Appearance = System.Windows.Forms.Appearance.Button;
+            this.but31.AutoCheck = false;
+            this.but31.BackColor = System.Drawing.Color.Green;
+            this.but31.Cursor = System.Windows.Forms.Cursors.No;
+            this.but31.Location = new System.Drawing.Point(654, 123);
+            this.but31.Name = "but31";
+            this.but31.Size = new System.Drawing.Size(36, 26);
+            this.but31.TabIndex = 140;
+            this.but31.Text = "31";
+            this.but31.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.but31.UseVisualStyleBackColor = false;
+            // 
+            // but30
+            // 
+            this.but30.Appearance = System.Windows.Forms.Appearance.Button;
+            this.but30.AutoCheck = false;
+            this.but30.BackColor = System.Drawing.Color.Green;
+            this.but30.Cursor = System.Windows.Forms.Cursors.No;
+            this.but30.Location = new System.Drawing.Point(619, 123);
+            this.but30.Name = "but30";
+            this.but30.Size = new System.Drawing.Size(36, 26);
+            this.but30.TabIndex = 139;
+            this.but30.Text = "30";
+            this.but30.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.but30.UseVisualStyleBackColor = false;
+            // 
+            // but29
+            // 
+            this.but29.Appearance = System.Windows.Forms.Appearance.Button;
+            this.but29.AutoCheck = false;
+            this.but29.BackColor = System.Drawing.Color.Green;
+            this.but29.Cursor = System.Windows.Forms.Cursors.No;
+            this.but29.Location = new System.Drawing.Point(584, 123);
+            this.but29.Name = "but29";
+            this.but29.Size = new System.Drawing.Size(36, 26);
+            this.but29.TabIndex = 138;
+            this.but29.Text = "29";
+            this.but29.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.but29.UseVisualStyleBackColor = false;
+            // 
+            // but28
+            // 
+            this.but28.Appearance = System.Windows.Forms.Appearance.Button;
+            this.but28.AutoCheck = false;
+            this.but28.BackColor = System.Drawing.Color.Green;
+            this.but28.Cursor = System.Windows.Forms.Cursors.No;
+            this.but28.Location = new System.Drawing.Point(549, 123);
+            this.but28.Name = "but28";
+            this.but28.Size = new System.Drawing.Size(36, 26);
+            this.but28.TabIndex = 137;
+            this.but28.Text = "28";
+            this.but28.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.but28.UseVisualStyleBackColor = false;
+            // 
+            // but27
+            // 
+            this.but27.Appearance = System.Windows.Forms.Appearance.Button;
+            this.but27.AutoCheck = false;
+            this.but27.BackColor = System.Drawing.Color.Green;
+            this.but27.Cursor = System.Windows.Forms.Cursors.No;
+            this.but27.Location = new System.Drawing.Point(654, 91);
+            this.but27.Name = "but27";
+            this.but27.Size = new System.Drawing.Size(36, 26);
+            this.but27.TabIndex = 136;
+            this.but27.Text = "27";
+            this.but27.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.but27.UseVisualStyleBackColor = false;
+            // 
+            // but26
+            // 
+            this.but26.Appearance = System.Windows.Forms.Appearance.Button;
+            this.but26.AutoCheck = false;
+            this.but26.BackColor = System.Drawing.Color.Green;
+            this.but26.Cursor = System.Windows.Forms.Cursors.No;
+            this.but26.Location = new System.Drawing.Point(619, 91);
+            this.but26.Name = "but26";
+            this.but26.Size = new System.Drawing.Size(36, 26);
+            this.but26.TabIndex = 135;
+            this.but26.Text = "26";
+            this.but26.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.but26.UseVisualStyleBackColor = false;
+            // 
+            // but25
+            // 
+            this.but25.Appearance = System.Windows.Forms.Appearance.Button;
+            this.but25.AutoCheck = false;
+            this.but25.BackColor = System.Drawing.Color.Green;
+            this.but25.Cursor = System.Windows.Forms.Cursors.No;
+            this.but25.Location = new System.Drawing.Point(584, 91);
+            this.but25.Name = "but25";
+            this.but25.Size = new System.Drawing.Size(36, 26);
+            this.but25.TabIndex = 134;
+            this.but25.Text = "25";
+            this.but25.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.but25.UseVisualStyleBackColor = false;
+            // 
+            // but24
+            // 
+            this.but24.Appearance = System.Windows.Forms.Appearance.Button;
+            this.but24.AutoCheck = false;
+            this.but24.BackColor = System.Drawing.Color.Green;
+            this.but24.Cursor = System.Windows.Forms.Cursors.No;
+            this.but24.Location = new System.Drawing.Point(549, 91);
+            this.but24.Name = "but24";
+            this.but24.Size = new System.Drawing.Size(36, 26);
+            this.but24.TabIndex = 133;
+            this.but24.Text = "24";
+            this.but24.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.but24.UseVisualStyleBackColor = false;
+            // 
+            // but23
+            // 
+            this.but23.Appearance = System.Windows.Forms.Appearance.Button;
+            this.but23.AutoCheck = false;
+            this.but23.BackColor = System.Drawing.Color.Green;
+            this.but23.Cursor = System.Windows.Forms.Cursors.No;
+            this.but23.Location = new System.Drawing.Point(654, 59);
+            this.but23.Name = "but23";
+            this.but23.Size = new System.Drawing.Size(36, 26);
+            this.but23.TabIndex = 132;
+            this.but23.Text = "23";
+            this.but23.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.but23.UseVisualStyleBackColor = false;
+            // 
+            // but19
+            // 
+            this.but19.Appearance = System.Windows.Forms.Appearance.Button;
+            this.but19.AutoCheck = false;
+            this.but19.BackColor = System.Drawing.Color.Green;
+            this.but19.Cursor = System.Windows.Forms.Cursors.No;
+            this.but19.Location = new System.Drawing.Point(654, 26);
+            this.but19.Name = "but19";
+            this.but19.Size = new System.Drawing.Size(36, 26);
+            this.but19.TabIndex = 131;
+            this.but19.Text = "19";
+            this.but19.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.but19.UseVisualStyleBackColor = false;
+            // 
+            // but18
+            // 
+            this.but18.Appearance = System.Windows.Forms.Appearance.Button;
+            this.but18.AutoCheck = false;
+            this.but18.BackColor = System.Drawing.Color.Green;
+            this.but18.Cursor = System.Windows.Forms.Cursors.No;
+            this.but18.Location = new System.Drawing.Point(619, 26);
+            this.but18.Name = "but18";
+            this.but18.Size = new System.Drawing.Size(36, 26);
+            this.but18.TabIndex = 130;
+            this.but18.Text = "18";
+            this.but18.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.but18.UseVisualStyleBackColor = false;
+            // 
+            // but17
+            // 
+            this.but17.Appearance = System.Windows.Forms.Appearance.Button;
+            this.but17.AutoCheck = false;
+            this.but17.BackColor = System.Drawing.Color.Green;
+            this.but17.Cursor = System.Windows.Forms.Cursors.No;
+            this.but17.Location = new System.Drawing.Point(584, 26);
+            this.but17.Name = "but17";
+            this.but17.Size = new System.Drawing.Size(36, 26);
+            this.but17.TabIndex = 129;
+            this.but17.Text = "17";
+            this.but17.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.but17.UseVisualStyleBackColor = false;
+            // 
+            // but16
+            // 
+            this.but16.Appearance = System.Windows.Forms.Appearance.Button;
+            this.but16.AutoCheck = false;
+            this.but16.BackColor = System.Drawing.Color.Green;
+            this.but16.Cursor = System.Windows.Forms.Cursors.No;
+            this.but16.Location = new System.Drawing.Point(549, 26);
+            this.but16.Name = "but16";
+            this.but16.Size = new System.Drawing.Size(36, 26);
+            this.but16.TabIndex = 128;
+            this.but16.Text = "16";
+            this.but16.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.but16.UseVisualStyleBackColor = false;
+            // 
+            // but21
+            // 
+            this.but21.Appearance = System.Windows.Forms.Appearance.Button;
+            this.but21.AutoCheck = false;
+            this.but21.BackColor = System.Drawing.Color.Green;
+            this.but21.Cursor = System.Windows.Forms.Cursors.No;
+            this.but21.Location = new System.Drawing.Point(584, 59);
+            this.but21.Name = "but21";
+            this.but21.Size = new System.Drawing.Size(36, 26);
+            this.but21.TabIndex = 127;
+            this.but21.Text = "21";
+            this.but21.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.but21.UseVisualStyleBackColor = false;
+            // 
+            // but20
+            // 
+            this.but20.Appearance = System.Windows.Forms.Appearance.Button;
+            this.but20.AutoCheck = false;
+            this.but20.BackColor = System.Drawing.Color.Green;
+            this.but20.Cursor = System.Windows.Forms.Cursors.No;
+            this.but20.Location = new System.Drawing.Point(549, 59);
+            this.but20.Name = "but20";
+            this.but20.Size = new System.Drawing.Size(36, 26);
+            this.but20.TabIndex = 126;
+            this.but20.Text = "20";
+            this.but20.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.but20.UseVisualStyleBackColor = false;
+            // 
+            // but22
+            // 
+            this.but22.Appearance = System.Windows.Forms.Appearance.Button;
+            this.but22.AutoCheck = false;
+            this.but22.BackColor = System.Drawing.Color.Green;
+            this.but22.Cursor = System.Windows.Forms.Cursors.No;
+            this.but22.Location = new System.Drawing.Point(619, 59);
+            this.but22.Name = "but22";
+            this.but22.Size = new System.Drawing.Size(36, 26);
+            this.but22.TabIndex = 125;
+            this.but22.Text = "22";
+            this.but22.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.but22.UseVisualStyleBackColor = false;
+            // 
+            // numAvg
+            // 
+            this.numAvg.Location = new System.Drawing.Point(238, 53);
+            this.numAvg.Minimum = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+            this.numAvg.Name = "numAvg";
+            this.numAvg.Size = new System.Drawing.Size(57, 27);
+            this.numAvg.TabIndex = 124;
+            this.numAvg.Value = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+            // 
+            // label22
+            // 
+            this.label22.AutoSize = true;
+            this.label22.Location = new System.Drawing.Point(239, 31);
+            this.label22.Name = "label22";
+            this.label22.Size = new System.Drawing.Size(72, 20);
+            this.label22.TabIndex = 123;
+            this.label22.Text = "NumAvg";
+            // 
+            // but15
+            // 
+            this.but15.Appearance = System.Windows.Forms.Appearance.Button;
+            this.but15.AutoCheck = false;
+            this.but15.BackColor = System.Drawing.Color.Green;
+            this.but15.Cursor = System.Windows.Forms.Cursors.No;
+            this.but15.Location = new System.Drawing.Point(493, 123);
+            this.but15.Name = "but15";
+            this.but15.Size = new System.Drawing.Size(36, 26);
+            this.but15.TabIndex = 121;
+            this.but15.Text = "15";
+            this.but15.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.but15.UseVisualStyleBackColor = false;
+            // 
+            // but14
+            // 
+            this.but14.Appearance = System.Windows.Forms.Appearance.Button;
+            this.but14.AutoCheck = false;
+            this.but14.BackColor = System.Drawing.Color.Green;
+            this.but14.Cursor = System.Windows.Forms.Cursors.No;
+            this.but14.Location = new System.Drawing.Point(458, 123);
+            this.but14.Name = "but14";
+            this.but14.Size = new System.Drawing.Size(36, 26);
+            this.but14.TabIndex = 120;
+            this.but14.Text = "14";
+            this.but14.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.but14.UseVisualStyleBackColor = false;
+            // 
+            // but13
+            // 
+            this.but13.Appearance = System.Windows.Forms.Appearance.Button;
+            this.but13.AutoCheck = false;
+            this.but13.BackColor = System.Drawing.Color.Green;
+            this.but13.Cursor = System.Windows.Forms.Cursors.No;
+            this.but13.Location = new System.Drawing.Point(423, 123);
+            this.but13.Name = "but13";
+            this.but13.Size = new System.Drawing.Size(36, 26);
+            this.but13.TabIndex = 119;
+            this.but13.Text = "13";
+            this.but13.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.but13.UseVisualStyleBackColor = false;
+            // 
+            // but12
+            // 
+            this.but12.Appearance = System.Windows.Forms.Appearance.Button;
+            this.but12.AutoCheck = false;
+            this.but12.BackColor = System.Drawing.Color.Green;
+            this.but12.Cursor = System.Windows.Forms.Cursors.No;
+            this.but12.Location = new System.Drawing.Point(388, 123);
+            this.but12.Name = "but12";
+            this.but12.Size = new System.Drawing.Size(36, 26);
+            this.but12.TabIndex = 118;
+            this.but12.Text = "12";
+            this.but12.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.but12.UseVisualStyleBackColor = false;
+            // 
+            // but11
+            // 
+            this.but11.Appearance = System.Windows.Forms.Appearance.Button;
+            this.but11.AutoCheck = false;
+            this.but11.BackColor = System.Drawing.Color.Green;
+            this.but11.Cursor = System.Windows.Forms.Cursors.No;
+            this.but11.Location = new System.Drawing.Point(493, 91);
+            this.but11.Name = "but11";
+            this.but11.Size = new System.Drawing.Size(36, 26);
+            this.but11.TabIndex = 117;
+            this.but11.Text = "11";
+            this.but11.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.but11.UseVisualStyleBackColor = false;
+            // 
+            // but10
+            // 
+            this.but10.Appearance = System.Windows.Forms.Appearance.Button;
+            this.but10.AutoCheck = false;
+            this.but10.BackColor = System.Drawing.Color.Green;
+            this.but10.Cursor = System.Windows.Forms.Cursors.No;
+            this.but10.Location = new System.Drawing.Point(458, 91);
+            this.but10.Name = "but10";
+            this.but10.Size = new System.Drawing.Size(36, 26);
+            this.but10.TabIndex = 116;
+            this.but10.Text = "10";
+            this.but10.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.but10.UseVisualStyleBackColor = false;
+            // 
+            // but9
+            // 
+            this.but9.Appearance = System.Windows.Forms.Appearance.Button;
+            this.but9.AutoCheck = false;
+            this.but9.BackColor = System.Drawing.Color.Green;
+            this.but9.Cursor = System.Windows.Forms.Cursors.No;
+            this.but9.Location = new System.Drawing.Point(423, 91);
+            this.but9.Name = "but9";
+            this.but9.Size = new System.Drawing.Size(36, 26);
+            this.but9.TabIndex = 115;
+            this.but9.Text = "9";
+            this.but9.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.but9.UseVisualStyleBackColor = false;
+            // 
+            // but8
+            // 
+            this.but8.Appearance = System.Windows.Forms.Appearance.Button;
+            this.but8.AutoCheck = false;
+            this.but8.BackColor = System.Drawing.Color.Green;
+            this.but8.Cursor = System.Windows.Forms.Cursors.No;
+            this.but8.Location = new System.Drawing.Point(388, 91);
+            this.but8.Name = "but8";
+            this.but8.Size = new System.Drawing.Size(36, 26);
+            this.but8.TabIndex = 114;
+            this.but8.Text = "8";
+            this.but8.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.but8.UseVisualStyleBackColor = false;
+            // 
+            // but7
+            // 
+            this.but7.Appearance = System.Windows.Forms.Appearance.Button;
+            this.but7.AutoCheck = false;
+            this.but7.BackColor = System.Drawing.Color.Green;
+            this.but7.Cursor = System.Windows.Forms.Cursors.No;
+            this.but7.Location = new System.Drawing.Point(493, 59);
+            this.but7.Name = "but7";
+            this.but7.Size = new System.Drawing.Size(36, 26);
+            this.but7.TabIndex = 113;
+            this.but7.Text = "7";
+            this.but7.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.but7.UseVisualStyleBackColor = false;
+            // 
+            // but3
+            // 
+            this.but3.Appearance = System.Windows.Forms.Appearance.Button;
+            this.but3.AutoCheck = false;
+            this.but3.BackColor = System.Drawing.Color.Green;
+            this.but3.Cursor = System.Windows.Forms.Cursors.No;
+            this.but3.Location = new System.Drawing.Point(493, 26);
+            this.but3.Name = "but3";
+            this.but3.Size = new System.Drawing.Size(36, 26);
+            this.but3.TabIndex = 112;
+            this.but3.Text = "3";
+            this.but3.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.but3.UseVisualStyleBackColor = false;
+            // 
+            // but2
+            // 
+            this.but2.Appearance = System.Windows.Forms.Appearance.Button;
+            this.but2.AutoCheck = false;
+            this.but2.BackColor = System.Drawing.Color.Green;
+            this.but2.Cursor = System.Windows.Forms.Cursors.No;
+            this.but2.Location = new System.Drawing.Point(458, 26);
+            this.but2.Name = "but2";
+            this.but2.Size = new System.Drawing.Size(36, 26);
+            this.but2.TabIndex = 111;
+            this.but2.Text = "2";
+            this.but2.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.but2.UseVisualStyleBackColor = false;
+            // 
+            // but1
+            // 
+            this.but1.Appearance = System.Windows.Forms.Appearance.Button;
+            this.but1.AutoCheck = false;
+            this.but1.BackColor = System.Drawing.Color.Green;
+            this.but1.Cursor = System.Windows.Forms.Cursors.No;
+            this.but1.Location = new System.Drawing.Point(423, 26);
+            this.but1.Name = "but1";
+            this.but1.Size = new System.Drawing.Size(36, 26);
+            this.but1.TabIndex = 110;
+            this.but1.Text = "1";
+            this.but1.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.but1.UseVisualStyleBackColor = false;
+            // 
+            // but0
+            // 
+            this.but0.Appearance = System.Windows.Forms.Appearance.Button;
+            this.but0.AutoCheck = false;
+            this.but0.BackColor = System.Drawing.Color.Green;
+            this.but0.Cursor = System.Windows.Forms.Cursors.No;
+            this.but0.Location = new System.Drawing.Point(388, 26);
+            this.but0.Name = "but0";
+            this.but0.Size = new System.Drawing.Size(36, 26);
+            this.but0.TabIndex = 109;
+            this.but0.Text = "0";
+            this.but0.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.but0.UseVisualStyleBackColor = false;
+            // 
+            // but5
+            // 
+            this.but5.Appearance = System.Windows.Forms.Appearance.Button;
+            this.but5.AutoCheck = false;
+            this.but5.BackColor = System.Drawing.Color.Green;
+            this.but5.Cursor = System.Windows.Forms.Cursors.No;
+            this.but5.Location = new System.Drawing.Point(423, 59);
+            this.but5.Name = "but5";
+            this.but5.Size = new System.Drawing.Size(36, 26);
+            this.but5.TabIndex = 108;
+            this.but5.Text = "5";
+            this.but5.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.but5.UseVisualStyleBackColor = false;
+            // 
+            // but4
+            // 
+            this.but4.Appearance = System.Windows.Forms.Appearance.Button;
+            this.but4.AutoCheck = false;
+            this.but4.BackColor = System.Drawing.Color.Green;
+            this.but4.Cursor = System.Windows.Forms.Cursors.No;
+            this.but4.Location = new System.Drawing.Point(388, 59);
+            this.but4.Name = "but4";
+            this.but4.Size = new System.Drawing.Size(36, 26);
+            this.but4.TabIndex = 107;
+            this.but4.Text = "4";
+            this.but4.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.but4.UseVisualStyleBackColor = false;
+            // 
+            // but6
+            // 
+            this.but6.Appearance = System.Windows.Forms.Appearance.Button;
+            this.but6.AutoCheck = false;
+            this.but6.BackColor = System.Drawing.Color.Green;
+            this.but6.Cursor = System.Windows.Forms.Cursors.No;
+            this.but6.Location = new System.Drawing.Point(458, 59);
+            this.but6.Name = "but6";
+            this.but6.Size = new System.Drawing.Size(36, 26);
+            this.but6.TabIndex = 106;
+            this.but6.Text = "6";
+            this.but6.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.but6.UseVisualStyleBackColor = false;
+            // 
+            // label21
+            // 
+            this.label21.AutoSize = true;
+            this.label21.Location = new System.Drawing.Point(301, 31);
+            this.label21.Name = "label21";
+            this.label21.Size = new System.Drawing.Size(69, 20);
+            this.label21.TabIndex = 105;
+            this.label21.Text = "I_thresh";
+            // 
+            // iWarningThresh
+            // 
+            this.iWarningThresh.Location = new System.Drawing.Point(298, 53);
+            this.iWarningThresh.Name = "iWarningThresh";
+            this.iWarningThresh.Size = new System.Drawing.Size(62, 27);
+            this.iWarningThresh.TabIndex = 104;
+            this.iWarningThresh.Text = "0.1";
+            this.iWarningThresh.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            // 
+            // progressBar1
+            // 
+            this.progressBar1.Location = new System.Drawing.Point(133, 53);
+            this.progressBar1.Maximum = 31;
+            this.progressBar1.Name = "progressBar1";
+            this.progressBar1.Size = new System.Drawing.Size(100, 23);
+            this.progressBar1.Step = 1;
+            this.progressBar1.Style = System.Windows.Forms.ProgressBarStyle.Continuous;
+            this.progressBar1.TabIndex = 103;
+            // 
+            // numButton
+            // 
+            this.numButton.Location = new System.Drawing.Point(134, 31);
+            this.numButton.Name = "numButton";
+            this.numButton.Size = new System.Drawing.Size(99, 23);
+            this.numButton.TabIndex = 100;
+            this.numButton.Text = "Auto Data";
+            this.numButton.UseVisualStyleBackColor = true;
+            this.numButton.Click += new System.EventHandler(this.numButton_Click);
+            // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(13, 32);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(146, 20);
+            this.label2.TabIndex = 99;
+            this.label2.Text = "Dicounter Number";
+            // 
+            // numTextBox
+            // 
+            this.numTextBox.Location = new System.Drawing.Point(16, 53);
+            this.numTextBox.Name = "numTextBox";
+            this.numTextBox.Size = new System.Drawing.Size(112, 27);
+            this.numTextBox.TabIndex = 98;
             // 
             // FEBSelectPanel
             // 
@@ -2551,31 +3349,9 @@
             this.FEBClientFooterBar.Size = new System.Drawing.Size(1260, 2);
             this.FEBClientFooterBar.TabIndex = 47;
             // 
-            // LightCheckTypeLbl
-            // 
-            this.LightCheckTypeLbl.AutoSize = true;
-            this.LightCheckTypeLbl.Location = new System.Drawing.Point(584, 16);
-            this.LightCheckTypeLbl.Name = "LightCheckTypeLbl";
-            this.LightCheckTypeLbl.Size = new System.Drawing.Size(72, 17);
-            this.LightCheckTypeLbl.TabIndex = 202;
-            this.LightCheckTypeLbl.Text = "Test Type";
-            // 
-            // LightCheckModuleHalf
-            // 
-            this.LightCheckModuleHalf.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.LightCheckModuleHalf.Enabled = false;
-            this.LightCheckModuleHalf.FormattingEnabled = true;
-            this.LightCheckModuleHalf.Items.AddRange(new object[] {
-            "TOP",
-            "BOTTOM"});
-            this.LightCheckModuleHalf.Location = new System.Drawing.Point(471, 36);
-            this.LightCheckModuleHalf.Name = "LightCheckModuleHalf";
-            this.LightCheckModuleHalf.Size = new System.Drawing.Size(93, 25);
-            this.LightCheckModuleHalf.TabIndex = 203;
-            // 
             // frmMain
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 17F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(10F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1264, 728);
             this.Controls.Add(this.FEBClientFooterBar);
@@ -2642,6 +3418,13 @@
             ((System.ComponentModel.ISupportInitialize)(this.ModuleQC_Offset)).EndInit();
             this.ModuleQAFEB2Box.ResumeLayout(false);
             this.ModuleQAFEB1Box.ResumeLayout(false);
+            this.tabPage1.ResumeLayout(false);
+            this.tabPage1.PerformLayout();
+            this.dicounterQAGroup.ResumeLayout(false);
+            this.dicounterQAGroup.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.measInterval)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numMeasure)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numAvg)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -2851,5 +3634,57 @@
         private System.Windows.Forms.ComboBox LightCheckType;
         private System.Windows.Forms.Label LightCheckTypeLbl;
         private System.Windows.Forms.ComboBox LightCheckModuleHalf;
+        private System.Windows.Forms.TabPage tabPage1;
+        private System.Windows.Forms.GroupBox dicounterQAGroup;
+        private System.Windows.Forms.Button stopMeasureBtn;
+        private System.Windows.Forms.Label measIntervalLabel;
+        private System.Windows.Forms.Label numMeasureLabel;
+        private System.Windows.Forms.NumericUpDown measInterval;
+        private System.Windows.Forms.NumericUpDown numMeasure;
+        private System.Windows.Forms.CheckBox sourceRunFlag;
+        private System.Windows.Forms.RadioButton but31;
+        private System.Windows.Forms.RadioButton but30;
+        private System.Windows.Forms.RadioButton but29;
+        private System.Windows.Forms.RadioButton but28;
+        private System.Windows.Forms.RadioButton but27;
+        private System.Windows.Forms.RadioButton but26;
+        private System.Windows.Forms.RadioButton but25;
+        private System.Windows.Forms.RadioButton but24;
+        private System.Windows.Forms.RadioButton but23;
+        private System.Windows.Forms.RadioButton but19;
+        private System.Windows.Forms.RadioButton but18;
+        private System.Windows.Forms.RadioButton but17;
+        private System.Windows.Forms.RadioButton but16;
+        private System.Windows.Forms.RadioButton but21;
+        private System.Windows.Forms.RadioButton but20;
+        private System.Windows.Forms.RadioButton but22;
+        private System.Windows.Forms.NumericUpDown numAvg;
+        private System.Windows.Forms.Label label22;
+        private System.Windows.Forms.RadioButton but15;
+        private System.Windows.Forms.RadioButton but14;
+        private System.Windows.Forms.RadioButton but13;
+        private System.Windows.Forms.RadioButton but12;
+        private System.Windows.Forms.RadioButton but11;
+        private System.Windows.Forms.RadioButton but10;
+        private System.Windows.Forms.RadioButton but9;
+        private System.Windows.Forms.RadioButton but8;
+        private System.Windows.Forms.RadioButton but7;
+        private System.Windows.Forms.RadioButton but3;
+        private System.Windows.Forms.RadioButton but2;
+        private System.Windows.Forms.RadioButton but1;
+        private System.Windows.Forms.RadioButton but0;
+        private System.Windows.Forms.RadioButton but5;
+        private System.Windows.Forms.RadioButton but4;
+        private System.Windows.Forms.RadioButton but6;
+        private System.Windows.Forms.Label label21;
+        private System.Windows.Forms.TextBox iWarningThresh;
+        private System.Windows.Forms.ProgressBar progressBar1;
+        public System.Windows.Forms.Button numButton;
+        private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.TextBox numTextBox;
+        private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.TextBox outFileName;
+        private System.Windows.Forms.Label label4;
+        private System.Windows.Forms.TextBox qaBias;
     }
 }

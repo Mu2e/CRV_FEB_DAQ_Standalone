@@ -7,6 +7,7 @@ using System.Net.Sockets;
 using System.IO;
 using System.Threading;
 using System.ComponentModel;
+using System.Net;
 
 namespace TB_mu2e
 {
@@ -1082,8 +1083,11 @@ namespace TB_mu2e
                         byte[] rbuf = new byte[6];
                         IAsyncResult rResult = TNETStream.BeginRead(rbuf, 0, rbuf.Length, null, null);
                         rResult.AsyncWaitHandle.WaitOne(200);
-                        if (!rResult.IsCompleted)
-                            Console.WriteLine("Reached timeout when reading register");
+                        if (!rResult.IsCompleted) {
+                            Console.WriteLine("Client connected with IP {0}", ((IPEndPoint)febTCPClient.Client.RemoteEndPoint).Address);
+                            Console.WriteLine("Reached timeout when reading register 1");
+                        }
+
                         BufVal(rbuf, out uint t, out double dv);
                         reg.val = t;
                         reg.dv = dv;
@@ -1111,7 +1115,7 @@ namespace TB_mu2e
                         IAsyncResult rResult = TNETStream.BeginRead(rbuf, 0, rbuf.Length, null, null);
                         rResult.AsyncWaitHandle.WaitOne(200);
                         if (!rResult.IsCompleted)
-                            Console.WriteLine("Reached timeout when reading register");
+                            Console.WriteLine("Reached timeout when reading register 2");
                         BufVal(rbuf, out tv[0], out double dv);
                         //if (febTCPClient.Available > 0)
                         //{
@@ -1128,7 +1132,7 @@ namespace TB_mu2e
                         rResult = TNETStream.BeginRead(rbuf, 0, rbuf.Length, null, null);
                         rResult.AsyncWaitHandle.WaitOne(200);
                         if (!rResult.IsCompleted)
-                            Console.WriteLine("Reached timeout when reading register");
+                            Console.WriteLine("Reached timeout when reading register 3");
                         BufVal(rbuf, out tv[1], out dv);
                         //if (febTCPClient.Available > 0)
                         //{
@@ -1253,6 +1257,7 @@ namespace TB_mu2e
             }
             string t = new string(chars);
             string[] tok = t.Split(new string[] { " ", Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
+//            Console.WriteLine(t);
             try { v = Convert.ToUInt32(tok.Last(),16); }
             catch { v = 0; }
             //catch { adc = -1; }

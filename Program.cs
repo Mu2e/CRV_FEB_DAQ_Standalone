@@ -171,6 +171,7 @@ namespace TB_mu2e
         {
             string hName = "";
             string dirName = "c://data//";
+            //string dirName = "d://data//";
             hName = run_name;
             RunName rn = new RunName();
             rn.ShowDialog();
@@ -184,7 +185,7 @@ namespace TB_mu2e
             //hName += DateTime.Now.Second.ToString("00");
             created = DateTime.Now;
             hName = run_name;//PP.myRun.run_name;
-            hName = dirName + hName + ".data";
+            hName = dirName + hName + ".dat";
             OutFileName = hName;
             try
             {
@@ -362,6 +363,11 @@ namespace TB_mu2e
             feb.SetVAll(0); //turns off the bias
         }
 
+        public void SetBias(float V)
+        {
+            feb.SetVAll(V);
+        }
+
         public double TakeMeasurement(int channel) //takes a current measurement for the same channel on all FEBs
         {
             int fpga = channel / 16;
@@ -377,12 +383,13 @@ namespace TB_mu2e
             currentMeasurements.TryGetValue(channel, out measurement);
             return measurement;                
         }
-
+        
         public void WriteMeasurements(string dicounter)//, double temperature)
         {
             using (StreamWriter writer = File.AppendText(filename)) //The output file
             {
-                writer.Write("{0}\t{1}\t{2}\t", dicounter, feb.ReadTemp(0), DateTime.Now.ToString("MM/dd/yy HH:mm:ss")); //Write current time, name of module, which side, and current temperature
+                
+                writer.Write("{0}\t{1}\t{2}\t{3}\t", dicounter, feb.ReadV(), feb.ReadTemp(0), DateTime.Now.ToString("MM/dd/yy HH:mm:ss")); //Write current time, name of module, which side, and current temperature
                 //foreach (KeyValuePair<int, double> channel in currentMeasurements)
                 for (int chan = 0; chan < 64; chan++)
                 {

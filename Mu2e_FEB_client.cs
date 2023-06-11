@@ -206,7 +206,9 @@ namespace TB_mu2e
             catch { counts = 0; }
             SendStr("wr " + Convert.ToString(4 * fpga, 16) + "44 " + Convert.ToString(counts, 16));
             SendStr("wr " + Convert.ToString(4 * fpga, 16) + "45 " + Convert.ToString(counts, 16));
-            Thread.Sleep((int)(Math.Ceiling(V / 10.0)*1000) + 500); //Wait for the bias to come up
+//            Thread.Sleep((int)(Math.Ceiling(V / 10.0)*1000) + 500); //Wait for the bias to come up
+            Thread.Sleep(10); //Wait for the bias to come up
+
         }
 
         public void SetVAll(double V)
@@ -262,7 +264,7 @@ namespace TB_mu2e
             else
                 SendStr("wr 20 1" + Convert.ToString(ch, 16));
             SendStr("gain 8");
-            SendStr("A0 5");
+            SendStr("A0 2");
             while (ReadStr(out t, out int dt) || !t.Contains("avg")) { Thread.Sleep(5); } //If after """reading""" we don't have the current, READ IT AGAIN DAMMIT
             string[] tok = t.Split(new string[] { " ", "\r\n", Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
             double adc = -4.096;
@@ -294,6 +296,8 @@ namespace TB_mu2e
                 //SendStr(t);
                 //t = "WR 0 3C\r\n";
                 //SendStr(t);
+
+                /*  changed 04/15/2021 by Ralf
                 t = "WR 0 4\r\n"; //reset the AFE seserializer logic
                 SendStr(t);
                 Thread.Sleep(1);
@@ -306,7 +310,11 @@ namespace TB_mu2e
                 t = "WR 400 20\r\n"; //reset the trigger counter and whatnot
                 SendStr(t);
                 Thread.Sleep(1);
-
+                */
+                //  changed 04/15/2021 by Ralf
+                t = "WR 316 20\r\n"; //reset the trigger counter and whatnot at all FPGAs
+                SendStr(t);
+                Thread.Sleep(1);
             }
             return true;
         }
