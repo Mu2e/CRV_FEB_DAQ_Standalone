@@ -32,6 +32,7 @@ namespace TB_mu2e
         public int num;
         public string InFileName = "";
         public string OutFileName = "";
+        public string RunSettingsLogName = "";
         public string run_name;
         public FileStream file;
         public StreamReader sr;
@@ -59,6 +60,8 @@ namespace TB_mu2e
         public bool OneSpill;
         public string[] RunParams;
         private List<byte[]> data_buffers;
+        public bool UseDynamicVBias;
+        public bool LogSettings;
 
         public LinkedList<SpillData> Spills;
         internal bool validateParse;
@@ -167,14 +170,14 @@ namespace TB_mu2e
             //}
         }
 
-        public void ActivateRun()
+        public void ActivateRun(bool inSequencer = false)
         {
             string hName = "";
             string dirName = "c://data//";
             //string dirName = "d://data//";
             hName = run_name;
             RunName rn = new RunName();
-            rn.ShowDialog();
+            if (!inSequencer) { rn.ShowDialog(); }
 
             //hName += "_ch" + this.chan.ToString();
             //hName += "_" + DateTime.Now.Year.ToString("0000");
@@ -187,6 +190,7 @@ namespace TB_mu2e
             hName = run_name;//PP.myRun.run_name;
             hName = dirName + hName + ".dat";
             OutFileName = hName;
+            RunSettingsLogName = OutFileName.Substring(0, OutFileName.Length - 4) + "_settings_history.log";
             try
             {
                 using (sw = new StreamWriter(OutFileName, true))
@@ -201,7 +205,47 @@ namespace TB_mu2e
 
                     using (StreamWriter sw2 = File.AppendText("c:\\data\\run_param.txt"))
                     {
-                        sw2.WriteLine(this.num.ToString() + " " + rn.textEbeam.Text + " " + rn.textIbeam.Text + " " + rn.BIASVtextBox.Text + " " + rn.GainTextBox.Text + " " + rn.comboPID.Text + " " + rn.textAngle.Text + " " + rn.textXpos.Text + " " + rn.textZpos.Text + " " + rn.textTemp.Text);
+                        if (!inSequencer) sw2.WriteLine(this.num.ToString() + " " + rn.textEbeam.Text + " " + rn.textIbeam.Text + " " + rn.BIASVtextBox.Text + " " + rn.GainTextBox.Text + " " + rn.comboPID.Text + " " + rn.textAngle.Text + " " + rn.textXpos.Text + " " + rn.textZpos.Text + " " + rn.textTemp.Text);
+                        else
+                        {
+                            string entry = this.num.ToString() + " ";
+                            string[] nameFields = OutFileName.Split(new char[] { '.' }, StringSplitOptions.RemoveEmptyEntries);
+                            entry += nameFields[nameFields.Length-3];
+                            entry += " ";
+                            if (PP.referenceFEBSettings.Length > 0)
+                            {
+                                entry += PP.referenceFEBSettings[0].WriteGainsToString();
+                            }
+                            sw2.WriteLine(entry);
+                        }
+                    }
+
+                    if (LogSettings)
+                    {
+                        if (!File.Exists(RunSettingsLogName))
+                        {
+                            try
+                            {
+                                using (FileStream fs = File.Create(RunSettingsLogName))
+                                {
+                                    // create an empty file 
+                                }
+                            }
+                            catch
+                            {
+                                System.Console.Write($"Failed to create file {RunSettingsLogName}!");
+                            }
+                        }
+                        using (StreamWriter sw3 = File.AppendText(RunSettingsLogName))
+                        {
+                            string output = "# Reference Settings:\r\n# ---------------------------------------\r\n\r\n";
+
+                            for (int i = 0; i < PP.referenceFEBSettings.Length; i++)
+                            {
+                                output += PP.referenceFEBSettings[i].DumpToText();
+                            }
+                            sw3.WriteLine(output);
+                        }
                     }
 
                     //If all goes well above, we are good to go for taking data.
@@ -241,7 +285,7 @@ namespace TB_mu2e
         }
 
 
-        public void RecordSpill()
+        public void RecordSpill(frmMain frmMain)
         {
             Thread.Sleep(1);
             if (ACTIVE)
@@ -283,6 +327,8 @@ namespace TB_mu2e
                     }
                 }
             }
+            // when done, enable dynamic VBias settings
+            frmMain.EnableWaitForBiasAdjustment();
         }
 
         public double ZeroFrac(int minX, int maxX, int minY, int maxY, int num_events)
@@ -603,6 +649,28 @@ namespace TB_mu2e
                 0.25, 0.25, 0.25, 0.25  //15
             }; //default thresholds at 0.25 for light tight check
 
+        public const double mVPerBulkUnit = 20.0;
+        public const double mVPerTrimUnit = -2.0;
+
+        public const double defaultCMBTemp = 20.0;
+        public const double defaultFEBTemp = 40.0;
+
+        public static readonly string[] biasBulkRegisterList = { "44", "45", "444", "445", "844", "845", "c44", "c45" };
+        public static readonly string[] biasTrimRegisterList = { "30", "31", "32", "33", "34", "35", "36", "37",
+                                                                 "38", "39", "3a", "3b", "3c", "3d", "3e", "3f",
+                                                                 "430", "431", "432", "433", "434", "435", "436", "437",
+                                                                 "438", "439", "43a", "43b", "43c", "43d", "43e", "43f",
+                                                                 "830", "831", "832", "833", "834", "835", "836", "837",
+                                                                 "838", "839", "83a", "83b", "83c", "83d", "83e", "83f",
+                                                                 "c30", "c31", "c32", "c33", "c34", "c35", "c36", "c37",
+                                                                 "c38", "c39", "c3a", "c3b", "c3c", "c3d", "c3e", "c3f"};
+        public static readonly string[] gainRegisterList = { "46", "47", "446", "447", "846", "847", "c46", "c47" };
+
+        public static FEBSettingsBiasGain[] referenceFEBSettings;
+        public static FEBSettingsBiasGain[] currentFEBSettings;
+
+        public static double[] CMBcoef;
+        public static double[] FEBcoef;
 
         //public static FEBC_client FEBC;
 

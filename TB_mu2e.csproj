@@ -333,6 +333,19 @@
       <DependentUpon>ClientSelectForm.cs</DependentUpon>
     </Compile>
     <Compile Include="DAQ_server.cs" />
+    <Compile Include="DynamicVoverSettingsForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="DynamicVoverSettingsForm.Designer.cs">
+      <DependentUpon>DynamicVoverSettingsForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="FEBBiasGainUsrCtrl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="FEBBiasGainUsrCtrl.Designer.cs">
+      <DependentUpon>FEBBiasGainUsrCtrl.cs</DependentUpon>
+    </Compile>
+    <Compile Include="FEBSettingsBiasGain.cs" />
     <Compile Include="HistoHelper.cs" />
     <Compile Include="Mu2e_FECC_client.cs" />
     <Compile Include="mu2e_registers.cs" />
@@ -342,6 +355,12 @@
     </Compile>
     <Compile Include="RunName.Designer.cs">
       <DependentUpon>RunName.cs</DependentUpon>
+    </Compile>
+    <Compile Include="SequencerBlock.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="SequencerBlock.Designer.cs">
+      <DependentUpon>SequencerBlock.cs</DependentUpon>
     </Compile>
     <Compile Include="SpillData.cs" />
     <Compile Include="TCP_receiver.cs" />
@@ -358,6 +377,15 @@
     <Compile Include="WC_client .cs" />
     <EmbeddedResource Include="ClientSelectForm.resx">
       <DependentUpon>ClientSelectForm.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DynamicVoverSettingsForm.resx">
+      <DependentUpon>DynamicVoverSettingsForm.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FEBBiasGainUsrCtrl.resx">
+      <DependentUpon>FEBBiasGainUsrCtrl.cs</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="frmMain.resx">
       <DependentUpon>frmMain.cs</DependentUpon>
@@ -376,6 +404,9 @@
     <EmbeddedResource Include="RunName.resx">
       <DependentUpon>RunName.cs</DependentUpon>
       <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="SequencerBlock.resx">
+      <DependentUpon>SequencerBlock.cs</DependentUpon>
     </EmbeddedResource>
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">

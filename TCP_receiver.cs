@@ -23,6 +23,12 @@ namespace TB_mu2e
         //To save data in "binary"
         //changed by Ralf 5/18/21
         //private static void Save(byte[] buf, string source)
+
+        public static void ResetTempReading(ref Mu2e_FEB_client feb)
+        {
+
+        }
+
         private static void Save(byte[] buf, string source, System.Net.Sockets.Socket feb_socket)
         {
             ReaderWriterLock locker = new ReaderWriterLock();
@@ -171,7 +177,14 @@ namespace TB_mu2e
             int readattempts = 0;
             do 
             {
-                feb.TNETSocket.Send(b);
+                try { feb.TNETSocket.Send(b); }
+                catch (Exception e)
+                {
+                    PP.myRun.UpdateStatus($"{feb.name} TNETSocket Send failure!");
+                    PP.myRun.UpdateStatus(e.Message);
+                    feb.Close();
+                    feb.Open(); // can check connections on ROC using "lca sock 1"
+                }
                 Thread.Sleep(50);
                 if(feb.TNETSocket.Available > 0)
                     feb.TNETSocket.Receive(hdr_buf);

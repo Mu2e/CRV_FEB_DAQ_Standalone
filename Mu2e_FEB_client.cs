@@ -264,7 +264,7 @@ namespace TB_mu2e
             else
                 SendStr("wr 20 1" + Convert.ToString(ch, 16));
             SendStr("gain 8");
-            SendStr("A0 2");
+            SendStr("A0 10");
             while (ReadStr(out t, out int dt) || !t.Contains("avg")) { Thread.Sleep(5); } //If after """reading""" we don't have the current, READ IT AGAIN DAMMIT
             string[] tok = t.Split(new string[] { " ", "\r\n", Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
             double adc = -4.096;
