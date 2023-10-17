@@ -199,6 +199,7 @@ namespace TB_mu2e
                 Console.WriteLine("+ READ");
 
                 //feb.TNETSocket.Receive(hdr_buf);
+              
                 spillwrdcnt = (hdr_buf[0] * 256 * 256 * 256 + //spillwrdcnt is how many words there are for ALL fpgas in a given spill
                                hdr_buf[1] * 256 * 256 +
                                hdr_buf[2] * 256 +

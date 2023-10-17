@@ -169,7 +169,7 @@
             this.lightGlobalThresh = new System.Windows.Forms.TextBox();
             this.lightCheckBtn = new System.Windows.Forms.Button();
             this.dicounterQCGroup = new System.Windows.Forms.GroupBox();
-            this.qaOutputFileName = new System.Windows.Forms.TextBox();
+            this.qcOutputFileName = new System.Windows.Forms.TextBox();
             this.qaOutputFileNameLabel = new System.Windows.Forms.Label();
             this.oneReadout = new System.Windows.Forms.CheckBox();
             this.qaDiNumAvgLabel = new System.Windows.Forms.Label();
@@ -186,6 +186,7 @@
             this.cmbDataGroup = new System.Windows.Forms.GroupBox();
             this.cmbDataTable = new System.Windows.Forms.TableLayoutPanel();
             this.cmbTestControl = new System.Windows.Forms.GroupBox();
+            this.cmbTesterProgresBar = new System.Windows.Forms.ProgressBar();
             this.lostCMBavgsBtn = new System.Windows.Forms.Button();
             this.updateFilesChkBox = new System.Windows.Forms.CheckBox();
             this.cmbInfoBox = new System.Windows.Forms.TextBox();
@@ -289,13 +290,14 @@
             this.pnlSequencer = new System.Windows.Forms.Panel();
             this.FEBSelectPanel = new System.Windows.Forms.TableLayoutPanel();
             this.SpillTimer = new System.Windows.Forms.Timer(this.components);
-            this.moduleQAHomingTimer = new System.Windows.Forms.Timer(this.components);
+            this.moduleQCHomingTimer = new System.Windows.Forms.Timer(this.components);
             this.moduleQCMeasurementTimer = new System.Windows.Forms.Timer(this.components);
             this.ModuleQCStepTimer = new System.Windows.Forms.Timer(this.components);
             this.LightCheckMeasurementTimer = new System.Windows.Forms.Timer(this.components);
             this.qcDiCounterMeasurementTimer = new System.Windows.Forms.Timer(this.components);
             this.FEBClientFooterBar = new System.Windows.Forms.Label();
             this.SequencerTimer = new System.Windows.Forms.Timer(this.components);
+            this.cmbTest_ShortHelperBtn = new System.Windows.Forms.Button();
             this.tabControl.SuspendLayout();
             this.tabRUN.SuspendLayout();
             this.groupBoxEvDisplay.SuspendLayout();
@@ -1983,7 +1985,7 @@
             // 
             // dicounterQCGroup
             // 
-            this.dicounterQCGroup.Controls.Add(this.qaOutputFileName);
+            this.dicounterQCGroup.Controls.Add(this.qcOutputFileName);
             this.dicounterQCGroup.Controls.Add(this.qaOutputFileNameLabel);
             this.dicounterQCGroup.Controls.Add(this.oneReadout);
             this.dicounterQCGroup.Controls.Add(this.qaDiNumAvgLabel);
@@ -2001,12 +2003,12 @@
             this.dicounterQCGroup.TabStop = false;
             this.dicounterQCGroup.Text = "DiCounter QC";
             // 
-            // qaOutputFileName
+            // qcOutputFileName
             // 
-            this.qaOutputFileName.Location = new System.Drawing.Point(759, 60);
-            this.qaOutputFileName.Name = "qaOutputFileName";
-            this.qaOutputFileName.Size = new System.Drawing.Size(112, 23);
-            this.qaOutputFileName.TabIndex = 119;
+            this.qcOutputFileName.Location = new System.Drawing.Point(759, 60);
+            this.qcOutputFileName.Name = "qcOutputFileName";
+            this.qcOutputFileName.Size = new System.Drawing.Size(112, 23);
+            this.qcOutputFileName.TabIndex = 119;
             // 
             // qaOutputFileNameLabel
             // 
@@ -2202,6 +2204,7 @@
             // 
             // cmbTestControl
             // 
+            this.cmbTestControl.Controls.Add(this.cmbTesterProgresBar);
             this.cmbTestControl.Controls.Add(this.lostCMBavgsBtn);
             this.cmbTestControl.Controls.Add(this.updateFilesChkBox);
             this.cmbTestControl.Controls.Add(this.cmbInfoBox);
@@ -2213,10 +2216,19 @@
             this.cmbTestControl.Controls.Add(this.cmbTestBtn);
             this.cmbTestControl.Location = new System.Drawing.Point(16, 15);
             this.cmbTestControl.Name = "cmbTestControl";
-            this.cmbTestControl.Size = new System.Drawing.Size(411, 184);
+            this.cmbTestControl.Size = new System.Drawing.Size(515, 184);
             this.cmbTestControl.TabIndex = 0;
             this.cmbTestControl.TabStop = false;
             this.cmbTestControl.Text = "CMB Test Control";
+            // 
+            // cmbTesterProgresBar
+            // 
+            this.cmbTesterProgresBar.Location = new System.Drawing.Point(33, 141);
+            this.cmbTesterProgresBar.Maximum = 160;
+            this.cmbTesterProgresBar.Name = "cmbTesterProgresBar";
+            this.cmbTesterProgresBar.Size = new System.Drawing.Size(147, 23);
+            this.cmbTesterProgresBar.Step = 8;
+            this.cmbTesterProgresBar.TabIndex = 11;
             // 
             // lostCMBavgsBtn
             // 
@@ -2254,6 +2266,7 @@
             this.requestNumTrigsLabel.Size = new System.Drawing.Size(113, 17);
             this.requestNumTrigsLabel.TabIndex = 7;
             this.requestNumTrigsLabel.Text = "Requested Trigs";
+            this.requestNumTrigsLabel.Visible = false;
             // 
             // requestNumTrigs
             // 
@@ -2262,6 +2275,7 @@
             this.requestNumTrigs.Size = new System.Drawing.Size(73, 23);
             this.requestNumTrigs.TabIndex = 6;
             this.requestNumTrigs.Text = "100";
+            this.requestNumTrigs.Visible = false;
             // 
             // numTrigsDisp
             // 
@@ -2271,6 +2285,7 @@
             this.numTrigsDisp.Size = new System.Drawing.Size(16, 17);
             this.numTrigsDisp.TabIndex = 4;
             this.numTrigsDisp.Text = "0";
+            this.numTrigsDisp.Visible = false;
             // 
             // numTrigLabel
             // 
@@ -2280,14 +2295,16 @@
             this.numTrigLabel.Size = new System.Drawing.Size(73, 17);
             this.numTrigLabel.TabIndex = 3;
             this.numTrigLabel.Text = "Num Trigs";
+            this.numTrigLabel.Visible = false;
             // 
             // sipmControl
             // 
+            this.sipmControl.Controls.Add(this.cmbTest_ShortHelperBtn);
             this.sipmControl.Controls.Add(this.cmbBias);
             this.sipmControl.Controls.Add(this.cmbBiasOverride);
             this.sipmControl.Location = new System.Drawing.Point(209, 48);
             this.sipmControl.Name = "sipmControl";
-            this.sipmControl.Size = new System.Drawing.Size(189, 55);
+            this.sipmControl.Size = new System.Drawing.Size(300, 55);
             this.sipmControl.TabIndex = 2;
             this.sipmControl.TabStop = false;
             this.sipmControl.Text = "SiPM Bias";
@@ -3523,10 +3540,10 @@
             this.SpillTimer.Interval = 1000;
             this.SpillTimer.Tick += new System.EventHandler(this.SpillTimer_Tick);
             // 
-            // moduleQAHomingTimer
+            // moduleQCHomingTimer
             // 
-            this.moduleQAHomingTimer.Interval = 200;
-            this.moduleQAHomingTimer.Tick += new System.EventHandler(this.ModuleQCHomingTimer_Tick);
+            this.moduleQCHomingTimer.Interval = 500;
+            this.moduleQCHomingTimer.Tick += new System.EventHandler(this.ModuleQCHomingTimer_Tick);
             // 
             // moduleQCMeasurementTimer
             // 
@@ -3535,7 +3552,7 @@
             // 
             // ModuleQCStepTimer
             // 
-            this.ModuleQCStepTimer.Interval = 10;
+            this.ModuleQCStepTimer.Interval = 500;
             this.ModuleQCStepTimer.Tick += new System.EventHandler(this.ModuleQCStepTimer_Tick);
             // 
             // LightCheckMeasurementTimer
@@ -3559,6 +3576,17 @@
             // 
             this.SequencerTimer.Interval = 1000;
             this.SequencerTimer.Tick += new System.EventHandler(this.SequencerTimer_Tick);
+            //
+            // cmbTest_ShortHelperBtn
+            // 
+            this.cmbTest_ShortHelperBtn.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.cmbTest_ShortHelperBtn.Location = new System.Drawing.Point(187, 17);
+            this.cmbTest_ShortHelperBtn.Name = "cmbTest_ShortHelperBtn";
+            this.cmbTest_ShortHelperBtn.Size = new System.Drawing.Size(107, 32);
+            this.cmbTest_ShortHelperBtn.TabIndex = 12;
+            this.cmbTest_ShortHelperBtn.Text = "Short Suspected";
+            this.cmbTest_ShortHelperBtn.UseVisualStyleBackColor = true;
+            this.cmbTest_ShortHelperBtn.Click += new System.EventHandler(this.CmbTest_ShortHelperBtn_Click);
             // 
             // frmMain
             // 
@@ -3787,7 +3815,7 @@
         private System.Windows.Forms.TextBox cmbInfoBox;
         private System.Windows.Forms.CheckBox updateFilesChkBox;
         private System.Windows.Forms.GroupBox cmbDataGroup;
-        private System.Windows.Forms.TextBox qaOutputFileName;
+        private System.Windows.Forms.TextBox qcOutputFileName;
         private System.Windows.Forms.Label qaOutputFileNameLabel;
         private System.Windows.Forms.TableLayoutPanel lightCheckFPGApanel;
         private System.Windows.Forms.CheckBox lightWriteToFileBox;
@@ -3819,7 +3847,7 @@
         private System.Windows.Forms.Button comPortConnectBtn;
         private System.Windows.Forms.Button ComPortDisconnectBtn;
         private System.Windows.Forms.Button ComPortRefresh;
-        private System.Windows.Forms.Timer moduleQAHomingTimer;
+        private System.Windows.Forms.Timer moduleQCHomingTimer;
         private System.Windows.Forms.Label ComPortStatusLbl;
         private System.Windows.Forms.TextBox ComPortStatusBox;
         private System.Windows.Forms.Timer moduleQCMeasurementTimer;
@@ -3916,5 +3944,7 @@
         public System.Windows.Forms.Timer SequencerTimer;
         public System.Windows.Forms.ProgressBar progressBarSequencer;
         public System.Windows.Forms.Label lblProgress;
+        private System.Windows.Forms.ProgressBar cmbTesterProgresBar;
+        private System.Windows.Forms.Button cmbTest_ShortHelperBtn;
     }
 }

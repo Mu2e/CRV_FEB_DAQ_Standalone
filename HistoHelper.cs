@@ -1,18 +1,19 @@
 ﻿using System;
-using System.Linq;
 
 namespace TB_mu2e
 {
+
     class HistoHelper
     {
         //----------------------------------------------
-        // TODO: Finish implementing "Big" histograms
+        // TODO: 
         //----------------------------------------------
 
         //In getting histograms, you get 8 histograms simultaneously (1 for each AFE, which is 2 per FPGA)
         //They will always arrive in ascending order in the array that is returned, i.e. if asked for ch. 16, it will return [0, 8, 16, 24, 32, 40, 48, 56], so it will be 16/8 = 2nd in the array
 
         //Datamembers here
+        private const int num_bins = 1024;
         private Mu2e_FEB_client febClient;
         public byte Ext_mode { get; set; }
         private ushort accumulation_interval;
@@ -49,41 +50,15 @@ namespace TB_mu2e
             GetRegisters();
         }
 
-        public ROOTNET.NTH1I[] GetHistogram(uint channel, byte binning, string suffix = "")
+        public ROOTNET.NTH1I[] GetHistogram(uint channel, string suffix = "")
         {
-            channel %= 8;
+            channel %= 8; //requested channel mod 8 (since each AFE only cares about the 8 channels connected to it)
 
-            //Get the registers for the requested channel           
-
-            //Get the read/write addresses which are important for starting and reading the histograms 
-            //uint[,] channels = AFE_ChannelAddresses(channel);  
-            //0x60
-            uint histCntrl_Dark_Base = 0x60 + (uint)Ext_mode + channel;//channels[0,4]; // This turns on the histogramming with the defined mode
-            //binning should only be 1, 2, 4, or 8, since those are the only supported histogram bin widths
-            switch (binning)
-            { //NOTICE: Binning has been deprecated. Adjustment of histogram "width" can be performed by adjusting the gain
-                //case 1:
-                //    histCntrl_Dark_Base += 0x0;
-                //    break;
-                //case 2:
-                //    histCntrl_Dark_Base += 0x500;
-                //    break;
-                //case 4:
-                //    histCntrl_Dark_Base += 0xA00;
-                //    break;
-                //case 8:
-                //    histCntrl_Dark_Base += 0xF00;
-                //    break;
-                default:
-                    histCntrl_Dark_Base += 0x0;
-                    break;
-            }
-
-            //Get the registers specific to the requested channel
-            SetRegisters();
+            SetRegisters(); //Preps the FEB (re-sets accumulation interval and resets the read pointers)
+            uint histCntrl_Dark_Base = 0x60 + (uint)Ext_mode + channel; // This is the "on" command for the histogramming and setting for gated histograms and the channel requested
 
             //Start the histogramming and wait for it to finish (very quick)
-            Mu2e_Register.WriteReg(histCntrl_Dark_Base, ref histo_controls[0], ref febClient.client);
+            Mu2e_Register.WriteReg(histCntrl_Dark_Base, ref histo_controls[0], ref febClient.client); 
             System.Threading.Thread.Sleep(accumulation_interval + 250); //small bit of time buffer added to the interval
             
             //Get and unpack the data
@@ -95,7 +70,7 @@ namespace TB_mu2e
             {
                 try
                 {
-                    histo[i] = new ROOTNET.NTH1I("Ch" + ((8 * i) + channel).ToString() + suffix, ((8 * i) + channel).ToString(), 1024/*512*/, 0, binning * 1024/*512*/); //First bin is underflow, last bin is overflow
+                    histo[i] = new ROOTNET.NTH1I("Ch" + ((8 * i) + channel).ToString() + suffix, ((8 * i) + channel).ToString(), num_bins, 0, num_bins); //First bin is underflow, last bin is overflow
                     for (uint binIndex = 0; binIndex < histogramBinContents[i].Length; binIndex++)
                     {
                         histo[i].SetBinContent((int)binIndex+1, histogramBinContents[i][binIndex]);
@@ -149,7 +124,7 @@ namespace TB_mu2e
                     System.Console.WriteLine("Expected {0} bytes for hitogram", lret);
                     //lret = febSocket.Receive(packs[packNum], packs[packNum].Length, System.Net.Sockets.SocketFlags.None);
                     //System.Console.WriteLine("Read: {0} / {1} bytes", lret, old_available);
-                } while (lret != old_available || old_available < 4096/*2048*/ || old_available > 4110/*2060*/); //2048 is the minimum byte length for an incoming histogram; each one is actually >=2049 due to the '>' sent by the board, also need to check if >2048 because sometimes the borad likes to send both histograms in one packet
+                } while (lret != old_available || old_available != 4*num_bins); //The 4 is because 32-bit bins -> 4 bytes per bin
             }
 
             return packs;
@@ -181,38 +156,6 @@ namespace TB_mu2e
 
             return data;
         }
-
-
-        #region Deprecated
-        //Returns the histogram readout address for the requested channel and its complement on a given FPGA.
-        //Also returns the FPGA and 'local FPGA channel'
-        //private uint[,] AFE_ChannelAddresses(uint requested_channel)
-        //{
-        //    uint[,] addresses = new uint[2,5]; //first row is for the requested channel, second row is for the channel complement
-        //    uint mapped_channel = requested_channel % 16,
-        //        fpga = requested_channel / 16;
-        //    if (mapped_channel > 7)
-        //    {
-        //        addresses[0, 0] = histo_controls[5].addr; //afe1_dataPort.addr; AFE read address for requested channel
-        //        addresses[1, 0] = histo_controls[4].addr; //afe0_dataPort.addr; AFE read address for complement channel
-        //        addresses[1, 2] = mapped_channel - 8; //The local FPGA channel number for the complement channel
-        //    }
-        //    else
-        //    {
-        //        addresses[0, 0] = histo_controls[4].addr; //afe0_dataPort.addr; AFE read address for requested channel
-        //        addresses[1, 0] = histo_controls[5].addr; //afe1_dataPort.addr; AFE read address for complement channel
-        //        addresses[1, 2] = mapped_channel + 8; //The local FPGA channel number for the complement channel
-        //    }
-
-        //    addresses[0, 1] = addresses[1,1] = fpga; //FPGA the channels are on
-        //    addresses[0, 2] = mapped_channel; //The 'local FPGA channel'
-        //    addresses[0, 3] = requested_channel; //Giving back the requested channel
-        //    addresses[1, 3] = (fpga * 16) + addresses[1, 2]; //Actual complement channel
-        //    addresses[0, 4] = addresses[1, 4] = mapped_channel % 8; //AFE channel mapping
-
-        //    return addresses;
-        //}
-        #endregion Deprecated
 
         public ushort GetAccumulation_interval() { return accumulation_interval; }
 
