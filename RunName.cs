@@ -98,25 +98,27 @@ namespace TB_mu2e
 
             DateTime n = System.DateTime.Now;
 
-            PP.myRun.run_name = "RUN_FEB_" + PP.myRun.num.ToString() + "_TB" + n.Year.ToString() + n.Month.ToString("00") + n.Day.ToString("00") + n.Hour.ToString("00") + n.Minute.ToString("00") + "_";
-            PP.myRun.run_name += textEbeam.Text;
-            PP.myRun.run_name += "GeV_";
-            PP.myRun.run_name += textIbeam.Text;
-            PP.myRun.run_name += "Kcnt_";
-            PP.myRun.run_name += BIASVtextBox.Text;
-            PP.myRun.run_name += "BV_";
-            PP.myRun.run_name += GainTextBox.Text;
-            PP.myRun.run_name += "Gain_";
-            PP.myRun.run_name += comboPID.Text;
-            PP.myRun.run_name += "_";
-            PP.myRun.run_name += textAngle.Text;
-            PP.myRun.run_name += "deg_x";
-            PP.myRun.run_name += textXpos.Text;
-            PP.myRun.run_name += "_z";
-            PP.myRun.run_name += textZpos.Text;
-            PP.myRun.run_name += "_";
-            PP.myRun.run_name += textTemp.Text;
-            PP.myRun.run_name += "degF";
+            //PP.myRun.run_name = "RUN_FEB_" + PP.myRun.num.ToString() + "_TB" + n.Year.ToString() + n.Month.ToString("00") + n.Day.ToString("00") + n.Hour.ToString("00") + n.Minute.ToString("00") + "_";
+            PP.myRun.run_name = "raw.mu2e.CRV_wideband_cosmics.crvaging-" + textEbeam.Text + "." + PP.myRun.num.ToString("000000");
+
+            //PP.myRun.run_name += textEbeam.Text;
+            //PP.myRun.run_name += "GeV_";
+            //PP.myRun.run_name += textIbeam.Text;
+            //PP.myRun.run_name += "Kcnt_";
+            //PP.myRun.run_name += BIASVtextBox.Text;
+            //PP.myRun.run_name += "BV_";
+            //PP.myRun.run_name += GainTextBox.Text;
+            //PP.myRun.run_name += "Gain_";
+            //PP.myRun.run_name += comboPID.Text;
+            //PP.myRun.run_name += "_";
+            //PP.myRun.run_name += textAngle.Text;
+            //PP.myRun.run_name += "deg_x";
+            //PP.myRun.run_name += textXpos.Text;
+            //PP.myRun.run_name += "_z";
+            //PP.myRun.run_name += textZpos.Text;
+            //PP.myRun.run_name += "_";
+            //PP.myRun.run_name += textTemp.Text;
+            //PP.myRun.run_name += "degF";
 
             textBox1.Text = PP.myRun.run_name;
 

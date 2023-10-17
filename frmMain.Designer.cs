@@ -51,6 +51,8 @@
             this.ud_VertMin = new System.Windows.Forms.NumericUpDown();
             this.ud_VertMax = new System.Windows.Forms.NumericUpDown();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.LogDynamicBiasChkBox = new System.Windows.Forms.CheckBox();
+            this.btnRefSettingFiles = new System.Windows.Forms.Button();
             this.SpillStatusGroupBox = new System.Windows.Forms.GroupBox();
             this.lblSpillsNum = new System.Windows.Forms.Label();
             this.lblNumSpills = new System.Windows.Forms.Label();
@@ -67,6 +69,7 @@
             this.lblTxtRunName = new System.Windows.Forms.Label();
             this.lblRunTime = new System.Windows.Forms.Label();
             this.lblSpillTime = new System.Windows.Forms.Label();
+            this.DynamicVbiasChkBox = new System.Windows.Forms.CheckBox();
             this.btnFebClientsChange = new System.Windows.Forms.Button();
             this.btnStopRun = new System.Windows.Forms.Button();
             this.btnStartRun = new System.Windows.Forms.Button();
@@ -220,6 +223,71 @@
             this.ModuleQAFEB1Box = new System.Windows.Forms.GroupBox();
             this.ModuleQCTableFEB1 = new System.Windows.Forms.TableLayoutPanel();
             this.ModuleQCBtn = new System.Windows.Forms.Button();
+            this.tabPage1 = new System.Windows.Forms.TabPage();
+            this.label3 = new System.Windows.Forms.Label();
+            this.outFileName = new System.Windows.Forms.TextBox();
+            this.label4 = new System.Windows.Forms.Label();
+            this.qaBias = new System.Windows.Forms.TextBox();
+            this.dicounterQAGroup = new System.Windows.Forms.GroupBox();
+            this.stopMeasureBtn = new System.Windows.Forms.Button();
+            this.measIntervalLabel = new System.Windows.Forms.Label();
+            this.numMeasureLabel = new System.Windows.Forms.Label();
+            this.measInterval = new System.Windows.Forms.NumericUpDown();
+            this.numMeasure = new System.Windows.Forms.NumericUpDown();
+            this.sourceRunFlag = new System.Windows.Forms.CheckBox();
+            this.but31 = new System.Windows.Forms.RadioButton();
+            this.but30 = new System.Windows.Forms.RadioButton();
+            this.but29 = new System.Windows.Forms.RadioButton();
+            this.but28 = new System.Windows.Forms.RadioButton();
+            this.but27 = new System.Windows.Forms.RadioButton();
+            this.but26 = new System.Windows.Forms.RadioButton();
+            this.but25 = new System.Windows.Forms.RadioButton();
+            this.but24 = new System.Windows.Forms.RadioButton();
+            this.but23 = new System.Windows.Forms.RadioButton();
+            this.but19 = new System.Windows.Forms.RadioButton();
+            this.but18 = new System.Windows.Forms.RadioButton();
+            this.but17 = new System.Windows.Forms.RadioButton();
+            this.but16 = new System.Windows.Forms.RadioButton();
+            this.but21 = new System.Windows.Forms.RadioButton();
+            this.but20 = new System.Windows.Forms.RadioButton();
+            this.but22 = new System.Windows.Forms.RadioButton();
+            this.numAvg = new System.Windows.Forms.NumericUpDown();
+            this.label22 = new System.Windows.Forms.Label();
+            this.but15 = new System.Windows.Forms.RadioButton();
+            this.but14 = new System.Windows.Forms.RadioButton();
+            this.but13 = new System.Windows.Forms.RadioButton();
+            this.but12 = new System.Windows.Forms.RadioButton();
+            this.but11 = new System.Windows.Forms.RadioButton();
+            this.but10 = new System.Windows.Forms.RadioButton();
+            this.but9 = new System.Windows.Forms.RadioButton();
+            this.but8 = new System.Windows.Forms.RadioButton();
+            this.but7 = new System.Windows.Forms.RadioButton();
+            this.but3 = new System.Windows.Forms.RadioButton();
+            this.but2 = new System.Windows.Forms.RadioButton();
+            this.but1 = new System.Windows.Forms.RadioButton();
+            this.but0 = new System.Windows.Forms.RadioButton();
+            this.but5 = new System.Windows.Forms.RadioButton();
+            this.but4 = new System.Windows.Forms.RadioButton();
+            this.but6 = new System.Windows.Forms.RadioButton();
+            this.label21 = new System.Windows.Forms.Label();
+            this.iWarningThresh = new System.Windows.Forms.TextBox();
+            this.progressBar1 = new System.Windows.Forms.ProgressBar();
+            this.numButton = new System.Windows.Forms.Button();
+            this.label2 = new System.Windows.Forms.Label();
+            this.numTextBox = new System.Windows.Forms.TextBox();
+            this.tabPage2 = new System.Windows.Forms.TabPage();
+            this.lblProgress = new System.Windows.Forms.Label();
+            this.btnRemove = new System.Windows.Forms.Button();
+            this.btnClear = new System.Windows.Forms.Button();
+            this.progressBarSequencer = new System.Windows.Forms.ProgressBar();
+            this.btnSetup = new System.Windows.Forms.Button();
+            this.sequencerLog = new System.Windows.Forms.RichTextBox();
+            this.btnSave = new System.Windows.Forms.Button();
+            this.btnLoad = new System.Windows.Forms.Button();
+            this.btnStop = new System.Windows.Forms.Button();
+            this.btnExecute = new System.Windows.Forms.Button();
+            this.btnAddStep = new System.Windows.Forms.Button();
+            this.pnlSequencer = new System.Windows.Forms.Panel();
             this.FEBSelectPanel = new System.Windows.Forms.TableLayoutPanel();
             this.SpillTimer = new System.Windows.Forms.Timer(this.components);
             this.moduleQCHomingTimer = new System.Windows.Forms.Timer(this.components);
@@ -228,6 +296,7 @@
             this.LightCheckMeasurementTimer = new System.Windows.Forms.Timer(this.components);
             this.qcDiCounterMeasurementTimer = new System.Windows.Forms.Timer(this.components);
             this.FEBClientFooterBar = new System.Windows.Forms.Label();
+            this.SequencerTimer = new System.Windows.Forms.Timer(this.components);
             this.cmbTest_ShortHelperBtn = new System.Windows.Forms.Button();
             this.tabControl.SuspendLayout();
             this.tabRUN.SuspendLayout();
@@ -265,6 +334,12 @@
             ((System.ComponentModel.ISupportInitialize)(this.ModuleQC_Offset)).BeginInit();
             this.ModuleQAFEB2Box.SuspendLayout();
             this.ModuleQAFEB1Box.SuspendLayout();
+            this.tabPage1.SuspendLayout();
+            this.dicounterQAGroup.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.measInterval)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numMeasure)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numAvg)).BeginInit();
+            this.tabPage2.SuspendLayout();
             this.SuspendLayout();
             // 
             // tabControl
@@ -277,6 +352,8 @@
             this.tabControl.Controls.Add(this.tabQC);
             this.tabControl.Controls.Add(this.tabCMBTester);
             this.tabControl.Controls.Add(this.tabModuleQC);
+            this.tabControl.Controls.Add(this.tabPage1);
+            this.tabControl.Controls.Add(this.tabPage2);
             this.tabControl.Location = new System.Drawing.Point(1, 0);
             this.tabControl.Name = "tabControl";
             this.tabControl.SelectedIndex = 0;
@@ -519,18 +596,43 @@
             // 
             // groupBox1
             // 
+            this.groupBox1.Controls.Add(this.LogDynamicBiasChkBox);
+            this.groupBox1.Controls.Add(this.btnRefSettingFiles);
             this.groupBox1.Controls.Add(this.SpillStatusGroupBox);
+            this.groupBox1.Controls.Add(this.DynamicVbiasChkBox);
             this.groupBox1.Controls.Add(this.btnFebClientsChange);
             this.groupBox1.Controls.Add(this.btnStopRun);
             this.groupBox1.Controls.Add(this.btnStartRun);
             this.groupBox1.Controls.Add(this.btnPrepare);
             this.groupBox1.Controls.Add(this.btnConnectAll);
-            this.groupBox1.Location = new System.Drawing.Point(7, 39);
+            this.groupBox1.Location = new System.Drawing.Point(7, 8);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(608, 403);
+            this.groupBox1.Size = new System.Drawing.Size(608, 467);
             this.groupBox1.TabIndex = 2;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "RUN CONTROL";
+            // 
+            // LogDynamicBiasChkBox
+            // 
+            this.LogDynamicBiasChkBox.AutoSize = true;
+            this.LogDynamicBiasChkBox.Enabled = false;
+            this.LogDynamicBiasChkBox.Location = new System.Drawing.Point(399, 436);
+            this.LogDynamicBiasChkBox.Name = "LogDynamicBiasChkBox";
+            this.LogDynamicBiasChkBox.Size = new System.Drawing.Size(137, 21);
+            this.LogDynamicBiasChkBox.TabIndex = 48;
+            this.LogDynamicBiasChkBox.Text = "Log Bias Settings";
+            this.LogDynamicBiasChkBox.UseVisualStyleBackColor = true;
+            // 
+            // btnRefSettingFiles
+            // 
+            this.btnRefSettingFiles.Location = new System.Drawing.Point(182, 431);
+            this.btnRefSettingFiles.Name = "btnRefSettingFiles";
+            this.btnRefSettingFiles.Size = new System.Drawing.Size(203, 28);
+            this.btnRefSettingFiles.TabIndex = 47;
+            this.btnRefSettingFiles.Tag = "";
+            this.btnRefSettingFiles.Text = "Reference Settings";
+            this.btnRefSettingFiles.UseVisualStyleBackColor = true;
+            this.btnRefSettingFiles.Click += new System.EventHandler(this.btnRefSettingFiles_Click);
             // 
             // SpillStatusGroupBox
             // 
@@ -547,7 +649,7 @@
             this.SpillStatusGroupBox.Controls.Add(this.lblSpillTime);
             this.SpillStatusGroupBox.Location = new System.Drawing.Point(176, 20);
             this.SpillStatusGroupBox.Name = "SpillStatusGroupBox";
-            this.SpillStatusGroupBox.Size = new System.Drawing.Size(426, 372);
+            this.SpillStatusGroupBox.Size = new System.Drawing.Size(426, 405);
             this.SpillStatusGroupBox.TabIndex = 38;
             this.SpillStatusGroupBox.TabStop = false;
             this.SpillStatusGroupBox.Text = "Spill Status";
@@ -587,7 +689,7 @@
             this.SpillStatusTable.RowCount = 2;
             this.SpillStatusTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 36F));
             this.SpillStatusTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
-            this.SpillStatusTable.Size = new System.Drawing.Size(414, 189);
+            this.SpillStatusTable.Size = new System.Drawing.Size(414, 221);
             this.SpillStatusTable.TabIndex = 39;
             // 
             // lblFebColumn
@@ -669,6 +771,7 @@
             this.saveAsciiBox.TabIndex = 36;
             this.saveAsciiBox.Text = "Save data as human-readable?";
             this.saveAsciiBox.UseVisualStyleBackColor = true;
+            this.saveAsciiBox.CheckedChanged += new System.EventHandler(this.saveAsciiBox_CheckedChanged);
             // 
             // lblRunName
             // 
@@ -714,6 +817,18 @@
             this.lblSpillTime.Size = new System.Drawing.Size(65, 17);
             this.lblSpillTime.TabIndex = 21;
             this.lblSpillTime.Text = "SpillTime";
+            // 
+            // DynamicVbiasChkBox
+            // 
+            this.DynamicVbiasChkBox.AutoSize = true;
+            this.DynamicVbiasChkBox.Enabled = false;
+            this.DynamicVbiasChkBox.Location = new System.Drawing.Point(13, 436);
+            this.DynamicVbiasChkBox.Name = "DynamicVbiasChkBox";
+            this.DynamicVbiasChkBox.Size = new System.Drawing.Size(167, 21);
+            this.DynamicVbiasChkBox.TabIndex = 39;
+            this.DynamicVbiasChkBox.Text = "Dynamic Bias Settings";
+            this.DynamicVbiasChkBox.UseVisualStyleBackColor = true;
+            this.DynamicVbiasChkBox.CheckedChanged += new System.EventHandler(this.DynamicVbiasChkBox_CheckedChanged);
             // 
             // btnFebClientsChange
             // 
@@ -1054,6 +1169,7 @@
             this.scanAllChanBox.TabIndex = 83;
             this.scanAllChanBox.Text = "Scan All Channels";
             this.scanAllChanBox.UseVisualStyleBackColor = true;
+            this.scanAllChanBox.CheckedChanged += new System.EventHandler(this.scanAllChanBox_CheckedChanged);
             // 
             // label23
             // 
@@ -1211,7 +1327,7 @@
             this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label1.Location = new System.Drawing.Point(0, 83);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(39, 16);
+            this.label1.Size = new System.Drawing.Size(38, 16);
             this.label1.TabIndex = 57;
             this.label1.Text = "Chan";
             // 
@@ -1234,7 +1350,7 @@
             this.lblInc.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lblInc.Location = new System.Drawing.Point(0, 56);
             this.lblInc.Name = "lblInc";
-            this.lblInc.Size = new System.Drawing.Size(68, 16);
+            this.lblInc.Size = new System.Drawing.Size(67, 16);
             this.lblInc.TabIndex = 53;
             this.lblInc.Text = "Time (ms)";
             // 
@@ -1272,7 +1388,7 @@
             this.lblStop.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lblStop.Location = new System.Drawing.Point(2, 29);
             this.lblStop.Name = "lblStop";
-            this.lblStop.Size = new System.Drawing.Size(36, 16);
+            this.lblStop.Size = new System.Drawing.Size(35, 16);
             this.lblStop.TabIndex = 51;
             this.lblStop.Text = "Stop";
             // 
@@ -1315,7 +1431,7 @@
             this.lblStart.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lblStart.Location = new System.Drawing.Point(2, 3);
             this.lblStart.Name = "lblStart";
-            this.lblStart.Size = new System.Drawing.Size(35, 16);
+            this.lblStart.Size = new System.Drawing.Size(34, 16);
             this.lblStart.TabIndex = 49;
             this.lblStart.Text = "Start";
             // 
@@ -1357,7 +1473,7 @@
             this.chkIntegral.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.chkIntegral.Location = new System.Drawing.Point(3, 36);
             this.chkIntegral.Name = "chkIntegral";
-            this.chkIntegral.Size = new System.Drawing.Size(123, 20);
+            this.chkIntegral.Size = new System.Drawing.Size(122, 20);
             this.chkIntegral.TabIndex = 57;
             this.chkIntegral.Text = "Integral Spect";
             this.chkIntegral.UseVisualStyleBackColor = true;
@@ -1369,7 +1485,7 @@
             this.chkLogY.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.chkLogY.Location = new System.Drawing.Point(3, 4);
             this.chkLogY.Name = "chkLogY";
-            this.chkLogY.Size = new System.Drawing.Size(63, 20);
+            this.chkLogY.Size = new System.Drawing.Size(62, 20);
             this.chkLogY.TabIndex = 55;
             this.chkLogY.Text = "LogY";
             this.chkLogY.UseVisualStyleBackColor = true;
@@ -2533,6 +2649,872 @@
             this.ModuleQCBtn.UseVisualStyleBackColor = true;
             this.ModuleQCBtn.Click += new System.EventHandler(this.ModuleQCBtn_Click);
             // 
+            // tabPage1
+            // 
+            this.tabPage1.Controls.Add(this.label3);
+            this.tabPage1.Controls.Add(this.outFileName);
+            this.tabPage1.Controls.Add(this.label4);
+            this.tabPage1.Controls.Add(this.qaBias);
+            this.tabPage1.Controls.Add(this.dicounterQAGroup);
+            this.tabPage1.Location = new System.Drawing.Point(4, 29);
+            this.tabPage1.Name = "tabPage1";
+            this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPage1.Size = new System.Drawing.Size(1255, 653);
+            this.tabPage1.TabIndex = 10;
+            this.tabPage1.Text = "tabPage1";
+            this.tabPage1.UseVisualStyleBackColor = true;
+            // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Font = new System.Drawing.Font("Consolas", 15.75F, ((System.Drawing.FontStyle)((System.Drawing.FontStyle.Bold | System.Drawing.FontStyle.Underline))), System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label3.Location = new System.Drawing.Point(306, 9);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(130, 24);
+            this.label3.TabIndex = 141;
+            this.label3.Text = "File name:";
+            // 
+            // outFileName
+            // 
+            this.outFileName.BackColor = System.Drawing.Color.White;
+            this.outFileName.Font = new System.Drawing.Font("Consolas", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.outFileName.Location = new System.Drawing.Point(493, 15);
+            this.outFileName.Name = "outFileName";
+            this.outFileName.Size = new System.Drawing.Size(135, 23);
+            this.outFileName.TabIndex = 140;
+            this.outFileName.Text = "NaturalAgingXXX";
+            this.outFileName.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            // 
+            // label4
+            // 
+            this.label4.AutoSize = true;
+            this.label4.Font = new System.Drawing.Font("Consolas", 15.75F, ((System.Drawing.FontStyle)((System.Drawing.FontStyle.Bold | System.Drawing.FontStyle.Underline))), System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label4.Location = new System.Drawing.Point(72, 9);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(82, 24);
+            this.label4.TabIndex = 139;
+            this.label4.Text = "Bias V";
+            // 
+            // qaBias
+            // 
+            this.qaBias.BackColor = System.Drawing.Color.Red;
+            this.qaBias.Font = new System.Drawing.Font("Consolas", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.qaBias.Location = new System.Drawing.Point(182, 14);
+            this.qaBias.Name = "qaBias";
+            this.qaBias.Size = new System.Drawing.Size(79, 23);
+            this.qaBias.TabIndex = 138;
+            this.qaBias.Text = "57.00";
+            this.qaBias.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            // 
+            // dicounterQAGroup
+            // 
+            this.dicounterQAGroup.Controls.Add(this.stopMeasureBtn);
+            this.dicounterQAGroup.Controls.Add(this.measIntervalLabel);
+            this.dicounterQAGroup.Controls.Add(this.numMeasureLabel);
+            this.dicounterQAGroup.Controls.Add(this.measInterval);
+            this.dicounterQAGroup.Controls.Add(this.numMeasure);
+            this.dicounterQAGroup.Controls.Add(this.sourceRunFlag);
+            this.dicounterQAGroup.Controls.Add(this.but31);
+            this.dicounterQAGroup.Controls.Add(this.but30);
+            this.dicounterQAGroup.Controls.Add(this.but29);
+            this.dicounterQAGroup.Controls.Add(this.but28);
+            this.dicounterQAGroup.Controls.Add(this.but27);
+            this.dicounterQAGroup.Controls.Add(this.but26);
+            this.dicounterQAGroup.Controls.Add(this.but25);
+            this.dicounterQAGroup.Controls.Add(this.but24);
+            this.dicounterQAGroup.Controls.Add(this.but23);
+            this.dicounterQAGroup.Controls.Add(this.but19);
+            this.dicounterQAGroup.Controls.Add(this.but18);
+            this.dicounterQAGroup.Controls.Add(this.but17);
+            this.dicounterQAGroup.Controls.Add(this.but16);
+            this.dicounterQAGroup.Controls.Add(this.but21);
+            this.dicounterQAGroup.Controls.Add(this.but20);
+            this.dicounterQAGroup.Controls.Add(this.but22);
+            this.dicounterQAGroup.Controls.Add(this.numAvg);
+            this.dicounterQAGroup.Controls.Add(this.label22);
+            this.dicounterQAGroup.Controls.Add(this.but15);
+            this.dicounterQAGroup.Controls.Add(this.but14);
+            this.dicounterQAGroup.Controls.Add(this.but13);
+            this.dicounterQAGroup.Controls.Add(this.but12);
+            this.dicounterQAGroup.Controls.Add(this.but11);
+            this.dicounterQAGroup.Controls.Add(this.but10);
+            this.dicounterQAGroup.Controls.Add(this.but9);
+            this.dicounterQAGroup.Controls.Add(this.but8);
+            this.dicounterQAGroup.Controls.Add(this.but7);
+            this.dicounterQAGroup.Controls.Add(this.but3);
+            this.dicounterQAGroup.Controls.Add(this.but2);
+            this.dicounterQAGroup.Controls.Add(this.but1);
+            this.dicounterQAGroup.Controls.Add(this.but0);
+            this.dicounterQAGroup.Controls.Add(this.but5);
+            this.dicounterQAGroup.Controls.Add(this.but4);
+            this.dicounterQAGroup.Controls.Add(this.but6);
+            this.dicounterQAGroup.Controls.Add(this.label21);
+            this.dicounterQAGroup.Controls.Add(this.iWarningThresh);
+            this.dicounterQAGroup.Controls.Add(this.progressBar1);
+            this.dicounterQAGroup.Controls.Add(this.numButton);
+            this.dicounterQAGroup.Controls.Add(this.label2);
+            this.dicounterQAGroup.Controls.Add(this.numTextBox);
+            this.dicounterQAGroup.Location = new System.Drawing.Point(67, 65);
+            this.dicounterQAGroup.Name = "dicounterQAGroup";
+            this.dicounterQAGroup.Size = new System.Drawing.Size(840, 237);
+            this.dicounterQAGroup.TabIndex = 135;
+            this.dicounterQAGroup.TabStop = false;
+            this.dicounterQAGroup.Text = "DiCounter QA";
+            // 
+            // stopMeasureBtn
+            // 
+            this.stopMeasureBtn.BackColor = System.Drawing.Color.Red;
+            this.stopMeasureBtn.Enabled = false;
+            this.stopMeasureBtn.Location = new System.Drawing.Point(34, 123);
+            this.stopMeasureBtn.Name = "stopMeasureBtn";
+            this.stopMeasureBtn.Size = new System.Drawing.Size(75, 26);
+            this.stopMeasureBtn.TabIndex = 146;
+            this.stopMeasureBtn.Text = "Stop";
+            this.stopMeasureBtn.UseVisualStyleBackColor = false;
+            // 
+            // measIntervalLabel
+            // 
+            this.measIntervalLabel.AutoSize = true;
+            this.measIntervalLabel.Location = new System.Drawing.Point(212, 123);
+            this.measIntervalLabel.Name = "measIntervalLabel";
+            this.measIntervalLabel.Size = new System.Drawing.Size(144, 34);
+            this.measIntervalLabel.TabIndex = 145;
+            this.measIntervalLabel.Text = "Measurement Interval\r\n(min)";
+            // 
+            // numMeasureLabel
+            // 
+            this.numMeasureLabel.AutoSize = true;
+            this.numMeasureLabel.Location = new System.Drawing.Point(212, 91);
+            this.numMeasureLabel.Name = "numMeasureLabel";
+            this.numMeasureLabel.Size = new System.Drawing.Size(134, 17);
+            this.numMeasureLabel.TabIndex = 144;
+            this.numMeasureLabel.Text = "Num Measurements";
+            // 
+            // measInterval
+            // 
+            this.measInterval.Location = new System.Drawing.Point(149, 123);
+            this.measInterval.Maximum = new decimal(new int[] {
+            11340,
+            0,
+            0,
+            0});
+            this.measInterval.Name = "measInterval";
+            this.measInterval.Size = new System.Drawing.Size(54, 23);
+            this.measInterval.TabIndex = 143;
+            this.measInterval.Value = new decimal(new int[] {
+            2,
+            0,
+            0,
+            0});
+            // 
+            // numMeasure
+            // 
+            this.numMeasure.Location = new System.Drawing.Point(134, 89);
+            this.numMeasure.Maximum = new decimal(new int[] {
+            10000,
+            0,
+            0,
+            0});
+            this.numMeasure.Minimum = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+            this.numMeasure.Name = "numMeasure";
+            this.numMeasure.Size = new System.Drawing.Size(69, 23);
+            this.numMeasure.TabIndex = 142;
+            this.numMeasure.Value = new decimal(new int[] {
+            100,
+            0,
+            0,
+            0});
+            // 
+            // sourceRunFlag
+            // 
+            this.sourceRunFlag.AutoSize = true;
+            this.sourceRunFlag.Location = new System.Drawing.Point(21, 91);
+            this.sourceRunFlag.Name = "sourceRunFlag";
+            this.sourceRunFlag.Size = new System.Drawing.Size(102, 21);
+            this.sourceRunFlag.TabIndex = 141;
+            this.sourceRunFlag.Text = "Source Run";
+            this.sourceRunFlag.UseVisualStyleBackColor = true;
+            // 
+            // but31
+            // 
+            this.but31.Appearance = System.Windows.Forms.Appearance.Button;
+            this.but31.AutoCheck = false;
+            this.but31.BackColor = System.Drawing.Color.Green;
+            this.but31.Cursor = System.Windows.Forms.Cursors.No;
+            this.but31.Location = new System.Drawing.Point(654, 123);
+            this.but31.Name = "but31";
+            this.but31.Size = new System.Drawing.Size(36, 26);
+            this.but31.TabIndex = 140;
+            this.but31.Text = "31";
+            this.but31.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.but31.UseVisualStyleBackColor = false;
+            // 
+            // but30
+            // 
+            this.but30.Appearance = System.Windows.Forms.Appearance.Button;
+            this.but30.AutoCheck = false;
+            this.but30.BackColor = System.Drawing.Color.Green;
+            this.but30.Cursor = System.Windows.Forms.Cursors.No;
+            this.but30.Location = new System.Drawing.Point(619, 123);
+            this.but30.Name = "but30";
+            this.but30.Size = new System.Drawing.Size(36, 26);
+            this.but30.TabIndex = 139;
+            this.but30.Text = "30";
+            this.but30.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.but30.UseVisualStyleBackColor = false;
+            // 
+            // but29
+            // 
+            this.but29.Appearance = System.Windows.Forms.Appearance.Button;
+            this.but29.AutoCheck = false;
+            this.but29.BackColor = System.Drawing.Color.Green;
+            this.but29.Cursor = System.Windows.Forms.Cursors.No;
+            this.but29.Location = new System.Drawing.Point(584, 123);
+            this.but29.Name = "but29";
+            this.but29.Size = new System.Drawing.Size(36, 26);
+            this.but29.TabIndex = 138;
+            this.but29.Text = "29";
+            this.but29.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.but29.UseVisualStyleBackColor = false;
+            // 
+            // but28
+            // 
+            this.but28.Appearance = System.Windows.Forms.Appearance.Button;
+            this.but28.AutoCheck = false;
+            this.but28.BackColor = System.Drawing.Color.Green;
+            this.but28.Cursor = System.Windows.Forms.Cursors.No;
+            this.but28.Location = new System.Drawing.Point(549, 123);
+            this.but28.Name = "but28";
+            this.but28.Size = new System.Drawing.Size(36, 26);
+            this.but28.TabIndex = 137;
+            this.but28.Text = "28";
+            this.but28.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.but28.UseVisualStyleBackColor = false;
+            // 
+            // but27
+            // 
+            this.but27.Appearance = System.Windows.Forms.Appearance.Button;
+            this.but27.AutoCheck = false;
+            this.but27.BackColor = System.Drawing.Color.Green;
+            this.but27.Cursor = System.Windows.Forms.Cursors.No;
+            this.but27.Location = new System.Drawing.Point(654, 91);
+            this.but27.Name = "but27";
+            this.but27.Size = new System.Drawing.Size(36, 26);
+            this.but27.TabIndex = 136;
+            this.but27.Text = "27";
+            this.but27.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.but27.UseVisualStyleBackColor = false;
+            // 
+            // but26
+            // 
+            this.but26.Appearance = System.Windows.Forms.Appearance.Button;
+            this.but26.AutoCheck = false;
+            this.but26.BackColor = System.Drawing.Color.Green;
+            this.but26.Cursor = System.Windows.Forms.Cursors.No;
+            this.but26.Location = new System.Drawing.Point(619, 91);
+            this.but26.Name = "but26";
+            this.but26.Size = new System.Drawing.Size(36, 26);
+            this.but26.TabIndex = 135;
+            this.but26.Text = "26";
+            this.but26.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.but26.UseVisualStyleBackColor = false;
+            // 
+            // but25
+            // 
+            this.but25.Appearance = System.Windows.Forms.Appearance.Button;
+            this.but25.AutoCheck = false;
+            this.but25.BackColor = System.Drawing.Color.Green;
+            this.but25.Cursor = System.Windows.Forms.Cursors.No;
+            this.but25.Location = new System.Drawing.Point(584, 91);
+            this.but25.Name = "but25";
+            this.but25.Size = new System.Drawing.Size(36, 26);
+            this.but25.TabIndex = 134;
+            this.but25.Text = "25";
+            this.but25.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.but25.UseVisualStyleBackColor = false;
+            // 
+            // but24
+            // 
+            this.but24.Appearance = System.Windows.Forms.Appearance.Button;
+            this.but24.AutoCheck = false;
+            this.but24.BackColor = System.Drawing.Color.Green;
+            this.but24.Cursor = System.Windows.Forms.Cursors.No;
+            this.but24.Location = new System.Drawing.Point(549, 91);
+            this.but24.Name = "but24";
+            this.but24.Size = new System.Drawing.Size(36, 26);
+            this.but24.TabIndex = 133;
+            this.but24.Text = "24";
+            this.but24.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.but24.UseVisualStyleBackColor = false;
+            // 
+            // but23
+            // 
+            this.but23.Appearance = System.Windows.Forms.Appearance.Button;
+            this.but23.AutoCheck = false;
+            this.but23.BackColor = System.Drawing.Color.Green;
+            this.but23.Cursor = System.Windows.Forms.Cursors.No;
+            this.but23.Location = new System.Drawing.Point(654, 59);
+            this.but23.Name = "but23";
+            this.but23.Size = new System.Drawing.Size(36, 26);
+            this.but23.TabIndex = 132;
+            this.but23.Text = "23";
+            this.but23.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.but23.UseVisualStyleBackColor = false;
+            // 
+            // but19
+            // 
+            this.but19.Appearance = System.Windows.Forms.Appearance.Button;
+            this.but19.AutoCheck = false;
+            this.but19.BackColor = System.Drawing.Color.Green;
+            this.but19.Cursor = System.Windows.Forms.Cursors.No;
+            this.but19.Location = new System.Drawing.Point(654, 26);
+            this.but19.Name = "but19";
+            this.but19.Size = new System.Drawing.Size(36, 26);
+            this.but19.TabIndex = 131;
+            this.but19.Text = "19";
+            this.but19.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.but19.UseVisualStyleBackColor = false;
+            // 
+            // but18
+            // 
+            this.but18.Appearance = System.Windows.Forms.Appearance.Button;
+            this.but18.AutoCheck = false;
+            this.but18.BackColor = System.Drawing.Color.Green;
+            this.but18.Cursor = System.Windows.Forms.Cursors.No;
+            this.but18.Location = new System.Drawing.Point(619, 26);
+            this.but18.Name = "but18";
+            this.but18.Size = new System.Drawing.Size(36, 26);
+            this.but18.TabIndex = 130;
+            this.but18.Text = "18";
+            this.but18.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.but18.UseVisualStyleBackColor = false;
+            // 
+            // but17
+            // 
+            this.but17.Appearance = System.Windows.Forms.Appearance.Button;
+            this.but17.AutoCheck = false;
+            this.but17.BackColor = System.Drawing.Color.Green;
+            this.but17.Cursor = System.Windows.Forms.Cursors.No;
+            this.but17.Location = new System.Drawing.Point(584, 26);
+            this.but17.Name = "but17";
+            this.but17.Size = new System.Drawing.Size(36, 26);
+            this.but17.TabIndex = 129;
+            this.but17.Text = "17";
+            this.but17.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.but17.UseVisualStyleBackColor = false;
+            // 
+            // but16
+            // 
+            this.but16.Appearance = System.Windows.Forms.Appearance.Button;
+            this.but16.AutoCheck = false;
+            this.but16.BackColor = System.Drawing.Color.Green;
+            this.but16.Cursor = System.Windows.Forms.Cursors.No;
+            this.but16.Location = new System.Drawing.Point(549, 26);
+            this.but16.Name = "but16";
+            this.but16.Size = new System.Drawing.Size(36, 26);
+            this.but16.TabIndex = 128;
+            this.but16.Text = "16";
+            this.but16.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.but16.UseVisualStyleBackColor = false;
+            // 
+            // but21
+            // 
+            this.but21.Appearance = System.Windows.Forms.Appearance.Button;
+            this.but21.AutoCheck = false;
+            this.but21.BackColor = System.Drawing.Color.Green;
+            this.but21.Cursor = System.Windows.Forms.Cursors.No;
+            this.but21.Location = new System.Drawing.Point(584, 59);
+            this.but21.Name = "but21";
+            this.but21.Size = new System.Drawing.Size(36, 26);
+            this.but21.TabIndex = 127;
+            this.but21.Text = "21";
+            this.but21.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.but21.UseVisualStyleBackColor = false;
+            // 
+            // but20
+            // 
+            this.but20.Appearance = System.Windows.Forms.Appearance.Button;
+            this.but20.AutoCheck = false;
+            this.but20.BackColor = System.Drawing.Color.Green;
+            this.but20.Cursor = System.Windows.Forms.Cursors.No;
+            this.but20.Location = new System.Drawing.Point(549, 59);
+            this.but20.Name = "but20";
+            this.but20.Size = new System.Drawing.Size(36, 26);
+            this.but20.TabIndex = 126;
+            this.but20.Text = "20";
+            this.but20.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.but20.UseVisualStyleBackColor = false;
+            // 
+            // but22
+            // 
+            this.but22.Appearance = System.Windows.Forms.Appearance.Button;
+            this.but22.AutoCheck = false;
+            this.but22.BackColor = System.Drawing.Color.Green;
+            this.but22.Cursor = System.Windows.Forms.Cursors.No;
+            this.but22.Location = new System.Drawing.Point(619, 59);
+            this.but22.Name = "but22";
+            this.but22.Size = new System.Drawing.Size(36, 26);
+            this.but22.TabIndex = 125;
+            this.but22.Text = "22";
+            this.but22.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.but22.UseVisualStyleBackColor = false;
+            // 
+            // numAvg
+            // 
+            this.numAvg.Location = new System.Drawing.Point(238, 53);
+            this.numAvg.Minimum = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+            this.numAvg.Name = "numAvg";
+            this.numAvg.Size = new System.Drawing.Size(57, 23);
+            this.numAvg.TabIndex = 124;
+            this.numAvg.Value = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+            // 
+            // label22
+            // 
+            this.label22.AutoSize = true;
+            this.label22.Location = new System.Drawing.Point(239, 31);
+            this.label22.Name = "label22";
+            this.label22.Size = new System.Drawing.Size(61, 17);
+            this.label22.TabIndex = 123;
+            this.label22.Text = "NumAvg";
+            // 
+            // but15
+            // 
+            this.but15.Appearance = System.Windows.Forms.Appearance.Button;
+            this.but15.AutoCheck = false;
+            this.but15.BackColor = System.Drawing.Color.Green;
+            this.but15.Cursor = System.Windows.Forms.Cursors.No;
+            this.but15.Location = new System.Drawing.Point(493, 123);
+            this.but15.Name = "but15";
+            this.but15.Size = new System.Drawing.Size(36, 26);
+            this.but15.TabIndex = 121;
+            this.but15.Text = "15";
+            this.but15.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.but15.UseVisualStyleBackColor = false;
+            // 
+            // but14
+            // 
+            this.but14.Appearance = System.Windows.Forms.Appearance.Button;
+            this.but14.AutoCheck = false;
+            this.but14.BackColor = System.Drawing.Color.Green;
+            this.but14.Cursor = System.Windows.Forms.Cursors.No;
+            this.but14.Location = new System.Drawing.Point(458, 123);
+            this.but14.Name = "but14";
+            this.but14.Size = new System.Drawing.Size(36, 26);
+            this.but14.TabIndex = 120;
+            this.but14.Text = "14";
+            this.but14.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.but14.UseVisualStyleBackColor = false;
+            // 
+            // but13
+            // 
+            this.but13.Appearance = System.Windows.Forms.Appearance.Button;
+            this.but13.AutoCheck = false;
+            this.but13.BackColor = System.Drawing.Color.Green;
+            this.but13.Cursor = System.Windows.Forms.Cursors.No;
+            this.but13.Location = new System.Drawing.Point(423, 123);
+            this.but13.Name = "but13";
+            this.but13.Size = new System.Drawing.Size(36, 26);
+            this.but13.TabIndex = 119;
+            this.but13.Text = "13";
+            this.but13.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.but13.UseVisualStyleBackColor = false;
+            // 
+            // but12
+            // 
+            this.but12.Appearance = System.Windows.Forms.Appearance.Button;
+            this.but12.AutoCheck = false;
+            this.but12.BackColor = System.Drawing.Color.Green;
+            this.but12.Cursor = System.Windows.Forms.Cursors.No;
+            this.but12.Location = new System.Drawing.Point(388, 123);
+            this.but12.Name = "but12";
+            this.but12.Size = new System.Drawing.Size(36, 26);
+            this.but12.TabIndex = 118;
+            this.but12.Text = "12";
+            this.but12.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.but12.UseVisualStyleBackColor = false;
+            // 
+            // but11
+            // 
+            this.but11.Appearance = System.Windows.Forms.Appearance.Button;
+            this.but11.AutoCheck = false;
+            this.but11.BackColor = System.Drawing.Color.Green;
+            this.but11.Cursor = System.Windows.Forms.Cursors.No;
+            this.but11.Location = new System.Drawing.Point(493, 91);
+            this.but11.Name = "but11";
+            this.but11.Size = new System.Drawing.Size(36, 26);
+            this.but11.TabIndex = 117;
+            this.but11.Text = "11";
+            this.but11.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.but11.UseVisualStyleBackColor = false;
+            // 
+            // but10
+            // 
+            this.but10.Appearance = System.Windows.Forms.Appearance.Button;
+            this.but10.AutoCheck = false;
+            this.but10.BackColor = System.Drawing.Color.Green;
+            this.but10.Cursor = System.Windows.Forms.Cursors.No;
+            this.but10.Location = new System.Drawing.Point(458, 91);
+            this.but10.Name = "but10";
+            this.but10.Size = new System.Drawing.Size(36, 26);
+            this.but10.TabIndex = 116;
+            this.but10.Text = "10";
+            this.but10.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.but10.UseVisualStyleBackColor = false;
+            // 
+            // but9
+            // 
+            this.but9.Appearance = System.Windows.Forms.Appearance.Button;
+            this.but9.AutoCheck = false;
+            this.but9.BackColor = System.Drawing.Color.Green;
+            this.but9.Cursor = System.Windows.Forms.Cursors.No;
+            this.but9.Location = new System.Drawing.Point(423, 91);
+            this.but9.Name = "but9";
+            this.but9.Size = new System.Drawing.Size(36, 26);
+            this.but9.TabIndex = 115;
+            this.but9.Text = "9";
+            this.but9.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.but9.UseVisualStyleBackColor = false;
+            // 
+            // but8
+            // 
+            this.but8.Appearance = System.Windows.Forms.Appearance.Button;
+            this.but8.AutoCheck = false;
+            this.but8.BackColor = System.Drawing.Color.Green;
+            this.but8.Cursor = System.Windows.Forms.Cursors.No;
+            this.but8.Location = new System.Drawing.Point(388, 91);
+            this.but8.Name = "but8";
+            this.but8.Size = new System.Drawing.Size(36, 26);
+            this.but8.TabIndex = 114;
+            this.but8.Text = "8";
+            this.but8.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.but8.UseVisualStyleBackColor = false;
+            // 
+            // but7
+            // 
+            this.but7.Appearance = System.Windows.Forms.Appearance.Button;
+            this.but7.AutoCheck = false;
+            this.but7.BackColor = System.Drawing.Color.Green;
+            this.but7.Cursor = System.Windows.Forms.Cursors.No;
+            this.but7.Location = new System.Drawing.Point(493, 59);
+            this.but7.Name = "but7";
+            this.but7.Size = new System.Drawing.Size(36, 26);
+            this.but7.TabIndex = 113;
+            this.but7.Text = "7";
+            this.but7.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.but7.UseVisualStyleBackColor = false;
+            // 
+            // but3
+            // 
+            this.but3.Appearance = System.Windows.Forms.Appearance.Button;
+            this.but3.AutoCheck = false;
+            this.but3.BackColor = System.Drawing.Color.Green;
+            this.but3.Cursor = System.Windows.Forms.Cursors.No;
+            this.but3.Location = new System.Drawing.Point(493, 26);
+            this.but3.Name = "but3";
+            this.but3.Size = new System.Drawing.Size(36, 26);
+            this.but3.TabIndex = 112;
+            this.but3.Text = "3";
+            this.but3.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.but3.UseVisualStyleBackColor = false;
+            // 
+            // but2
+            // 
+            this.but2.Appearance = System.Windows.Forms.Appearance.Button;
+            this.but2.AutoCheck = false;
+            this.but2.BackColor = System.Drawing.Color.Green;
+            this.but2.Cursor = System.Windows.Forms.Cursors.No;
+            this.but2.Location = new System.Drawing.Point(458, 26);
+            this.but2.Name = "but2";
+            this.but2.Size = new System.Drawing.Size(36, 26);
+            this.but2.TabIndex = 111;
+            this.but2.Text = "2";
+            this.but2.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.but2.UseVisualStyleBackColor = false;
+            // 
+            // but1
+            // 
+            this.but1.Appearance = System.Windows.Forms.Appearance.Button;
+            this.but1.AutoCheck = false;
+            this.but1.BackColor = System.Drawing.Color.Green;
+            this.but1.Cursor = System.Windows.Forms.Cursors.No;
+            this.but1.Location = new System.Drawing.Point(423, 26);
+            this.but1.Name = "but1";
+            this.but1.Size = new System.Drawing.Size(36, 26);
+            this.but1.TabIndex = 110;
+            this.but1.Text = "1";
+            this.but1.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.but1.UseVisualStyleBackColor = false;
+            // 
+            // but0
+            // 
+            this.but0.Appearance = System.Windows.Forms.Appearance.Button;
+            this.but0.AutoCheck = false;
+            this.but0.BackColor = System.Drawing.Color.Green;
+            this.but0.Cursor = System.Windows.Forms.Cursors.No;
+            this.but0.Location = new System.Drawing.Point(388, 26);
+            this.but0.Name = "but0";
+            this.but0.Size = new System.Drawing.Size(36, 26);
+            this.but0.TabIndex = 109;
+            this.but0.Text = "0";
+            this.but0.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.but0.UseVisualStyleBackColor = false;
+            // 
+            // but5
+            // 
+            this.but5.Appearance = System.Windows.Forms.Appearance.Button;
+            this.but5.AutoCheck = false;
+            this.but5.BackColor = System.Drawing.Color.Green;
+            this.but5.Cursor = System.Windows.Forms.Cursors.No;
+            this.but5.Location = new System.Drawing.Point(423, 59);
+            this.but5.Name = "but5";
+            this.but5.Size = new System.Drawing.Size(36, 26);
+            this.but5.TabIndex = 108;
+            this.but5.Text = "5";
+            this.but5.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.but5.UseVisualStyleBackColor = false;
+            // 
+            // but4
+            // 
+            this.but4.Appearance = System.Windows.Forms.Appearance.Button;
+            this.but4.AutoCheck = false;
+            this.but4.BackColor = System.Drawing.Color.Green;
+            this.but4.Cursor = System.Windows.Forms.Cursors.No;
+            this.but4.Location = new System.Drawing.Point(388, 59);
+            this.but4.Name = "but4";
+            this.but4.Size = new System.Drawing.Size(36, 26);
+            this.but4.TabIndex = 107;
+            this.but4.Text = "4";
+            this.but4.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.but4.UseVisualStyleBackColor = false;
+            // 
+            // but6
+            // 
+            this.but6.Appearance = System.Windows.Forms.Appearance.Button;
+            this.but6.AutoCheck = false;
+            this.but6.BackColor = System.Drawing.Color.Green;
+            this.but6.Cursor = System.Windows.Forms.Cursors.No;
+            this.but6.Location = new System.Drawing.Point(458, 59);
+            this.but6.Name = "but6";
+            this.but6.Size = new System.Drawing.Size(36, 26);
+            this.but6.TabIndex = 106;
+            this.but6.Text = "6";
+            this.but6.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.but6.UseVisualStyleBackColor = false;
+            // 
+            // label21
+            // 
+            this.label21.AutoSize = true;
+            this.label21.Location = new System.Drawing.Point(301, 31);
+            this.label21.Name = "label21";
+            this.label21.Size = new System.Drawing.Size(59, 17);
+            this.label21.TabIndex = 105;
+            this.label21.Text = "I_thresh";
+            // 
+            // iWarningThresh
+            // 
+            this.iWarningThresh.Location = new System.Drawing.Point(298, 53);
+            this.iWarningThresh.Name = "iWarningThresh";
+            this.iWarningThresh.Size = new System.Drawing.Size(62, 23);
+            this.iWarningThresh.TabIndex = 104;
+            this.iWarningThresh.Text = "0.1";
+            this.iWarningThresh.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            // 
+            // progressBar1
+            // 
+            this.progressBar1.Location = new System.Drawing.Point(133, 53);
+            this.progressBar1.Maximum = 31;
+            this.progressBar1.Name = "progressBar1";
+            this.progressBar1.Size = new System.Drawing.Size(100, 23);
+            this.progressBar1.Step = 1;
+            this.progressBar1.Style = System.Windows.Forms.ProgressBarStyle.Continuous;
+            this.progressBar1.TabIndex = 103;
+            // 
+            // numButton
+            // 
+            this.numButton.Location = new System.Drawing.Point(134, 31);
+            this.numButton.Name = "numButton";
+            this.numButton.Size = new System.Drawing.Size(99, 23);
+            this.numButton.TabIndex = 100;
+            this.numButton.Text = "Auto Data";
+            this.numButton.UseVisualStyleBackColor = true;
+            this.numButton.Click += new System.EventHandler(this.numButton_Click);
+            // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(13, 32);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(123, 17);
+            this.label2.TabIndex = 99;
+            this.label2.Text = "Dicounter Number";
+            // 
+            // numTextBox
+            // 
+            this.numTextBox.Location = new System.Drawing.Point(16, 53);
+            this.numTextBox.Name = "numTextBox";
+            this.numTextBox.Size = new System.Drawing.Size(112, 23);
+            this.numTextBox.TabIndex = 98;
+            // 
+            // tabPage2
+            // 
+            this.tabPage2.Controls.Add(this.lblProgress);
+            this.tabPage2.Controls.Add(this.btnRemove);
+            this.tabPage2.Controls.Add(this.btnClear);
+            this.tabPage2.Controls.Add(this.progressBarSequencer);
+            this.tabPage2.Controls.Add(this.btnSetup);
+            this.tabPage2.Controls.Add(this.sequencerLog);
+            this.tabPage2.Controls.Add(this.btnSave);
+            this.tabPage2.Controls.Add(this.btnLoad);
+            this.tabPage2.Controls.Add(this.btnStop);
+            this.tabPage2.Controls.Add(this.btnExecute);
+            this.tabPage2.Controls.Add(this.btnAddStep);
+            this.tabPage2.Controls.Add(this.pnlSequencer);
+            this.tabPage2.Location = new System.Drawing.Point(4, 29);
+            this.tabPage2.Name = "tabPage2";
+            this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPage2.Size = new System.Drawing.Size(1255, 653);
+            this.tabPage2.TabIndex = 11;
+            this.tabPage2.Text = "Sequencer";
+            this.tabPage2.UseVisualStyleBackColor = true;
+            // 
+            // lblProgress
+            // 
+            this.lblProgress.Location = new System.Drawing.Point(4, 455);
+            this.lblProgress.Margin = new System.Windows.Forms.Padding(0);
+            this.lblProgress.Name = "lblProgress";
+            this.lblProgress.Size = new System.Drawing.Size(85, 18);
+            this.lblProgress.TabIndex = 52;
+            this.lblProgress.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // btnRemove
+            // 
+            this.btnRemove.Enabled = false;
+            this.btnRemove.Location = new System.Drawing.Point(406, 3);
+            this.btnRemove.Name = "btnRemove";
+            this.btnRemove.Size = new System.Drawing.Size(125, 34);
+            this.btnRemove.TabIndex = 51;
+            this.btnRemove.Text = "REMOVE";
+            this.btnRemove.UseVisualStyleBackColor = true;
+            this.btnRemove.Click += new System.EventHandler(this.btnRemove_Click);
+            // 
+            // btnClear
+            // 
+            this.btnClear.Enabled = false;
+            this.btnClear.Location = new System.Drawing.Point(537, 3);
+            this.btnClear.Name = "btnClear";
+            this.btnClear.Size = new System.Drawing.Size(125, 34);
+            this.btnClear.TabIndex = 50;
+            this.btnClear.Text = "CLEAR";
+            this.btnClear.UseVisualStyleBackColor = true;
+            this.btnClear.Click += new System.EventHandler(this.btnClear_Click);
+            // 
+            // progressBarSequencer
+            // 
+            this.progressBarSequencer.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(192)))), ((int)(((byte)(0)))));
+            this.progressBarSequencer.Location = new System.Drawing.Point(92, 455);
+            this.progressBarSequencer.Name = "progressBarSequencer";
+            this.progressBarSequencer.Size = new System.Drawing.Size(1159, 18);
+            this.progressBarSequencer.Style = System.Windows.Forms.ProgressBarStyle.Continuous;
+            this.progressBarSequencer.TabIndex = 49;
+            // 
+            // btnSetup
+            // 
+            this.btnSetup.Location = new System.Drawing.Point(3, 3);
+            this.btnSetup.Name = "btnSetup";
+            this.btnSetup.Size = new System.Drawing.Size(200, 34);
+            this.btnSetup.TabIndex = 48;
+            this.btnSetup.Text = "SET UP";
+            this.btnSetup.UseVisualStyleBackColor = true;
+            this.btnSetup.Click += new System.EventHandler(this.btnSetup_Click);
+            // 
+            // sequencerLog
+            // 
+            this.sequencerLog.Dock = System.Windows.Forms.DockStyle.Bottom;
+            this.sequencerLog.Location = new System.Drawing.Point(3, 479);
+            this.sequencerLog.MaxLength = 10240;
+            this.sequencerLog.Name = "sequencerLog";
+            this.sequencerLog.ReadOnly = true;
+            this.sequencerLog.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.ForcedBoth;
+            this.sequencerLog.Size = new System.Drawing.Size(1249, 171);
+            this.sequencerLog.TabIndex = 47;
+            this.sequencerLog.Text = "";
+            this.sequencerLog.WordWrap = false;
+            this.sequencerLog.TextChanged += new System.EventHandler(this.sequencerLog_TextChanged);
+            // 
+            // btnSave
+            // 
+            this.btnSave.Enabled = false;
+            this.btnSave.Location = new System.Drawing.Point(996, 3);
+            this.btnSave.Name = "btnSave";
+            this.btnSave.Size = new System.Drawing.Size(125, 34);
+            this.btnSave.TabIndex = 5;
+            this.btnSave.Text = "SAVE";
+            this.btnSave.UseVisualStyleBackColor = true;
+            this.btnSave.Click += new System.EventHandler(this.btnSave_Click);
+            // 
+            // btnLoad
+            // 
+            this.btnLoad.Location = new System.Drawing.Point(1127, 3);
+            this.btnLoad.Name = "btnLoad";
+            this.btnLoad.Size = new System.Drawing.Size(125, 34);
+            this.btnLoad.TabIndex = 4;
+            this.btnLoad.Text = "LOAD";
+            this.btnLoad.UseVisualStyleBackColor = true;
+            this.btnLoad.Click += new System.EventHandler(this.btnLoad_Click);
+            // 
+            // btnStop
+            // 
+            this.btnStop.Enabled = false;
+            this.btnStop.Location = new System.Drawing.Point(799, 3);
+            this.btnStop.Name = "btnStop";
+            this.btnStop.Size = new System.Drawing.Size(125, 34);
+            this.btnStop.TabIndex = 3;
+            this.btnStop.Text = "STOP";
+            this.btnStop.UseVisualStyleBackColor = true;
+            this.btnStop.Click += new System.EventHandler(this.btnStop_Click);
+            // 
+            // btnExecute
+            // 
+            this.btnExecute.Enabled = false;
+            this.btnExecute.Location = new System.Drawing.Point(668, 3);
+            this.btnExecute.Name = "btnExecute";
+            this.btnExecute.Size = new System.Drawing.Size(125, 34);
+            this.btnExecute.TabIndex = 2;
+            this.btnExecute.Text = "EXECUTE";
+            this.btnExecute.UseVisualStyleBackColor = true;
+            this.btnExecute.Click += new System.EventHandler(this.btnExecute_Click);
+            // 
+            // btnAddStep
+            // 
+            this.btnAddStep.Enabled = false;
+            this.btnAddStep.Location = new System.Drawing.Point(275, 3);
+            this.btnAddStep.Name = "btnAddStep";
+            this.btnAddStep.Size = new System.Drawing.Size(125, 34);
+            this.btnAddStep.TabIndex = 1;
+            this.btnAddStep.Text = "ADD";
+            this.btnAddStep.UseVisualStyleBackColor = true;
+            this.btnAddStep.Click += new System.EventHandler(this.btnAddStep_Click);
+            // 
+            // pnlSequencer
+            // 
+            this.pnlSequencer.AutoScroll = true;
+            this.pnlSequencer.Location = new System.Drawing.Point(3, 39);
+            this.pnlSequencer.Name = "pnlSequencer";
+            this.pnlSequencer.Size = new System.Drawing.Size(1249, 410);
+            this.pnlSequencer.TabIndex = 0;
+            // 
             // FEBSelectPanel
             // 
             this.FEBSelectPanel.ColumnCount = 8;
@@ -2590,6 +3572,11 @@
             this.FEBClientFooterBar.Size = new System.Drawing.Size(1260, 2);
             this.FEBClientFooterBar.TabIndex = 47;
             // 
+            // SequencerTimer
+            // 
+            this.SequencerTimer.Interval = 1000;
+            this.SequencerTimer.Tick += new System.EventHandler(this.SequencerTimer_Tick);
+            //
             // cmbTest_ShortHelperBtn
             // 
             this.cmbTest_ShortHelperBtn.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
@@ -2625,6 +3612,7 @@
             ((System.ComponentModel.ISupportInitialize)(this.ud_VertMin)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.ud_VertMax)).EndInit();
             this.groupBox1.ResumeLayout(false);
+            this.groupBox1.PerformLayout();
             this.SpillStatusGroupBox.ResumeLayout(false);
             this.SpillStatusGroupBox.PerformLayout();
             this.SpillStatusTable.ResumeLayout(false);
@@ -2670,6 +3658,14 @@
             ((System.ComponentModel.ISupportInitialize)(this.ModuleQC_Offset)).EndInit();
             this.ModuleQAFEB2Box.ResumeLayout(false);
             this.ModuleQAFEB1Box.ResumeLayout(false);
+            this.tabPage1.ResumeLayout(false);
+            this.tabPage1.PerformLayout();
+            this.dicounterQAGroup.ResumeLayout(false);
+            this.dicounterQAGroup.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.measInterval)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numMeasure)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numAvg)).EndInit();
+            this.tabPage2.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
@@ -2879,6 +3875,75 @@
         private System.Windows.Forms.ComboBox LightCheckType;
         private System.Windows.Forms.Label LightCheckTypeLbl;
         private System.Windows.Forms.ComboBox LightCheckModuleHalf;
+        private System.Windows.Forms.TabPage tabPage1;
+        private System.Windows.Forms.GroupBox dicounterQAGroup;
+        private System.Windows.Forms.Button stopMeasureBtn;
+        private System.Windows.Forms.Label measIntervalLabel;
+        private System.Windows.Forms.Label numMeasureLabel;
+        private System.Windows.Forms.NumericUpDown measInterval;
+        private System.Windows.Forms.NumericUpDown numMeasure;
+        private System.Windows.Forms.CheckBox sourceRunFlag;
+        private System.Windows.Forms.RadioButton but31;
+        private System.Windows.Forms.RadioButton but30;
+        private System.Windows.Forms.RadioButton but29;
+        private System.Windows.Forms.RadioButton but28;
+        private System.Windows.Forms.RadioButton but27;
+        private System.Windows.Forms.RadioButton but26;
+        private System.Windows.Forms.RadioButton but25;
+        private System.Windows.Forms.RadioButton but24;
+        private System.Windows.Forms.RadioButton but23;
+        private System.Windows.Forms.RadioButton but19;
+        private System.Windows.Forms.RadioButton but18;
+        private System.Windows.Forms.RadioButton but17;
+        private System.Windows.Forms.RadioButton but16;
+        private System.Windows.Forms.RadioButton but21;
+        private System.Windows.Forms.RadioButton but20;
+        private System.Windows.Forms.RadioButton but22;
+        private System.Windows.Forms.NumericUpDown numAvg;
+        private System.Windows.Forms.Label label22;
+        private System.Windows.Forms.RadioButton but15;
+        private System.Windows.Forms.RadioButton but14;
+        private System.Windows.Forms.RadioButton but13;
+        private System.Windows.Forms.RadioButton but12;
+        private System.Windows.Forms.RadioButton but11;
+        private System.Windows.Forms.RadioButton but10;
+        private System.Windows.Forms.RadioButton but9;
+        private System.Windows.Forms.RadioButton but8;
+        private System.Windows.Forms.RadioButton but7;
+        private System.Windows.Forms.RadioButton but3;
+        private System.Windows.Forms.RadioButton but2;
+        private System.Windows.Forms.RadioButton but1;
+        private System.Windows.Forms.RadioButton but0;
+        private System.Windows.Forms.RadioButton but5;
+        private System.Windows.Forms.RadioButton but4;
+        private System.Windows.Forms.RadioButton but6;
+        private System.Windows.Forms.Label label21;
+        private System.Windows.Forms.TextBox iWarningThresh;
+        private System.Windows.Forms.ProgressBar progressBar1;
+        public System.Windows.Forms.Button numButton;
+        private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.TextBox numTextBox;
+        private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.TextBox outFileName;
+        private System.Windows.Forms.Label label4;
+        private System.Windows.Forms.TextBox qaBias;
+        private System.Windows.Forms.CheckBox DynamicVbiasChkBox;
+        private System.Windows.Forms.Button btnRefSettingFiles;
+        private System.Windows.Forms.CheckBox LogDynamicBiasChkBox;
+        private System.Windows.Forms.TabPage tabPage2;
+        private System.Windows.Forms.Button btnSave;
+        private System.Windows.Forms.Button btnLoad;
+        private System.Windows.Forms.Button btnStop;
+        private System.Windows.Forms.Button btnExecute;
+        private System.Windows.Forms.Button btnAddStep;
+        private System.Windows.Forms.Panel pnlSequencer;
+        private System.Windows.Forms.Button btnSetup;
+        private System.Windows.Forms.Button btnClear;
+        private System.Windows.Forms.Button btnRemove;
+        public System.Windows.Forms.RichTextBox sequencerLog;
+        public System.Windows.Forms.Timer SequencerTimer;
+        public System.Windows.Forms.ProgressBar progressBarSequencer;
+        public System.Windows.Forms.Label lblProgress;
         private System.Windows.Forms.ProgressBar cmbTesterProgresBar;
         private System.Windows.Forms.Button cmbTest_ShortHelperBtn;
     }

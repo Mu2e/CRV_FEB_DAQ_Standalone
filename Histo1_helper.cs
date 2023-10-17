@@ -20,6 +20,7 @@ namespace TB_mu2e
         public int num_point;
         public bool saved;
         public int board;
+        public int fpga;
         public int chan;
         public double min_v;
         public double max_v;
@@ -65,6 +66,7 @@ namespace TB_mu2e
             string dirName = "c://data//";
 
             hName += "IV_FEB" + this.board.ToString();
+            hName += "_FPGA" + this.fpga.ToString();
             hName += "_ch" + this.chan.ToString();
             hName += "_" + this.created_time.Year.ToString("0000");
             hName += this.created_time.Month.ToString("00");
@@ -90,6 +92,7 @@ namespace TB_mu2e
                 //sw.Write(this.min_count); sw.WriteLine(this.min_count);
                 //sw.Write("-- integral "); sw.WriteLine(this.integral);
                 sw.Write("-- board "); sw.WriteLine(this.board);
+                sw.Write("-- fpga "); sw.WriteLine(this.fpga);
                 sw.Write("-- chan "); sw.WriteLine(this.chan);
                 sw.WriteLine("--------------");
                 foreach (PointPair p in this.list)
