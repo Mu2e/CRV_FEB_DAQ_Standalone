@@ -2626,9 +2626,7 @@ namespace TB_mu2e
                     }
                     else
                     {
-
-
-
+                        //qcStartButton.Enabled = false;  //prevents multiple clicks of the buttons
                         qcStartButton.Text = "STOP";
                         qcStartButton.BackColor = Color.Red;
                         qcStartButton.Update();
@@ -2645,7 +2643,7 @@ namespace TB_mu2e
 
                         if (PP.qcDicounterMeasurements == null)
                             //PP.qcDicounterMeasurements = new CurrentMeasurements(activeFEB, Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) + "\\Google Drive\\CRV Fabrication Documents\\Data\\QA\\Dicounter Source Testing\\ScanningData_" + qaOutputFileName.Text + ".txt");
-                            PP.qcDicounterMeasurements = new CurrentMeasurements(activeFEB, "C:/data\\ScanningData_" + qaOutputFileName.Text + ".txt");
+                            PP.qcDicounterMeasurements = new CurrentMeasurements(activeFEB, "C:/data\\ScanningData_" + qcOutputFileName.Text + ".txt");
                         else
                         {
                             PP.qcDicounterMeasurements.Purge();
@@ -4285,7 +4283,7 @@ namespace TB_mu2e
 
         private void StepperCheckForMessages()
         {
-            if (comPort != null && (moduleQAHomingTimer.Enabled || ModuleQCStepTimer.Enabled))
+            if (comPort != null && ModuleQCStepTimer.Enabled)
             {
                 try
                 {
