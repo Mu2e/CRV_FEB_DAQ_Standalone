@@ -52,7 +52,17 @@ namespace TB_mu2e
                                 buff = new byte[feb_socket.Available];
                                 feb_socket.Receive(buff);
                             }
-//                            socket.Send(stab); //ask it about the current settings for the first two FPGAs
+
+                            //turning on cmbena only when needed
+                            feb_socket.Send(PP.GetBytes("cmbena 1\r\n"));
+                            Thread.Sleep(250);
+                            if (feb_socket.Available > 0) //discard return message
+                            {
+                                buff = new byte[feb_socket.Available];
+                                feb_socket.Receive(buff);
+                            }
+
+                            // socket.Send(stab); //ask it about the current settings for the first two FPGAs
                             byte[] stab = Encoding.ASCII.GetBytes("stab\r\n");
                             feb_socket.Send(stab); //ask it about the current settings for the first two FPGAs
                             System.Threading.Thread.Sleep(10);
@@ -60,6 +70,16 @@ namespace TB_mu2e
                             feb_socket.Receive(buff);
                             bw.Write("stab\r\n");
                             bw.Write(Encoding.ASCII.GetString(buff));
+
+                            //added by Yongyi 10/23/23
+                            //cmbena (1-wire temperature sensor) needs to be turned off to prevent capcitive crosstalks
+                            feb_socket.Send(PP.GetBytes("cmbena 0\r\n"));
+                            if (feb_socket.Available > 0) //discard return message
+                            {
+                                buff = new byte[feb_socket.Available];
+                                feb_socket.Receive(buff);
+                            }
+
                         }                            
 
                         bw.Write("--** SOURCE = " + source + "\r\n");
