@@ -7,6 +7,7 @@ using System.IO;
 using System.IO.Ports;
 using System.Linq;
 using System.Net.Sockets;
+using System.Net.WebSockets;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
@@ -1581,6 +1582,7 @@ namespace TB_mu2e
                                 // turning back on cmbena
                                 feb.SendStr("cmbena 1");
                                 feb.ReadStr(out string trash2, out int rtn_trash_time2);
+                                Thread.Sleep(250);
 
                                 // read FEB temperature
                                 // using "ADC 1" to get 17 values. The last one is the FEB temperature in degC
@@ -1730,7 +1732,7 @@ namespace TB_mu2e
                                 }
                             }
                             // sleep until cmb readings can be readout properly
-                            System.Threading.Thread.Sleep(1000);
+                            // System.Threading.Thread.Sleep(1000);
                             /*
                             for (int iFEB = 0; iFEB < PP.Num_FEB_clients; iFEB++)
                             {
@@ -1740,6 +1742,15 @@ namespace TB_mu2e
                                 PP.myRun.UpdateStatus($"FEB {iFEB}\r\n{adcrtn}\r\n");
                             }
                             */
+
+                            // turning off cmbena to prevent crosstalk
+                            for (int iFEB = 0; iFEB < PP.Num_FEB_clients; iFEB++)
+                            {
+                                Mu2e_FEB_client feb = PP.FEB_clients[iFEB];
+                                feb.SendStr("cmbena 0");
+                                feb.ReadStr(out string trash1, out int rtn_trash_time1);
+                            }
+
                             PP.myRun.UpdateStatus("Dynamic Vbias adjustment done.");
                             wait_for_bias_adjustment = false;
                         }
@@ -2142,6 +2153,9 @@ namespace TB_mu2e
                                 buff = new byte[socket.Available];
                                 socket.Receive(buff);
                                 stabStream.WriteLine(Encoding.ASCII.GetString(buff));
+
+                                socket.Send(PP.GetBytes("cmbena 0\r\n"));
+                                
                             }
                         }
                     }
