@@ -3808,7 +3808,7 @@ namespace TB_mu2e
                 //Autoscroll to the end of the text box
                 runLog.SelectionStart = runLog.TextLength;
                 runLog.SelectionLength = 0;
-                runLog.ScrollToCaret();
+                //runLog.ScrollToCaret();//sometimes causing errors and interrupt run
             }
             catch { }
         }
