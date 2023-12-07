@@ -284,6 +284,7 @@ namespace TB_mu2e
 
         private void btnSelectFile_Click(object sender, EventArgs e)
         {
+            string buffer = "";
             Thread loadCmdsFileDialogThread = new Thread((ThreadStart)(() =>
             {
                 OpenFileDialog loadCmdsDialog = new OpenFileDialog
@@ -299,10 +300,15 @@ namespace TB_mu2e
                     return;
                 else
                 {
-                    txtLoadFile.Text = loadCmdsDialog.FileName;
+                    buffer = loadCmdsDialog.FileName;
                     InvalidateBlock();
                 }
             }));
+            loadCmdsFileDialogThread.SetApartmentState(ApartmentState.STA);
+            loadCmdsFileDialogThread.Start();
+            loadCmdsFileDialogThread.Join();
+
+            txtLoadFile.Text = buffer;
         }
 
         private void SequencerBlock_MouseDown(object sender, MouseEventArgs e)
