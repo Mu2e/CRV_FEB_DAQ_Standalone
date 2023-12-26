@@ -240,6 +240,7 @@
             this.comboBoxAction.FormattingEnabled = true;
             this.comboBoxAction.Items.AddRange(new object[] {
             "Idle",
+            "Execute Console Command",
             "Set Pipeline Delay",
             "Load",
             "Set All Bias By Bulk",

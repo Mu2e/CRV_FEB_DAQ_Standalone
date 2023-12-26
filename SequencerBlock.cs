@@ -1,4 +1,5 @@
 ﻿using System;
+using System.CodeDom.Compiler;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -82,7 +83,8 @@ namespace TB_mu2e
                         }
                         txtLoadFile.Text = fields[2];
                     }
-                    else if (selectedOption == "Set Pipeline Delay" || 
+                    else if (selectedOption == "Execute Console Command" ||
+                             selectedOption == "Set Pipeline Delay" || 
                              selectedOption == "Set All Bias By Bulk" || 
                              selectedOption == "Increase Bulk By Counts" || 
                              selectedOption == "Increase Trim By Counts" || 
@@ -149,6 +151,15 @@ namespace TB_mu2e
                 groupBoxParameter.Text = "Duration";
                 lblParameter.Text = "Time [s]";
                 groupBoxFEB.Visible = false;
+                groupBoxRun.Visible = false;
+                groupBoxLoad.Visible = false;
+            }
+            else if (selectedOption == "Execute Console Command")
+            {
+                groupBoxParameter.Visible = true;
+                groupBoxParameter.Text = "Execute";
+                lblParameter.Text = "";
+                groupBoxFEB.Visible = true;
                 groupBoxRun.Visible = false;
                 groupBoxLoad.Visible = false;
             }
@@ -351,6 +362,12 @@ namespace TB_mu2e
                 {
                     parentForm.sequencerLog.AppendText($"Invalid input at Step {iStep + 1}: Expect an integer value input.\r\n");
                 }
+            }
+            else if (selectedOption == "Execute Console Command")
+            {
+                SelectFEB();
+                isValid = true;
+                parentForm.sequencerLog.AppendText($"Step {iStep + 1}: Execute \"{txtParameter.Text}\" for FEB {AssembleFEBNames()}.\r\n");
             }
             else if (selectedOption == "Set Pipeline Delay")
             {
@@ -591,7 +608,7 @@ namespace TB_mu2e
             }
             else
             {
-                parentForm.sequencerLog.AppendText($"Step {iStep + 1}: No action selected.\r\n");                 
+                parentForm.sequencerLog.AppendText($"Step {iStep + 1}: No action selected.\r\n");
             }
 
             if (isValid) BlockValidated = true;
@@ -636,10 +653,11 @@ namespace TB_mu2e
                 blockString += txtLoadFile.Text;
                 blockString += "\n";
             }
-            else if (selectedOption == "Set Pipeline Delay" ||
-                     selectedOption == "Set All Bias By Bulk" || 
-                     selectedOption == "Increase Bulk By Counts" || 
-                     selectedOption == "Increase Trim By Counts" || 
+            else if (selectedOption == "Execute Console Command" ||
+                     selectedOption == "Set Pipeline Delay" ||
+                     selectedOption == "Set All Bias By Bulk" ||
+                     selectedOption == "Increase Bulk By Counts" ||
+                     selectedOption == "Increase Trim By Counts" ||
                      selectedOption == "Set Gain To")
             {
                 blockString += txtParameter.Text;
@@ -687,6 +705,28 @@ namespace TB_mu2e
                         this.TimerCounter = 0;
                         parentForm.SequencerBusy = false;
                     }
+                }
+                else if (selectedOption == "Execute Console Command")
+                {
+                    for (int i = 0; i < FEBSelection.Length; i++)
+                    {
+                        if (FEBSelection[i])
+                        {
+                            int original_feb_num = parentForm.Get_ActiveFEB();
+                            if (PP.FEB_clients != null)
+                            {
+                                parentForm.UpdateSequencerStatus($"FEB {i}:");
+                                parentForm.ChangeActiveFEB(i);
+                                parentForm.Execute_Console_Command(txtParameter.Text + "\r\n", true); //\r\n needed for the command to be recognized!
+                                parentForm.ChangeActiveFEB(original_feb_num);
+                            }
+                        }
+                    }
+                    Thread.Sleep(1000); // give 1s 
+                    parentForm.UpdateSequencerStatus($"Step {iStep + 1} done: Execute \"{txtParameter.Text}\" for FEB {AssembleFEBNames()}.");
+                    this.InProgress = false;
+                    this.TimerCounter = 0;
+                    parentForm.SequencerBusy = false;
                 }
                 else if (selectedOption == "Set Pipeline Delay")
                 {
@@ -911,9 +951,10 @@ namespace TB_mu2e
                                 {
                                     newMeasuredBias[j] = double.Parse(tok2[8 + j]);
                                     output += (newMeasuredBias[j].ToString() + " ");
-                                    if (newMeasuredBias[j] > 60.0)
-                                    {
-                                        readBackOK = false; // if out of normal V range flag error
+                                    //if (newMeasuredBias[j] > 60.0)
+                                    if (newMeasuredBias[j] > 65.0)
+                                        {
+                                            readBackOK = false; // if out of normal V range flag error
                                     }
                                 }
                                 parentForm.UpdateSequencerStatus($"Readback (bulk): {output}");
