@@ -24,6 +24,13 @@ namespace TB_mu2e
         private int _ActiveFEB = 0;
         private Mu2e_FEB_client activeFEB;
         private uConsole console;
+        
+        public int Get_ActiveFEB() { return _ActiveFEB; }
+        public void ChangeActiveFEB(int i)
+        {
+            _ActiveFEB = i;
+            activeFEB = PP.FEB_clients[i];
+        }
 
         private static int num_reg = 15;
         private TextBox[] txtREGISTERS = new TextBox[num_reg];
@@ -278,6 +285,15 @@ namespace TB_mu2e
 
         private void ConsoleBox_TextChanged(object sender, EventArgs e)
         {
+            string input = ConsoleBox.Text;
+            bool toSequencer = false;
+            Execute_Console_Command(input, toSequencer);
+            if (input.Contains("\n"))
+                ConsoleBox.Text = "";
+        }
+
+        public void Execute_Console_Command(string input, bool toSequencer)
+        { 
             if (activeFEB != null)
             {
                 if (activeFEB.ClientOpen)
@@ -287,21 +303,22 @@ namespace TB_mu2e
                     bool multi_write = false;
                     string sent_string = "";
 
-                    if (ConsoleBox.Text.Contains("\n"))
+                    if (input.Contains("\n"))
                     {
                         try
                         {
-                            if (ConsoleBox.Text.Contains("$")) //this is a comment
+                            if (input.Contains("$")) //this is a comment
                             {
-                                AddConsoleMessage(ConsoleBox.Text);
-                                ConsoleBox.Text = "";
+                                if (toSequencer)
+                                    UpdateSequencerStatus(input);
+                                else
+                                    AddConsoleMessage(input);
                             }
                             else
                             {
-                                byte[] buf = PP.GetBytes(ConsoleBox.Text);
-                                sent_string = ConsoleBox.Text;
-                                if (ConsoleBox.Text.ToLower().Contains("wr")) { this_is_a_write = true; if (ConsoleBox.Text.ToLower().Contains("wrm")) { multi_write = true; } }
-                                ConsoleBox.Text = "";
+                                byte[] buf = PP.GetBytes(input);
+                                sent_string = input;
+                                if (input.ToLower().Contains("wr")) { this_is_a_write = true; if (input.ToLower().Contains("wrm")) { multi_write = true; } }
                                 while (activeFEB.TNETSocket.Available > 0)
                                 {
                                     byte[] rbuf = new byte[activeFEB.TNETSocket.Available];
@@ -320,7 +337,10 @@ namespace TB_mu2e
                                     int ret_len = activeFEB.TNETSocket.Receive(rec_buf, rec_buf.Length, System.Net.Sockets.SocketFlags.None);
                                     string t = string.Join("", PP.GetString(rec_buf, ret_len).Split('>'));
                                     t = sent_string + t;
-                                    AddConsoleMessage(t);
+                                    if (toSequencer)
+                                        UpdateSequencerStatus(t);
+                                    else
+                                        AddConsoleMessage(t);
                                 }
                                 else if (this_is_a_write)
                                 {
@@ -345,12 +365,17 @@ namespace TB_mu2e
                                             int ret_len = activeFEB.TNETSocket.Receive(rec_buf);
                                             string t = string.Join("", PP.GetString(rec_buf, ret_len).Split('>'));
                                             t = sent_string + t;
-                                            AddConsoleMessage(t);
-
+                                            if (toSequencer)
+                                                UpdateSequencerStatus(t);
+                                            else
+                                                AddConsoleMessage(t);
                                         }
                                         else
                                         {
-                                            AddConsoleMessage("Writing to multiple registers must be of the form: wri [start_reg] [value] [num_writes] \r\n Your command was: " + sent_string);
+                                            if (toSequencer)
+                                                UpdateSequencerStatus("Writing to multiple registers must be of the form: wri [start_reg] [value] [num_writes] \r\n Your command was: " + sent_string);
+                                            else
+                                                AddConsoleMessage("Writing to multiple registers must be of the form: wri [start_reg] [value] [num_writes] \r\n Your command was: " + sent_string);
                                         }
 
                                     }
@@ -368,14 +393,20 @@ namespace TB_mu2e
                                         int ret_len = activeFEB.TNETSocket.Receive(rec_buf);
                                         string t = string.Join("", PP.GetString(rec_buf, ret_len).Split('>'));
                                         t = sent_string + t;
-                                        AddConsoleMessage(t);
+                                        if (toSequencer)
+                                            UpdateSequencerStatus(t);
+                                        else
+                                            AddConsoleMessage(t);
                                     }
                                 }
                             }
                         }
                         catch (Exception dispExcep)
                         {
-                            AddConsoleMessage(dispExcep.ToString());
+                            if (toSequencer)
+                                UpdateSequencerStatus(dispExcep.ToString());
+                            else
+                                AddConsoleMessage(dispExcep.ToString());
                         }
                     }
                 }
